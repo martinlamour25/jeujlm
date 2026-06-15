@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#2A0E3A" />
-  <meta name="description" content="Président·e du Peuple — le jeu de décision pour appliquer L'Avenir en commun et soutenir la campagne 2027 de Jean-Luc Mélenchon." />
+  <meta name="description" content="Président·e du Peuple — jeu de décision narratif pour appliquer L'Avenir en commun et soutenir la campagne 2027 de Jean-Luc Mélenchon." />
   <title>Président·e du Peuple — L'Avenir en commun 2027</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
@@ -21,14 +21,27 @@
     <div class="grain"></div>
   </div>
 
+  <!-- Bouton son flottant -->
+  <button class="audio-btn" id="audioBtn" aria-label="Son">🔊</button>
+
+  <!-- ============ GÉNÉRIQUE / INTRO ANIMÉE ============ -->
+  <div class="intro" id="intro">
+    <div class="intro-crowd" id="introCrowd"></div>
+    <div class="intro-logo" id="introLogo"></div>
+    <h1 class="intro-title" id="introTitle"></h1>
+    <p class="intro-tag" id="introTag">L'Avenir en commun</p>
+    <div class="intro-year" id="introYear">2027</div>
+    <button class="intro-skip" id="introSkip">Passer ›</button>
+  </div>
+
   <main id="app">
     <!-- ============ ACCUEIL ============ -->
     <section class="screen screen--home is-active" id="screen-home" aria-label="Accueil">
       <div class="home-top">
         <div class="logo-phi" id="logoPhi"></div>
-        <p class="kicker">Jeu de décision · campagne 2027</p>
+        <p class="kicker">Jeu de décision narratif · 2027</p>
         <h1 class="home-title">Président·e<br /><span>du Peuple</span></h1>
-        <p class="home-sub">Tu viens d'être élu·e. Tranche les dilemmes, applique <em>L'Avenir en commun</em> et tiens ton mandat jusqu'en 2032 sans qu'aucun pilier ne s'effondre.</p>
+        <p class="home-sub">Élu·e en 2027, tranche les dilemmes du pouvoir, affronte les crises et applique <em>L'Avenir en commun</em> sans qu'aucun pilier ne s'effondre.</p>
       </div>
       <div class="home-actions">
         <button class="btn btn--primary btn--big" id="btnPlay"><span>Prendre le pouvoir</span></button>
@@ -37,10 +50,37 @@
           <button class="btn btn--ghost" id="btnAbout">À propos</button>
         </div>
         <div class="home-best" id="homeBest" hidden>
-          <span class="dot"></span> Record : <strong id="homeBestScore">0</strong> mesures adoptées
+          <span class="dot"></span> Record : <strong id="homeBestScore">0</strong> mesures · survie <strong id="homeBestSurv">0</strong> mois
         </div>
       </div>
-      <p class="home-foot">Jeu non officiel · contenu issu du programme <em>L'Avenir en commun</em></p>
+      <p class="home-foot">Jeu non officiel · contenu issu de <em>L'Avenir en commun</em> · crises inspirées de l'actualité 2025-2026</p>
+    </section>
+
+    <!-- ============ CHOIX DU MODE ============ -->
+    <section class="screen screen--modes" id="screen-modes" aria-label="Choix du mode" hidden>
+      <header class="topbar">
+        <button class="icon-btn" id="modesBack" aria-label="Retour">‹</button>
+        <div class="topbar-title">Choisis ton aventure</div>
+        <div style="width:40px"></div>
+      </header>
+      <div class="mode-list">
+        <button class="mode-card" id="modeStory">
+          <div class="mode-ico">📖</div>
+          <div class="mode-txt">
+            <h3>Mode Histoire</h3>
+            <p>Le quinquennat 2027 → 2032 en quatre actes. Arcs narratifs, personnages récurrents, crises scénarisées. Mène la France jusqu'à la 6ᵉ République.</p>
+            <span class="mode-tag">Campagne · fin multiple</span>
+          </div>
+        </button>
+        <button class="mode-card" id="modeInfinite">
+          <div class="mode-ico">♾️</div>
+          <div class="mode-txt">
+            <h3>Mode Survie</h3>
+            <p>Gouverne le plus longtemps possible. Les crises s'enchaînent, la pression monte mois après mois. Score = mois tenus + mesures adoptées.</p>
+            <span class="mode-tag">Infini · difficulté croissante</span>
+          </div>
+        </button>
+      </div>
     </section>
 
     <!-- ============ JEU ============ -->
@@ -48,21 +88,21 @@
       <header class="topbar">
         <button class="icon-btn" id="playQuit" aria-label="Quitter">×</button>
         <div class="mandate">
-          <div class="mandate-row"><span id="mandateLabel">Mandat 2027</span><span id="mandateYear">2027</span></div>
+          <div class="mandate-row"><span id="mandateLabel">Mandat</span><span id="mandateYear">2027</span></div>
           <div class="mandate-track"><div class="mandate-fill" id="mandateFill"></div></div>
         </div>
         <div class="score-pill"><span>✓</span><strong id="playScore">0</strong></div>
       </header>
 
-      <!-- Jauges -->
-      <div class="gauges" id="gauges"><!-- injectées --></div>
+      <div class="gauges" id="gauges"></div>
 
-      <!-- Table de cartes -->
       <div class="deck" id="deck">
         <div class="swipe-hint swipe-hint--l" id="hintL"></div>
         <div class="swipe-hint swipe-hint--r" id="hintR"></div>
         <div class="card" id="card">
-          <div class="card-avatar" id="cardAvatar"></div>
+          <div class="card-scene" id="cardScene" aria-hidden="true"></div>
+          <div class="card-ribbon" id="cardRibbon" hidden>⚡ ACTUALITÉ</div>
+          <div class="card-portrait" id="cardAvatar"></div>
           <div class="card-who" id="cardWho">—</div>
           <div class="card-bubble" id="cardText">…</div>
           <div class="card-stamp card-stamp--l" id="stampL">NON</div>
@@ -70,14 +110,12 @@
         </div>
       </div>
 
-      <!-- Boutons de choix (alternative au swipe) -->
       <div class="choices">
         <button class="choice choice--l" id="choiceL"><span class="ch-arrow">‹</span><span id="choiceLlabel">Refuser</span></button>
         <button class="choice choice--r" id="choiceR"><span id="choiceRlabel">Accepter</span><span class="ch-arrow">›</span></button>
       </div>
       <p class="swipe-tip">Glisse la carte ◀ ▶ ou utilise les boutons</p>
 
-      <!-- Conséquence (tiroir) -->
       <div class="feedback" id="feedback" aria-live="polite">
         <div class="feedback-deltas" id="feedbackDeltas"></div>
         <p class="feedback-why" id="feedbackResult"></p>
@@ -89,7 +127,7 @@
       </div>
     </section>
 
-    <!-- ============ FIN (victoire / défaite) ============ -->
+    <!-- ============ FIN ============ -->
     <section class="screen screen--end" id="screen-end" aria-label="Fin du mandat" hidden>
       <canvas id="confetti" aria-hidden="true"></canvas>
       <div class="end-body">
@@ -99,7 +137,7 @@
         <p class="end-sub" id="endSub"></p>
         <div class="end-stats">
           <div class="stat"><strong id="endMeasures">0</strong><span>mesures adoptées</span></div>
-          <div class="stat"><strong id="endYears">0</strong><span>années tenues</span></div>
+          <div class="stat"><strong id="endYears">0</strong><span id="endYearsLbl">années tenues</span></div>
           <div class="stat"><strong id="endGrade">—</strong><span>bilan</span></div>
         </div>
         <div class="end-measures" id="endMeasureList"></div>
@@ -111,6 +149,17 @@
     </section>
   </main>
 
+  <!-- ============ OVERLAY D'ACTE ============ -->
+  <div class="act-overlay" id="actOverlay" hidden>
+    <div class="act-scene" id="actScene" aria-hidden="true"></div>
+    <div class="act-inner">
+      <p class="act-kicker" id="actKicker">ACTE I</p>
+      <h2 class="act-title" id="actTitle">—</h2>
+      <div class="act-line"></div>
+      <p class="act-hint">Touche pour continuer</p>
+    </div>
+  </div>
+
   <div class="modal" id="modal" hidden>
     <div class="modal-card" role="dialog" aria-modal="true">
       <button class="modal-close" id="modalClose" aria-label="Fermer">×</button>
@@ -121,6 +170,8 @@
 
   <div class="toast" id="toast" hidden></div>
 
+  <script src="js/audio.js"></script>
+  <script src="js/art.js"></script>
   <script src="js/data.js"></script>
   <script src="js/game.js"></script>
 </body>
