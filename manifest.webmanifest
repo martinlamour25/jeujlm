@@ -1,0 +1,15 @@
+{
+  "name": "Place au Peuple 2027",
+  "short_name": "Place au Peuple",
+  "description": "Jeu citoyen pour découvrir le programme L'Avenir en commun et soutenir la campagne 2027.",
+  "lang": "fr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#25082f",
+  "theme_color": "#2A0E3A",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
