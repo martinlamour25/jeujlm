@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#2A0E3A" />
-  <meta name="description" content="Place au Peuple 2027 — le jeu citoyen pour découvrir le programme L'Avenir en commun et soutenir la campagne de Jean-Luc Mélenchon." />
-  <title>Place au Peuple 2027 — L'Avenir en commun</title>
+  <meta name="description" content="Président·e du Peuple — le jeu de décision pour appliquer L'Avenir en commun et soutenir la campagne 2027 de Jean-Luc Mélenchon." />
+  <title>Président·e du Peuple — L'Avenir en commun 2027</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon.svg" />
@@ -15,7 +15,6 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Décor : fond animé + lueurs -->
   <div class="backdrop" aria-hidden="true">
     <div class="glow glow-1"></div>
     <div class="glow glow-2"></div>
@@ -23,145 +22,95 @@
   </div>
 
   <main id="app">
-    <!-- ============ ÉCRAN : ACCUEIL ============ -->
+    <!-- ============ ACCUEIL ============ -->
     <section class="screen screen--home is-active" id="screen-home" aria-label="Accueil">
       <div class="home-top">
         <div class="logo-phi" id="logoPhi"></div>
-        <p class="kicker">Jeu citoyen · campagne 2027</p>
-        <h1 class="home-title">Place au<br /><span>Peuple</span></h1>
-        <p class="home-sub">Mène la campagne citoyenne, découvre <em>L'Avenir en commun</em> et conduis le peuple jusqu'à la victoire de 2027.</p>
+        <p class="kicker">Jeu de décision · campagne 2027</p>
+        <h1 class="home-title">Président·e<br /><span>du Peuple</span></h1>
+        <p class="home-sub">Tu viens d'être élu·e. Tranche les dilemmes, applique <em>L'Avenir en commun</em> et tiens ton mandat jusqu'en 2032 sans qu'aucun pilier ne s'effondre.</p>
       </div>
-
       <div class="home-actions">
-        <button class="btn btn--primary btn--big" id="btnPlay">
-          <span>Lancer la campagne</span>
-        </button>
+        <button class="btn btn--primary btn--big" id="btnPlay"><span>Prendre le pouvoir</span></button>
         <div class="home-row">
           <button class="btn btn--ghost" id="btnHow">Comment jouer</button>
           <button class="btn btn--ghost" id="btnAbout">À propos</button>
         </div>
         <div class="home-best" id="homeBest" hidden>
-          <span class="dot"></span> Meilleur score : <strong id="homeBestScore">0</strong> voix
+          <span class="dot"></span> Record : <strong id="homeBestScore">0</strong> mesures adoptées
         </div>
       </div>
-
       <p class="home-foot">Jeu non officiel · contenu issu du programme <em>L'Avenir en commun</em></p>
     </section>
 
-    <!-- ============ ÉCRAN : CARTE DE CAMPAGNE ============ -->
-    <section class="screen screen--map" id="screen-map" aria-label="Carte de campagne" hidden>
+    <!-- ============ JEU ============ -->
+    <section class="screen screen--play" id="screen-play" aria-label="Jeu" hidden>
       <header class="topbar">
-        <button class="icon-btn" id="mapHome" aria-label="Accueil">‹</button>
-        <div class="topbar-title">Carte de campagne</div>
-        <div class="score-pill"><span class="phi-mini"></span><strong id="mapScore">0</strong></div>
-      </header>
-
-      <div class="gauge">
-        <div class="gauge-head">
-          <span>Soutien populaire</span>
-          <strong id="gaugePct">12 %</strong>
+        <button class="icon-btn" id="playQuit" aria-label="Quitter">×</button>
+        <div class="mandate">
+          <div class="mandate-row"><span id="mandateLabel">Mandat 2027</span><span id="mandateYear">2027</span></div>
+          <div class="mandate-track"><div class="mandate-fill" id="mandateFill"></div></div>
         </div>
-        <div class="gauge-track">
-          <div class="gauge-fill" id="gaugeFill" style="width:12%"></div>
-          <div class="gauge-goal" style="left:50%"><span>50 %</span></div>
+        <div class="score-pill"><span>✓</span><strong id="playScore">0</strong></div>
+      </header>
+
+      <!-- Jauges -->
+      <div class="gauges" id="gauges"><!-- injectées --></div>
+
+      <!-- Table de cartes -->
+      <div class="deck" id="deck">
+        <div class="swipe-hint swipe-hint--l" id="hintL"></div>
+        <div class="swipe-hint swipe-hint--r" id="hintR"></div>
+        <div class="card" id="card">
+          <div class="card-avatar" id="cardAvatar"></div>
+          <div class="card-who" id="cardWho">—</div>
+          <div class="card-bubble" id="cardText">…</div>
+          <div class="card-stamp card-stamp--l" id="stampL">NON</div>
+          <div class="card-stamp card-stamp--r" id="stampR">OUI</div>
         </div>
-        <p class="gauge-hint" id="gaugeHint">Atteins 50 % pour gagner l'élection.</p>
       </div>
 
-      <div class="map-scroll">
-        <div class="path" id="path"><!-- étapes injectées par JS --></div>
+      <!-- Boutons de choix (alternative au swipe) -->
+      <div class="choices">
+        <button class="choice choice--l" id="choiceL"><span class="ch-arrow">‹</span><span id="choiceLlabel">Refuser</span></button>
+        <button class="choice choice--r" id="choiceR"><span id="choiceRlabel">Accepter</span><span class="ch-arrow">›</span></button>
       </div>
-    </section>
+      <p class="swipe-tip">Glisse la carte ◀ ▶ ou utilise les boutons</p>
 
-    <!-- ============ ÉCRAN : INTRO DE THÈME ============ -->
-    <section class="screen screen--intro" id="screen-intro" aria-label="Introduction du thème" hidden>
-      <header class="topbar">
-        <button class="icon-btn" id="introBack" aria-label="Retour">‹</button>
-        <div class="topbar-title" id="introTop">Étape</div>
-        <div style="width:40px"></div>
-      </header>
-      <div class="intro-body">
-        <div class="intro-badge" id="introBadge"></div>
-        <p class="intro-num" id="introNum">Étape 1 / 7</p>
-        <h2 class="intro-title" id="introTitle">Titre</h2>
-        <p class="intro-subtitle" id="introSubtitle">Sous-titre</p>
-        <div class="intro-card" id="introText"></div>
-        <blockquote class="intro-quote" id="introQuote"></blockquote>
-      </div>
-      <div class="screen-actions">
-        <button class="btn btn--primary btn--big" id="introStart">Sur le terrain&nbsp;!</button>
-      </div>
-    </section>
-
-    <!-- ============ ÉCRAN : QUESTION ============ -->
-    <section class="screen screen--quiz" id="screen-quiz" aria-label="Question" hidden>
-      <header class="topbar">
-        <button class="icon-btn" id="quizQuit" aria-label="Quitter">×</button>
-        <div class="quiz-progress" id="quizProgress"><!-- pips --></div>
-        <div class="combo" id="combo" hidden>🔥<span id="comboN">2</span></div>
-      </header>
-
-      <div class="quiz-meta">
-        <span class="chip" id="quizChip">Thème</span>
-        <div class="timer"><div class="timer-bar" id="timerBar"></div></div>
-      </div>
-
-      <div class="quiz-body">
-        <h2 class="question" id="questionText">Question</h2>
-        <div class="options" id="options"><!-- options injectées --></div>
-      </div>
-
-      <!-- Tiroir de feedback -->
+      <!-- Conséquence (tiroir) -->
       <div class="feedback" id="feedback" aria-live="polite">
-        <div class="feedback-head" id="feedbackHead">Bravo&nbsp;!</div>
-        <p class="feedback-why" id="feedbackWhy"></p>
+        <div class="feedback-deltas" id="feedbackDeltas"></div>
+        <p class="feedback-why" id="feedbackResult"></p>
+        <div class="feedback-note" id="feedbackNote"></div>
         <div class="feedback-foot">
-          <span class="feedback-tag">📖 L'Avenir en commun</span>
+          <span class="feedback-tag" id="feedbackTag">📖 L'Avenir en commun</span>
           <button class="btn btn--primary" id="feedbackNext">Continuer</button>
         </div>
       </div>
     </section>
 
-    <!-- ============ ÉCRAN : RÉSULTAT D'ÉTAPE ============ -->
-    <section class="screen screen--result" id="screen-result" aria-label="Résultat" hidden>
-      <div class="result-body">
-        <div class="stars" id="stars"><span>★</span><span>★</span><span>★</span></div>
-        <div class="result-badge" id="resultBadge"></div>
-        <h2 class="result-title" id="resultTitle">Étape réussie&nbsp;!</h2>
-        <p class="result-sub" id="resultSub"></p>
-        <div class="result-stats">
-          <div class="stat"><strong id="resGood">0/5</strong><span>bonnes réponses</span></div>
-          <div class="stat"><strong id="resVoix">+0</strong><span>voix gagnées</span></div>
-          <div class="stat"><strong id="resPct">+0 %</strong><span>de soutien</span></div>
-        </div>
-        <blockquote class="result-quote" id="resultQuote"></blockquote>
-      </div>
-      <div class="screen-actions">
-        <button class="btn btn--primary btn--big" id="resultNext">Continuer la campagne</button>
-      </div>
-    </section>
-
-    <!-- ============ ÉCRAN : VICTOIRE / FIN ============ -->
-    <section class="screen screen--win" id="screen-win" aria-label="Fin de campagne" hidden>
+    <!-- ============ FIN (victoire / défaite) ============ -->
+    <section class="screen screen--end" id="screen-end" aria-label="Fin du mandat" hidden>
       <canvas id="confetti" aria-hidden="true"></canvas>
-      <div class="win-body">
-        <div class="win-emblem" id="winEmblem"></div>
-        <p class="kicker" id="winKicker">Élection 2027</p>
-        <h2 class="win-title" id="winTitle">Victoire !</h2>
-        <p class="win-sub" id="winSub"></p>
-        <div class="win-score">
-          <strong id="winScore">0</strong><span>voix rassemblées</span>
+      <div class="end-body">
+        <div class="end-emblem" id="endEmblem"></div>
+        <p class="kicker" id="endKicker">Fin de mandat</p>
+        <h2 class="end-title" id="endTitle">—</h2>
+        <p class="end-sub" id="endSub"></p>
+        <div class="end-stats">
+          <div class="stat"><strong id="endMeasures">0</strong><span>mesures adoptées</span></div>
+          <div class="stat"><strong id="endYears">0</strong><span>années tenues</span></div>
+          <div class="stat"><strong id="endGrade">—</strong><span>bilan</span></div>
         </div>
-        <div class="badges" id="winBadges"></div>
+        <div class="end-measures" id="endMeasureList"></div>
       </div>
-      <div class="screen-actions win-actions">
-        <button class="btn btn--primary btn--big" id="winShare">Partager le résultat</button>
-        <button class="btn btn--ghost" id="winReplay">Rejouer</button>
+      <div class="screen-actions end-actions">
+        <button class="btn btn--primary btn--big" id="endReplay">Rejouer</button>
+        <button class="btn btn--ghost" id="endShare">Partager mon bilan</button>
       </div>
     </section>
   </main>
 
-  <!-- ============ MODALE (aide / à propos) ============ -->
   <div class="modal" id="modal" hidden>
     <div class="modal-card" role="dialog" aria-modal="true">
       <button class="modal-close" id="modalClose" aria-label="Fermer">×</button>
@@ -170,7 +119,6 @@
     </div>
   </div>
 
-  <!-- Annonce sonore visuelle (toast) -->
   <div class="toast" id="toast" hidden></div>
 
   <script src="js/data.js"></script>

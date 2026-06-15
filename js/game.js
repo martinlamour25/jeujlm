@@ -1,448 +1,361 @@
 /* =========================================================
-   Place au Peuple 2027 — moteur de jeu (vanilla JS)
+   Président·e du Peuple — moteur de jeu (vanilla JS)
+   Jeu de décision « swipe » basé sur L'Avenir en commun.
    ========================================================= */
 (function () {
   "use strict";
 
-  /* ---------- Bibliothèque d'icônes SVG ---------- */
-  // Toutes dessinées en "currentColor" pour s'adapter à la couleur du thème.
+  /* ---------- Icônes SVG (dessinées en currentColor) ---------- */
   const ICONS = {
     phi:
-      '<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
       '<defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1">' +
       '<stop offset="0" stop-color="#ff2b46"/><stop offset="1" stop-color="#ffd166"/></linearGradient></defs>' +
-      '<circle cx="50" cy="50" r="30" stroke="url(#pg)" stroke-width="9"/>' +
+      '<circle cx="50" cy="50" r="30" fill="none" stroke="url(#pg)" stroke-width="9"/>' +
       '<rect x="45" y="10" width="10" height="80" rx="5" fill="url(#pg)"/></svg>',
-    republique:
-      '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
-      '<path d="M6 40h36"/><path d="M9 40V22M19 40V22M29 40V22M39 40V22"/><path d="M6 22 24 8l18 14z"/><path d="M22 30h4"/></svg>',
-    richesses:
-      '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
-      '<path d="M24 6v36"/><path d="M8 14h26a6 6 0 0 1 0 12H14a6 6 0 0 0 0 12h26"/></svg>',
-    ecologie:
-      '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
-      '<path d="M24 42c0-14 6-26 18-30C40 24 36 38 24 42z"/><path d="M24 42C12 38 8 24 6 12c12 4 18 16 18 30z"/><path d="M24 42V20"/></svg>',
-    europe:
-      '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
-      '<circle cx="24" cy="24" r="18"/><path d="M24 6v36M6 24h36"/><path d="M12 12c8 6 16 6 24 0M12 36c8-6 16-6 24 0"/></svg>',
-    paix:
-      '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
-      '<path d="M40 10c-14 0-26 8-26 22 0 0 8-2 12-8"/><path d="M14 32l-6 8M14 32c10 0 14-8 14-8"/><path d="M40 10c-6 4-10 10-12 14"/></svg>',
-    progres:
-      '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
-      '<path d="M24 42c10 0 16-7 16-18S34 6 24 6 8 13 8 24s6 18 16 18z"/><path d="M24 16v16M16 24h16"/></svg>',
-    frontieres:
-      '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
-      '<path d="M24 4c8 4 12 12 12 22l-12 12L12 26C12 16 16 8 24 4z"/><circle cx="24" cy="20" r="4"/><path d="M16 38c-2 4-2 6-2 6s2 0 6-2M32 38c2 4 2 6 2 6s-2 0-6-2"/></svg>',
+    // Jauges
+    fist:
+      '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 11V6.5a1.5 1.5 0 0 1 3 0V10h1V5a1.5 1.5 0 0 1 3 0v5h1V6.5a1.5 1.5 0 0 1 3 0V13a6 6 0 0 1-6 6h-1a6 6 0 0 1-6-6v-1.5a1.5 1.5 0 0 1 3 0V11z"/><rect x="6" y="2" width="12" height="2.4" rx="1.2"/></svg>',
+    social:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M5 8h11a3 3 0 0 1 0 6H8a3 3 0 0 0 0 6h11"/></svg>',
+    leaf:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c0-7 3-13 9-15-1 9-4 13-9 15z"/><path d="M12 21C6 19 3 14 3 6c6 1 9 6 9 15z"/></svg>',
+    globe:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M5 7c4 3 10 3 14 0M5 17c4-3 10-3 14 0"/></svg>',
     trophy:
-      '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
-      '<path d="M14 8h20v10a10 10 0 0 1-20 0z"/><path d="M14 12H8v4a6 6 0 0 0 6 6M34 12h6v4a6 6 0 0 1-6 6"/><path d="M24 28v6M18 40h12M20 34h8l2 6H18z"/></svg>'
+      '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8h20v10a10 10 0 0 1-20 0z"/><path d="M14 12H8v4a6 6 0 0 0 6 6M34 12h6v4a6 6 0 0 1-6 6"/><path d="M24 28v6M18 40h12M20 34h8l2 6H18z"/></svg>',
+    // Avatars (tête + symbole)
+    suit:
+      '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="22" r="11"/><path d="M14 54c2-11 9-16 18-16s16 5 18 16"/><path d="M32 38l-5 16M32 38l5 16"/><path d="M28 33l4 5 4-5"/></svg>',
+    worker:
+      '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="26" r="10"/><path d="M16 18a16 16 0 0 1 32 0z"/><path d="M14 54c2-10 9-15 18-15s16 5 18 15"/></svg>',
+    youth:
+      '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="26" r="10"/><path d="M20 22c0-7 5-10 12-10s12 3 12 10l4 2"/><path d="M14 54c2-10 9-15 18-15s16 5 18 15"/></svg>',
+    scientist:
+      '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="24" r="11"/><circle cx="27" cy="23" r="3"/><circle cx="37" cy="23" r="3"/><path d="M30 23h4"/><path d="M14 54c2-11 9-16 18-16s16 5 18 16"/></svg>',
+    general:
+      '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="28" r="10"/><path d="M16 22h32l-4-6H20z"/><path d="M32 14v-2"/><path d="M14 56c2-10 9-15 18-15s16 5 18 15"/></svg>',
+    eu:
+      '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="20"/><g fill="currentColor" stroke="none"><circle cx="32" cy="14" r="2"/><circle cx="46" cy="20" r="2"/><circle cx="50" cy="34" r="2"/><circle cx="44" cy="46" r="2"/><circle cx="32" cy="50" r="2"/><circle cx="20" cy="46" r="2"/><circle cx="14" cy="34" r="2"/><circle cx="18" cy="20" r="2"/></g></svg>',
+    citizen:
+      '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="24" r="11"/><path d="M14 54c2-11 9-16 18-16s16 5 18 16"/></svg>'
   };
 
   /* ---------- Helpers ---------- */
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
-  const haptic = (ms) => { if (navigator.vibrate) try { navigator.vibrate(ms); } catch (e) {} };
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const haptic = (p) => { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) {} };
 
-  /* ---------- État ---------- */
-  const BASE_PCT = 12;       // socle de départ (clin d'œil aux ~20% de 2017)
-  const STORE_KEY = "ppp2027.save.v1";
-  const BEST_KEY = "ppp2027.best.v1";
+  /* ---------- Constantes ---------- */
+  const KEYS = ["p", "s", "e", "v"];
+  const START = 55;            // valeur de départ de chaque pilier
+  const TURNS_TO_WIN = 18;     // cartes à tenir = mandat 2027 → 2032
+  const BEST_KEY = "ppp2027.president.best";
 
-  let state = {
-    score: 0,
-    progress: {},   // { themeId: { done:true, stars:n, good:n } }
-  };
+  /* ---------- État de partie ---------- */
+  let g = {};                  // valeurs des piliers
+  let turn = 0;                // numéro de carte
+  let measures = [];           // mesures adoptées (libellés)
+  let deck = [];               // pioche mélangée
+  let current = null;          // carte affichée
+  let busy = false;            // verrou pendant l'animation
 
-  function load() {
-    try {
-      const raw = localStorage.getItem(STORE_KEY);
-      if (raw) state = Object.assign(state, JSON.parse(raw));
-    } catch (e) {}
-  }
-  function save() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
-  }
-  function bestScore() {
-    return parseInt(localStorage.getItem(BEST_KEY) || "0", 10) || 0;
-  }
-  function setBest(v) {
-    if (v > bestScore()) localStorage.setItem(BEST_KEY, String(v));
-  }
-
-  // Index de la première étape non terminée.
-  function currentIndex() {
-    for (let i = 0; i < THEMES.length; i++) {
-      if (!state.progress[THEMES[i].id] || !state.progress[THEMES[i].id].done) return i;
-    }
-    return THEMES.length; // tout terminé
-  }
-  function completedCount() {
-    return THEMES.filter((t) => state.progress[t.id] && state.progress[t.id].done).length;
-  }
-  // Pourcentage de soutien : socle + part proportionnelle aux étoiles gagnées.
-  function supportPct() {
-    let stars = 0;
-    THEMES.forEach((t) => { if (state.progress[t.id]) stars += state.progress[t.id].stars || 0; });
-    const maxStars = THEMES.length * 3;
-    const gain = Math.round(((50 - BASE_PCT) + 8) * (stars / maxStars)); // jusqu'à ~58% si parfait
-    return Math.min(58, BASE_PCT + gain);
-  }
+  function bestScore() { return parseInt(localStorage.getItem(BEST_KEY) || "0", 10) || 0; }
+  function setBest(v) { if (v > bestScore()) localStorage.setItem(BEST_KEY, String(v)); }
 
   /* ---------- Navigation entre écrans ---------- */
-  let activeScreen = "home";
   function show(id) {
     $$(".screen").forEach((s) => {
       const on = s.id === "screen-" + id;
-      if (on) {
-        s.hidden = false;
-        requestAnimationFrame(() => s.classList.add("is-active"));
-      } else {
+      if (on) { s.hidden = false; requestAnimationFrame(() => s.classList.add("is-active")); }
+      else {
         s.classList.remove("is-active");
         setTimeout(() => { if (!s.classList.contains("is-active")) s.hidden = true; }, 380);
       }
     });
-    activeScreen = id;
   }
 
   function toast(msg) {
     const t = $("#toast");
-    t.textContent = msg; t.hidden = false;
+    t.innerHTML = msg; t.hidden = false;
     requestAnimationFrame(() => t.classList.add("show"));
     clearTimeout(toast._t);
-    toast._t = setTimeout(() => {
-      t.classList.remove("show");
-      setTimeout(() => (t.hidden = true), 300);
-    }, 1900);
+    toast._t = setTimeout(() => { t.classList.remove("show"); setTimeout(() => (t.hidden = true), 300); }, 2200);
   }
 
   /* ---------- Accueil ---------- */
   function initHome() {
     $("#logoPhi").innerHTML = ICONS.phi;
     const b = bestScore();
-    if (b > 0) {
-      $("#homeBest").hidden = false;
-      $("#homeBestScore").textContent = b.toLocaleString("fr-FR");
-    }
+    if (b > 0) { $("#homeBest").hidden = false; $("#homeBestScore").textContent = b; }
   }
 
-  /* ---------- Carte de campagne ---------- */
-  function renderMap() {
-    $("#mapScore").textContent = state.score.toLocaleString("fr-FR");
-    const pct = supportPct();
-    $("#gaugePct").textContent = pct + " %";
-    $("#gaugeFill").style.width = pct + "%";
-    const cur = currentIndex();
-    $("#gaugeHint").textContent =
-      cur >= THEMES.length
-        ? "Campagne terminée — rejoue une étape pour grimper encore !"
-        : "Atteins 50 % pour gagner l'élection de 2027.";
+  /* ---------- Jauges ---------- */
+  function buildGauges() {
+    const wrap = $("#gauges");
+    wrap.innerHTML = "";
+    KEYS.forEach((k) => {
+      const def = GAUGES[k];
+      const el = document.createElement("div");
+      el.className = "gauge2";
+      el.dataset.g = k;
+      el.style.setProperty("--gc", def.color);
+      el.innerHTML =
+        '<div class="g-delta" id="delta-' + k + '"></div>' +
+        '<div class="g-ring" id="ring-' + k + '"><span class="g-ico">' + ICONS[def.icon] + "</span></div>" +
+        '<div class="g-name">' + def.name + "</div>";
+      wrap.appendChild(el);
+    });
+    paintGauges();
+  }
 
-    const path = $("#path");
-    path.innerHTML = "";
-    THEMES.forEach((t, i) => {
-      const prog = state.progress[t.id];
-      let stateName = "locked";
-      if (prog && prog.done) stateName = "done";
-      else if (i === cur) stateName = "current";
+  function paintGauges() {
+    KEYS.forEach((k) => {
+      const ring = $("#ring-" + k);
+      const v = clamp(g[k], 0, 100);
+      ring.style.setProperty("--p", v);
+      const item = ring.parentElement;
+      item.classList.toggle("danger", v <= 20);
+    });
+  }
 
-      const node = document.createElement("div");
-      node.className = "node " + (i % 2 === 0 ? "node--left" : "node--right");
-      node.dataset.state = stateName;
-      node.style.color = t.color;
+  function flashDelta(k, d) {
+    if (!d) return;
+    const el = $("#delta-" + k);
+    el.textContent = (d > 0 ? "+" : "") + d;
+    el.className = "g-delta show " + (d > 0 ? "up" : "down");
+    setTimeout(() => (el.className = "g-delta"), 1100);
+  }
 
-      const stars = prog ? prog.stars : 0;
-      const starHtml =
-        stateName === "done"
-          ? Array.from({ length: 3 }, (_, k) => (k < stars ? "★" : '<span class="off">★</span>')).join("")
-          : "";
+  /* ---------- Démarrage de partie ---------- */
+  function newGame() {
+    g = { p: START, s: START, e: START, v: START };
+    turn = 0;
+    measures = [];
+    deck = shuffle(CARDS.slice());
+    busy = false;
+    buildGauges();
+    $("#playScore").textContent = "0";
+    updateMandate();
+    show("play");
+    setTimeout(nextCard, 380);
+  }
 
-      node.innerHTML =
-        (i > 0 ? '<span class="node-link"></span>' : "") +
-        '<div class="node-dot">' + ICONS[t.icon] + "</div>" +
-        '<div class="node-info">' +
-        '<span class="node-step">Étape ' + t.num + "</span>" +
-        '<span class="node-name">' + t.title + "</span>" +
-        '<span class="node-stars">' + starHtml + "</span>" +
-        "</div>";
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = (Math.random() * (i + 1)) | 0;
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
 
-      if (stateName !== "locked") {
-        node.addEventListener("click", () => { haptic(8); openIntro(i); });
-      } else {
-        node.addEventListener("click", () => toast("Termine d'abord l'étape précédente 🔒"));
+  function updateMandate() {
+    const pct = Math.min(100, (turn / TURNS_TO_WIN) * 100);
+    $("#mandateFill").style.width = pct + "%";
+    const year = 2027 + Math.floor((turn / TURNS_TO_WIN) * 5);
+    $("#mandateLabel").textContent = "Mandat présidentiel";
+    $("#mandateYear").textContent = Math.min(2032, year);
+  }
+
+  /* ---------- Affichage d'une carte ---------- */
+  function nextCard() {
+    if (turn >= TURNS_TO_WIN) { return endGame(true, null); }
+    if (deck.length === 0) deck = shuffle(CARDS.slice());
+    current = deck.pop();
+    const theme = GAUGES[current.theme];
+
+    const card = $("#card");
+    card.style.transition = "none";
+    card.style.transform = "translate(-50%, 0) rotate(0deg)";
+    card.style.opacity = "0";
+    card.classList.toggle("is-crisis", !!current.crisis);
+    card.style.setProperty("--accent", theme.color);
+
+    const av = $("#cardAvatar");
+    av.innerHTML = ICONS[current.avatar] || ICONS.citizen;
+    av.style.color = theme.color;
+    av.style.background = "radial-gradient(circle at 30% 30%, " + theme.color + "33, rgba(255,255,255,.05))";
+
+    $("#cardWho").textContent = current.who.replace(/<[^>]+>/g, "");
+    $("#cardWho").innerHTML = current.who;
+    $("#cardText").innerHTML = current.text;
+    $("#choiceLlabel").textContent = current.left.label;
+    $("#choiceRlabel").textContent = current.right.label;
+    $("#stampL").textContent = current.left.label;
+    $("#stampR").textContent = current.right.label;
+    setHints(0);
+
+    requestAnimationFrame(() => {
+      card.style.transition = "transform .45s cubic-bezier(.2,1,.3,1), opacity .35s ease";
+      card.style.transform = "translate(-50%, 0) rotate(0deg)";
+      card.style.opacity = "1";
+      busy = false;
+    });
+    updateMandate();
+  }
+
+  function setHints(dx) {
+    const r = clamp(dx / 120, -1, 1);
+    $("#stampR").style.opacity = r > 0 ? r : 0;
+    $("#stampL").style.opacity = r < 0 ? -r : 0;
+    $("#hintR").style.opacity = r > 0 ? r * 0.9 : 0;
+    $("#hintL").style.opacity = r < 0 ? -r * 0.9 : 0;
+    $("#choiceR").classList.toggle("hot", r > 0.25);
+    $("#choiceL").classList.toggle("hot", r < -0.25);
+  }
+
+  /* ---------- Glisser-déposer (swipe) ---------- */
+  let drag = null;
+  function bindSwipe() {
+    const card = $("#card");
+    const start = (x, y) => { if (busy) return; drag = { x, y, dx: 0 }; card.style.transition = "none"; };
+    const move = (x, y) => {
+      if (!drag) return;
+      drag.dx = x - drag.x;
+      const rot = drag.dx / 18;
+      card.style.transform = "translate(-50%, " + (Math.abs(drag.dx) * 0.04) + "px) translateX(" + drag.dx + "px) rotate(" + rot + "deg)";
+      setHints(drag.dx);
+    };
+    const end = () => {
+      if (!drag) return;
+      const dx = drag.dx;
+      drag = null;
+      if (Math.abs(dx) > 95) commit(dx > 0 ? "right" : "left");
+      else {
+        card.style.transition = "transform .3s cubic-bezier(.3,1.4,.4,1)";
+        card.style.transform = "translate(-50%, 0) rotate(0deg)";
+        setHints(0);
       }
-      path.appendChild(node);
-    });
-
-    // Si tout est terminé, proposer l'écran de victoire.
-    if (cur >= THEMES.length) {
-      setTimeout(() => openWin(false), 400);
-    }
-  }
-
-  /* ---------- Intro de thème ---------- */
-  let activeTheme = null;
-  function openIntro(index) {
-    activeTheme = THEMES[index];
-    const t = activeTheme;
-    $("#introTop").textContent = "Étape " + t.num;
-    $("#introBadge").innerHTML = ICONS[t.icon];
-    $("#introBadge").style.background = "linear-gradient(135deg," + t.color + ", rgba(255,255,255,.15))";
-    $("#introBadge").style.color = "#fff";
-    $("#introNum").textContent = "Étape " + t.num + " / " + THEMES.length;
-    $("#introTitle").textContent = t.title;
-    $("#introSubtitle").textContent = t.subtitle;
-    $("#introText").innerHTML = t.intro;
-    $("#introQuote").textContent = t.quote;
-    show("intro");
-  }
-
-  /* ---------- Moteur de quiz ---------- */
-  let quiz = null; // { theme, qIndex, good, combo, answers:[] }
-  const TIME_MS = 18000;     // temps "souple" par question
-  const VOIX_BASE = 100;     // voix par bonne réponse
-  const VOIX_SPEED = 60;     // bonus rapidité max
-  let timerRAF = null, timerStart = 0, timerActive = false;
-
-  function startTheme() {
-    quiz = { theme: activeTheme, qIndex: 0, good: 0, combo: 0, voix: 0, answers: [] };
-    $("#quizChip").textContent = activeTheme.title;
-    renderPips();
-    show("quiz");
-    setTimeout(loadQuestion, 360);
-  }
-
-  function renderPips() {
-    const wrap = $("#quizProgress");
-    wrap.innerHTML = "";
-    quiz.theme.questions.forEach((_, i) => {
-      const p = document.createElement("span");
-      p.className = "pip";
-      if (i < quiz.qIndex) p.classList.add(quiz.answers[i] ? "done-ok" : "done-ko");
-      else if (i === quiz.qIndex) p.classList.add("active");
-      wrap.appendChild(p);
-    });
-  }
-
-  function loadQuestion() {
-    const q = quiz.theme.questions[quiz.qIndex];
-    renderPips();
-    $("#feedback").classList.remove("show", "ok", "ko");
-
-    // combo affichage
-    const comboEl = $("#combo");
-    if (quiz.combo >= 2) { comboEl.hidden = false; $("#comboN").textContent = quiz.combo; }
-    else comboEl.hidden = true;
-
-    $("#questionText").textContent = q.q;
-    const opts = $("#options");
-    opts.className = "options";
-    opts.innerHTML = "";
-
-    let choices;
-    if (q.type === "vf") {
-      choices = [{ label: "Vrai", val: true }, { label: "Faux", val: false }];
-    } else {
-      choices = q.options.map((label, idx) => ({ label, val: idx }));
-    }
-
-    choices.forEach((c, i) => {
-      const btn = document.createElement("button");
-      btn.className = "option";
-      btn.innerHTML =
-        '<span class="opt-key">' + (q.type === "vf" ? (c.val ? "✓" : "✕") : String.fromCharCode(65 + i)) + "</span>" +
-        "<span>" + c.label + "</span>";
-      btn.addEventListener("click", () => answer(c.val, btn));
-      opts.appendChild(btn);
-    });
-
-    startTimer();
-  }
-
-  function startTimer() {
-    const bar = $("#timerBar");
-    bar.style.transition = "none";
-    bar.style.transform = "scaleX(1)";
-    timerStart = performance.now();
-    timerActive = true;
-    cancelAnimationFrame(timerRAF);
-    const tick = (now) => {
-      if (!timerActive) return;
-      const left = Math.max(0, 1 - (now - timerStart) / TIME_MS);
-      bar.style.transform = "scaleX(" + left + ")";
-      if (left <= 0) { answer("__timeout__", null); return; }
-      timerRAF = requestAnimationFrame(tick);
     };
-    timerRAF = requestAnimationFrame(tick);
+
+    card.addEventListener("touchstart", (e) => start(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+    card.addEventListener("touchmove", (e) => move(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+    card.addEventListener("touchend", end);
+    card.addEventListener("mousedown", (e) => { start(e.clientX, e.clientY); e.preventDefault(); });
+    window.addEventListener("mousemove", (e) => { if (drag) move(e.clientX, e.clientY); });
+    window.addEventListener("mouseup", end);
+
+    $("#choiceL").addEventListener("click", () => { if (!busy) commit("left"); });
+    $("#choiceR").addEventListener("click", () => { if (!busy) commit("right"); });
   }
 
-  function answer(value, btn) {
-    if (!timerActive) return;
-    timerActive = false;
-    cancelAnimationFrame(timerRAF);
+  /* ---------- Validation d'un choix ---------- */
+  function commit(side) {
+    if (busy || !current) return;
+    busy = true;
+    const opt = current[side];
+    const card = $("#card");
+    const dir = side === "right" ? 1 : -1;
 
-    const q = quiz.theme.questions[quiz.qIndex];
-    const correctVal = q.type === "vf" ? q.answer : q.answer;
-    const isCorrect = value === correctVal;
-    const elapsed = performance.now() - timerStart;
+    haptic(12);
+    card.style.transition = "transform .42s cubic-bezier(.4,0,.6,1), opacity .42s ease";
+    card.style.transform = "translate(-50%,0) translateX(" + dir * 140 + "vw) rotate(" + dir * 22 + "deg)";
+    card.style.opacity = "0";
+    setHints(0);
 
-    // Verrouille et révèle.
-    const opts = $("#options");
-    opts.classList.add("locked");
-    $$(".option", opts).forEach((el, i) => {
-      const isThis = el === btn;
-      const thisVal = q.type === "vf" ? (i === 0) : i;
-      if (thisVal === correctVal) el.classList.add("correct");
-      else if (isThis) el.classList.add("wrong");
-      else el.classList.add("dim");
+    // Applique les effets
+    const fx = opt.fx || {};
+    KEYS.forEach((k) => {
+      if (fx[k]) { g[k] = clamp(g[k] + fx[k], 0, 100); flashDelta(k, fx[k]); }
     });
+    paintGauges();
 
-    quiz.answers[quiz.qIndex] = isCorrect;
-
-    if (isCorrect) {
-      quiz.good++;
-      quiz.combo++;
-      const speedBonus = Math.round(VOIX_SPEED * Math.max(0, 1 - elapsed / TIME_MS));
-      const comboBonus = (quiz.combo - 1) * 25;
-      const gained = VOIX_BASE + speedBonus + comboBonus;
-      quiz.voix += gained;
-      state.score += gained;
-      haptic(12);
-      showFeedback(true, q.why, "+" + gained + " voix" + (quiz.combo >= 2 ? "  🔥 x" + quiz.combo : ""));
-    } else {
-      quiz.combo = 0;
-      haptic([8, 40, 8]);
-      const head = value === "__timeout__" ? "Temps écoulé !" : "Pas tout à fait…";
-      showFeedback(false, q.why, head);
+    if (opt.measure && measures.indexOf(opt.measure) === -1) {
+      measures.push(opt.measure);
+      $("#playScore").textContent = measures.length;
     }
-    save();
+    turn++;
+
+    setTimeout(() => showFeedback(opt), 260);
   }
 
-  function showFeedback(ok, why, head) {
+  function showFeedback(opt) {
     const fb = $("#feedback");
-    fb.classList.add("show", ok ? "ok" : "ko");
-    $("#feedbackHead").textContent = ok ? (head.includes("🔥") ? "Excellent ! " + head : "Bravo ! " + head) : head;
-    $("#feedbackWhy").innerHTML = why;
-    renderPips();
+    // Récap des deltas
+    const fx = opt.fx || {};
+    const chips = KEYS.filter((k) => fx[k]).map((k) =>
+      '<span class="d-chip ' + (fx[k] > 0 ? "up" : "down") + '" style="--gc:' + GAUGES[k].color + '">' +
+      '<span class="d-ico">' + ICONS[GAUGES[k].icon] + "</span>" +
+      (fx[k] > 0 ? "+" : "") + fx[k] + "</span>"
+    ).join("");
+    $("#feedbackDeltas").innerHTML = chips;
+    $("#feedbackResult").innerHTML = opt.result;
+    $("#feedbackNote").innerHTML = "<strong>📖 L'Avenir en commun —</strong> " + opt.note;
+    $("#feedbackTag").innerHTML = opt.measure ? "✅ Mesure adoptée : " + opt.measure : "📖 L'Avenir en commun";
+    fb.classList.add("show");
   }
 
-  function nextQuestion() {
+  function afterFeedback() {
     $("#feedback").classList.remove("show");
-    quiz.qIndex++;
-    if (quiz.qIndex >= quiz.theme.questions.length) {
-      setTimeout(finishTheme, 250);
+    // Vérifie la défaite (un pilier à zéro)
+    const dead = KEYS.find((k) => g[k] <= 0);
+    if (dead) { setTimeout(() => endGame(false, dead), 320); return; }
+    setTimeout(nextCard, 280);
+  }
+
+  /* ---------- Fin de partie ---------- */
+  function endGame(survived, deadKey) {
+    setBest(measures.length);
+    const emblem = $("#endEmblem");
+    const years = Math.min(5, (turn / TURNS_TO_WIN) * 5);
+
+    if (survived) {
+      const healthy = KEYS.every((k) => g[k] >= 40);
+      emblem.innerHTML = ICONS.phi;
+      $("#endKicker").textContent = "Mandat accompli · 2032";
+      $("#endTitle").textContent = healthy && measures.length >= 12 ? "Raz-de-marée populaire !" : "Mandat accompli !";
+      $("#endSub").innerHTML = healthy
+        ? "Tu as tenu les cinq ans en gardant les quatre piliers solides. <strong>La 6<sup>e</sup> République est proclamée</strong> et l'avenir s'écrit en commun. ✊"
+        : "Tu as bouclé ton mandat. Quelques équilibres ont vacillé, mais le cap de <em>L'Avenir en commun</em> a tenu.";
     } else {
-      setTimeout(loadQuestion, 320);
+      const d = DEFEATS[deadKey];
+      emblem.innerHTML = ICONS.trophy;
+      emblem.style.opacity = ".5";
+      $("#endKicker").textContent = "Présidence interrompue";
+      $("#endTitle").textContent = d.title;
+      $("#endSub").innerHTML = d.text + " Mais le combat continue.";
     }
+
+    $("#endMeasures").textContent = measures.length;
+    $("#endYears").textContent = years.toFixed(years < 5 ? 1 : 0).replace(".0", "");
+    $("#endGrade").textContent = grade(measures.length, survived);
+
+    const list = $("#endMeasureList");
+    if (measures.length) {
+      list.innerHTML = '<p class="eml-title">Mesures de L\'Avenir en commun adoptées</p>' +
+        '<div class="eml-chips">' +
+        measures.map((m) => '<span class="eml-chip">✓ ' + m + "</span>").join("") + "</div>";
+    } else {
+      list.innerHTML = '<p class="eml-title">Aucune mesure adoptée… rejoue pour appliquer le programme&nbsp;!</p>';
+    }
+
+    show("end");
+    if (survived) startConfetti();
   }
 
-  /* ---------- Résultat d'étape ---------- */
-  function finishTheme() {
-    const t = quiz.theme;
-    const total = t.questions.length;
-    const good = quiz.good;
-    let stars = 0;
-    if (good === total) stars = 3;
-    else if (good >= Math.ceil(total * 0.6)) stars = 2;
-    else if (good >= 1) stars = 1;
-
-    const prev = state.progress[t.id] || { stars: 0 };
-    state.progress[t.id] = {
-      done: true,
-      stars: Math.max(prev.stars || 0, stars),
-      good: good
-    };
-    setBest(state.score);
-    save();
-
-    // Affichage
-    $("#resultBadge").innerHTML = ICONS[t.icon];
-    $("#resultBadge").style.background = "linear-gradient(135deg," + t.color + ", rgba(255,255,255,.15))";
-    $("#resultBadge").style.color = "#fff";
-    $("#resultTitle").textContent = stars === 3 ? "Étape conquise !" : stars === 2 ? "Belle progression !" : "Étape franchie";
-    $("#resultSub").textContent =
-      "Badge débloqué : « " + t.title + " ». " +
-      (stars === 3 ? "Score parfait, le peuple se rassemble derrière toi !" : "Rejoue pour décrocher les 3 étoiles.");
-    $("#resGood").textContent = good + "/" + total;
-    $("#resVoix").textContent = "+" + quiz.voix;
-    const before = supportPctExcluding();
-    const after = supportPct();
-    $("#resPct").textContent = "+" + Math.max(0, after - before) + " %";
-    $("#resultQuote").textContent = t.quote;
-
-    // étoiles animées
-    const starEls = $$("#stars span");
-    starEls.forEach((s, i) => {
-      s.classList.remove("lit");
-      if (i < stars) setTimeout(() => s.classList.add("lit"), 300 + i * 220);
-    });
-
-    show("result");
+  function grade(n, survived) {
+    if (!survived) return "✊";
+    if (n >= 14) return "A+";
+    if (n >= 11) return "A";
+    if (n >= 8) return "B";
+    if (n >= 5) return "C";
+    return "D";
   }
 
-  // Soutien recalculé en ignorant l'étape qui vient d'être jouée (pour afficher le gain).
-  function supportPctExcluding() {
-    const t = quiz.theme;
-    let stars = 0;
-    THEMES.forEach((th) => {
-      if (th.id === t.id) return;
-      if (state.progress[th.id]) stars += state.progress[th.id].stars || 0;
-    });
-    const maxStars = THEMES.length * 3;
-    const gain = Math.round(((50 - BASE_PCT) + 8) * (stars / maxStars));
-    return Math.min(58, BASE_PCT + gain);
-  }
-
-  /* ---------- Victoire / fin de campagne ---------- */
-  function openWin(animate) {
-    const pct = supportPct();
-    const win = pct >= 50;
-    $("#winEmblem").innerHTML = win ? ICONS.phi : ICONS.trophy;
-    $("#winKicker").textContent = "Élection présidentielle 2027";
-    $("#winTitle").textContent = win ? "Victoire !" : "Campagne bouclée";
-    $("#winSub").innerHTML = win
-      ? "Avec <strong>" + pct + " %</strong> de soutien populaire, le peuple l'emporte. Place à la convocation de l'Assemblée constituante et à la 6<sup>e</sup> République !"
-      : "Tu rassembles <strong>" + pct + " %</strong> du soutien populaire. Rejoue les étapes pour viser les 3 étoiles partout et franchir la barre des 50 %.";
-    $("#winScore").textContent = state.score.toLocaleString("fr-FR");
-    setBest(state.score);
-
-    // Galerie de badges
-    const wrap = $("#winBadges");
-    wrap.innerHTML = "";
-    THEMES.forEach((t) => {
-      const prog = state.progress[t.id];
-      if (!prog || !prog.done) return;
-      const chip = document.createElement("div");
-      chip.className = "badge-chip";
-      chip.innerHTML =
-        '<span class="bc-ico" style="background:' + t.color + '">' + ICONS[t.icon] + "</span>" +
-        "<span>" + t.title + " " + "★".repeat(prog.stars) + "</span>";
-      wrap.appendChild(chip);
-    });
-
-    show("win");
-    if (win) startConfetti();
-  }
-
-  /* ---------- Confettis (canvas) ---------- */
+  /* ---------- Confettis ---------- */
   let confettiRAF = null;
   function startConfetti() {
     const cv = $("#confetti");
     const ctx = cv.getContext("2d");
     const dpr = Math.min(2, window.devicePixelRatio || 1);
-    function size() { cv.width = cv.clientWidth * dpr; cv.height = cv.clientHeight * dpr; }
-    size();
-    const colors = ["#ff2b46", "#ffd166", "#ff8aa0", "#fff7f9", "#7e5bd8"];
-    const N = 140;
-    const parts = Array.from({ length: N }, () => ({
-      x: Math.random() * cv.width,
-      y: Math.random() * -cv.height,
-      r: (4 + Math.random() * 6) * dpr,
-      c: colors[(Math.random() * colors.length) | 0],
-      vy: (2 + Math.random() * 4) * dpr,
-      vx: (Math.random() - 0.5) * 2 * dpr,
-      a: Math.random() * Math.PI,
-      va: (Math.random() - 0.5) * 0.3
+    cv.width = cv.clientWidth * dpr; cv.height = cv.clientHeight * dpr;
+    const colors = ["#ff2b46", "#ffd166", "#ff8aa0", "#fff7f9", "#7e5bd8", "#2bd97a"];
+    const parts = Array.from({ length: 130 }, () => ({
+      x: Math.random() * cv.width, y: Math.random() * -cv.height,
+      r: (4 + Math.random() * 6) * dpr, c: colors[(Math.random() * colors.length) | 0],
+      vy: (2 + Math.random() * 4) * dpr, vx: (Math.random() - 0.5) * 2 * dpr,
+      a: Math.random() * Math.PI, va: (Math.random() - 0.5) * 0.3
     }));
     let frames = 0;
     function draw() {
@@ -451,115 +364,70 @@
         p.y += p.vy; p.x += p.vx; p.a += p.va;
         if (p.y > cv.height + 20) { p.y = -20; p.x = Math.random() * cv.width; }
         ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a);
-        ctx.fillStyle = p.c;
-        ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 0.6);
-        ctx.restore();
+        ctx.fillStyle = p.c; ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 0.6); ctx.restore();
       });
-      frames++;
-      confettiRAF = requestAnimationFrame(draw);
-      if (frames > 480) { cancelAnimationFrame(confettiRAF); } // s'arrête après ~8s
+      if (++frames < 500) confettiRAF = requestAnimationFrame(draw);
     }
-    cancelAnimationFrame(confettiRAF);
-    draw();
+    cancelAnimationFrame(confettiRAF); draw();
   }
 
   /* ---------- Partage ---------- */
   async function shareResult() {
-    const pct = supportPct();
     const text =
-      "🔥 J'ai rassemblé " + state.score.toLocaleString("fr-FR") +
-      " voix et " + pct + " % de soutien populaire sur « Place au Peuple 2027 » !\n" +
-      "Découvre L'Avenir en commun et joue toi aussi. #PlaceAuPeuple #2027";
+      "✊ J'ai gouverné selon L'Avenir en commun et adopté " + measures.length +
+      " mesures du programme dans « Président·e du Peuple » !\n" +
+      "À toi de tenir le mandat jusqu'en 2032. #PlaceAuPeuple #2027";
     try {
-      if (navigator.share) {
-        await navigator.share({ title: "Place au Peuple 2027", text });
-      } else {
-        await navigator.clipboard.writeText(text);
-        toast("Résultat copié — à partager !");
-      }
-    } catch (e) { /* annulé */ }
+      if (navigator.share) await navigator.share({ title: "Président·e du Peuple", text });
+      else { await navigator.clipboard.writeText(text); toast("Bilan copié — à partager&nbsp;!"); }
+    } catch (e) {}
   }
 
-  /* ---------- Modale (aide / à propos) ---------- */
-  function openModal(title, html) {
-    $("#modalTitle").textContent = title;
-    $("#modalBody").innerHTML = html;
-    $("#modal").hidden = false;
-  }
+  /* ---------- Modale ---------- */
+  function openModal(title, html) { $("#modalTitle").textContent = title; $("#modalBody").innerHTML = html; $("#modal").hidden = false; }
   function closeModal() { $("#modal").hidden = true; }
 
   const HOW_HTML =
-    '<p class="lead">Mène une campagne citoyenne en 7 étapes — une par chapitre du programme <em>L\'Avenir en commun</em>.</p>' +
+    '<p class="lead">Tu viens d\'être élu·e Président·e en 2027. Des personnages viennent te soumettre un dilemme.</p>' +
     "<ul>" +
-    "<li><b>1.</b> Sur la carte, ouvre l'étape qui clignote.</li>" +
-    "<li><b>2.</b> Réponds aux questions : vite et juste pour un max de <b>voix</b>.</li>" +
-    "<li><b>3.</b> Enchaîne les bonnes réponses pour déclencher des <b>combos 🔥</b>.</li>" +
-    "<li><b>4.</b> Chaque étape gagne des <b>étoiles</b> et fait monter le <b>soutien populaire</b>.</li>" +
-    "<li><b>5.</b> Franchis la barre des <b>50 %</b> pour gagner l'élection de 2027 !</li>" +
+    "<li><b>◀ ▶</b> Glisse la carte à gauche ou à droite (ou utilise les deux boutons) pour décider.</li>" +
+    "<li><b>4 piliers</b> évoluent à chaque choix : ✊ Peuple, ⚖️ Social, 🌍 Planète, 🕊️ Souveraineté.</li>" +
+    "<li><b>Gouverner, c'est arbitrer&nbsp;:</b> appliquer le programme renforce le peuple, mais attention à l'équilibre.</li>" +
+    "<li><b>Si un pilier tombe à zéro, ta présidence chute</b> (révocation, révolte, effondrement, mise sous tutelle).</li>" +
+    "<li><b>Objectif&nbsp;:</b> tenir ton mandat jusqu'en <b>2032</b> en adoptant un maximum de <b>mesures phares</b>.</li>" +
     "</ul>" +
-    "<p>Bonne ou mauvaise réponse, une explication apparaît à chaque fois : on apprend le programme en jouant.</p>";
+    "<p>Chaque décision dévoile sa conséquence et une note <em>L'Avenir en commun</em> : on apprend le programme en gouvernant.</p>";
 
   const ABOUT_HTML =
-    "<p>Place au Peuple 2027 est un <b>jeu citoyen non officiel</b>, conçu pour faire découvrir de façon ludique le programme " +
+    "<p><b>Président·e du Peuple</b> est un <b>jeu citoyen non officiel</b>, conçu pour faire découvrir de façon vivante le programme " +
     "<em>L'Avenir en commun</em> et soutenir la candidature de Jean-Luc Mélenchon en 2027.</p>" +
-    "<p>Toutes les questions s'appuient sur le programme <em>L'Avenir en commun</em> (version actualisée) et les documents de campagne de la France insoumise.</p>" +
-    "<p>Aucune donnée n'est collectée : ta progression reste sur ton appareil.</p>" +
+    "<p>Tous les dilemmes et mesures s'appuient sur le programme <em>L'Avenir en commun</em> et les documents de campagne de la France insoumise.</p>" +
+    "<p>Aucune donnée n'est collectée : seul ton record reste sur ton appareil.</p>" +
     '<p style="color:#d7b9d6;font-size:.85rem">Fait avec passion pour la révolution citoyenne. ✊</p>';
 
-  /* ---------- Réinitialisation ---------- */
-  function resetCampaign() {
-    state.score = 0;
-    state.progress = {};
-    save();
-  }
-
-  /* ---------- Liaison des événements ---------- */
+  /* ---------- Liaisons ---------- */
   function bind() {
-    $("#btnPlay").addEventListener("click", () => { haptic(10); renderMap(); show("map"); });
+    $("#btnPlay").addEventListener("click", () => { haptic(10); newGame(); });
     $("#btnHow").addEventListener("click", () => openModal("Comment jouer", HOW_HTML));
     $("#btnAbout").addEventListener("click", () => openModal("À propos", ABOUT_HTML));
     $("#modalClose").addEventListener("click", closeModal);
     $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") closeModal(); });
 
-    $("#mapHome").addEventListener("click", () => show("home"));
-    $("#introBack").addEventListener("click", () => { renderMap(); show("map"); });
-    $("#introStart").addEventListener("click", () => { haptic(10); startTheme(); });
+    $("#playQuit").addEventListener("click", () => show("home"));
+    $("#feedbackNext").addEventListener("click", afterFeedback);
 
-    $("#quizQuit").addEventListener("click", () => {
-      timerActive = false; cancelAnimationFrame(timerRAF);
-      renderMap(); show("map");
-    });
-    $("#feedbackNext").addEventListener("click", nextQuestion);
+    $("#endReplay").addEventListener("click", () => { $("#endEmblem").style.opacity = "1"; newGame(); });
+    $("#endShare").addEventListener("click", shareResult);
 
-    $("#resultNext").addEventListener("click", () => {
-      renderMap();
-      if (currentIndex() >= THEMES.length) openWin(true);
-      else show("map");
-    });
-
-    $("#winShare").addEventListener("click", shareResult);
-    $("#winReplay").addEventListener("click", () => {
-      resetCampaign(); renderMap(); show("map");
-      toast("Nouvelle campagne lancée !");
-    });
-
-    // Empêche le zoom double-tap sur iOS pour les boutons.
+    bindSwipe();
     document.addEventListener("gesturestart", (e) => e.preventDefault());
   }
 
-  /* ---------- Service worker (PWA) ---------- */
   function registerSW() {
-    if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+    if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
       navigator.serviceWorker.register("sw.js").catch(() => {});
-    }
   }
 
-  /* ---------- Démarrage ---------- */
-  function init() {
-    load();
-    initHome();
-    bind();
-    registerSW();
-  }
+  function init() { initHome(); bind(); registerSW(); }
   document.addEventListener("DOMContentLoaded", init);
 })();

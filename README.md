@@ -1,58 +1,48 @@
-# ✊ Place au Peuple 2027
+# ✊ Président·e du Peuple
 
-**Le jeu web citoyen pour découvrir le programme _L'Avenir en commun_ et soutenir la campagne de Jean-Luc Mélenchon en 2027.**
+**Le jeu de décision mobile pour gouverner selon _L'Avenir en commun_ — en soutien à la campagne de Jean-Luc Mélenchon en 2027.**
 
-Un jeu mobile-first, beau, complet et **instructif** : on apprend le programme en menant une campagne, étape par étape, jusqu'à la victoire de l'élection présidentielle.
+Pas un quiz : un **jeu de choix à la "swipe"** (dans l'esprit de _Reigns_), tendu, captivant et instructif. Tu viens d'être élu·e Président·e de la République. Des personnages viennent te soumettre un dilemme — à toi de **glisser la carte à gauche ou à droite** pour décider, et de **tenir ton mandat jusqu'en 2032**.
 
-> Jeu **non officiel**, à but pédagogique. Tout le contenu s'appuie sur le programme _L'Avenir en commun_ (version actualisée) et les documents de campagne de la France insoumise fournis.
+> Jeu **non officiel**, à but pédagogique. Tout le contenu s'appuie sur le programme _L'Avenir en commun_ (version actualisée) et les documents de campagne de la France insoumise.
 
 ---
 
-## 🎮 Le concept
+## 🎴 Le concept
 
-Tu mènes une **campagne citoyenne en 7 étapes** — une par chapitre du programme :
+- À chaque carte, un personnage (le **MEDEF**, une **lycéenne**, la **Commission européenne**, le **GIEC**, un **général de l'OTAN**, un **syndicaliste**, un **spéculateur**…) te pose un dilemme bien réel.
+- Tu **glisses** la carte **◀ à gauche** ou **▶ à droite** (ou tu utilises les deux boutons) pour trancher.
+- Chaque décision fait évoluer **4 piliers** :
 
-| # | Étape | Chapitre du programme |
-|---|-------|------------------------|
-| 1 | 6ᵉ République | Face à la crise démocratique |
-| 2 | Partager les richesses | Face à l'urgence sociale |
-| 3 | Planification écologique | Face à la crise climatique |
-| 4 | Sortir des traités | Face à la crise européenne |
-| 5 | Indépendance & paix | Face à la guerre |
-| 6 | Progrès humain | Face à la grande régression |
-| 7 | Frontières de l'Humanité | Face au déclinisme |
+  | Pilier | Ce qu'il représente |
+  |--------|---------------------|
+  | ✊ **Peuple** | Démocratie & soutien populaire (6ᵉ République, RIC…) |
+  | ⚖️ **Social** | Partage des richesses & services publics |
+  | 🌍 **Planète** | Planification écologique |
+  | 🕊️ **Souveraineté** | Indépendance, paix & démocratie internationale |
 
-À chaque étape, tu réponds à des questions (QCM et Vrai/Faux) tirées du programme :
+- **Gouverner, c'est arbitrer.** Appliquer le programme renforce le peuple, mais chaque choix a un coût : il faut tenir l'**équilibre** des quatre piliers.
+- ⚠️ **Si un pilier tombe à zéro, ta présidence chute** : révocation par RIC, révolte sociale, effondrement écologique ou mise sous tutelle.
+- 🎯 **Objectif** : survivre les 5 ans du mandat (**2027 → 2032**) en adoptant un maximum de **mesures phares** de _L'Avenir en commun_.
 
-- **Vite et juste** → plus de **voix** (bonus de rapidité).
-- **Enchaîne les bonnes réponses** → **combos 🔥** qui multiplient le score.
-- Chaque étape rapporte des **étoiles** (jusqu'à 3) et fait monter la **jauge de soutien populaire**.
-- **Franchis les 50 %** → tu gagnes l'élection 2027 et tu convoques la 6ᵉ République ! 🎉
-- Bonne ou mauvaise réponse, **une explication s'affiche** : on retient le programme.
-
-La progression et le meilleur score sont sauvegardés **localement** sur l'appareil (aucune donnée collectée).
+Chaque décision dévoile sa **conséquence** et une note **« 📖 L'Avenir en commun »** : on apprend le programme en gouvernant. Cartes tirées au hasard, **fins multiples**, rejouabilité → l'effet « encore une carte ».
 
 ## ✨ Caractéristiques
 
-- 📱 **Mobile-first** : conçu pour le pouce, plein écran, zones de tap larges, safe-areas iOS.
-- 🎨 **Soigné graphiquement** : identité aubergine → rouge insoumis, logo φ, illustrations SVG, fond animé, confettis de victoire.
-- 🧠 **Instructif** : ~35 questions sourcées, avec explication « 📖 L'Avenir en commun ».
+- 📱 **Natif mobile** : mécanique de **swipe** au pouce, une seule main, plein écran, safe-areas iOS, vibrations.
+- 🎨 **Soigné** : identité aubergine → rouge insoumis, logo φ, avatars & jauges en SVG, cartes animées, confettis de victoire.
+- 🧠 **Instructif** : **32 dilemmes** sourcés et **32 mesures** réelles du programme, chacune expliquée.
+- ⚖️ **Stratégique** : système de 4 jauges équilibrées, difficulté réelle (jouer le programme de façon cohérente = victoire).
 - ⚡ **Léger & sans dépendance** : HTML/CSS/JS pur, aucun framework, aucun build.
-- 🔌 **Installable (PWA)** : fonctionne hors-ligne une fois ouvert (manifest + service worker).
-- ♿ **Accessible** : respecte `prefers-reduced-motion`, contrastes élevés.
+- 🔌 **PWA installable** : fonctionne hors-ligne (manifest + service worker). Record sauvegardé localement, **aucune donnée collectée**.
 
 ## 🚀 Lancer le jeu
 
-Comme le jeu utilise un service worker, sers-le via un petit serveur local (le double-clic `file://` fonctionne aussi, sans le mode hors-ligne) :
+Le jeu utilise un service worker : sers-le via un petit serveur local (le double-clic `file://` marche aussi, sans le mode hors-ligne).
 
 ```bash
-# Python
-python3 -m http.server 8000
-# puis ouvrir http://localhost:8000  (idéalement en vue mobile dans les devtools)
-```
-
-```bash
-# ou Node
+python3 -m http.server 8000   # puis http://localhost:8000 (vue mobile dans les DevTools)
+# ou
 npx serve .
 ```
 
@@ -60,25 +50,36 @@ npx serve .
 
 ```
 .
-├── index.html              # structure des écrans
-├── styles.css              # design system mobile-first
+├── index.html              # écrans : accueil · jeu · fin
+├── styles.css              # design system mobile-first (jauges, cartes, swipe)
 ├── js/
-│   ├── data.js             # contenu : 7 thèmes + questions (issu du programme)
-│   └── game.js             # moteur : navigation, quiz, score, carte, confettis
+│   ├── data.js             # 4 piliers + 32 cartes/dilemmes (issus du programme)
+│   └── game.js             # moteur : swipe, jauges, mandat, conséquences, confettis
 ├── icons/icon.svg          # icône / logo φ
 ├── manifest.webmanifest    # PWA
 ├── sw.js                   # cache hors-ligne
 └── README.md
 ```
 
-## 🛠️ Étendre le jeu
+## 🛠️ Ajouter une carte
 
-Tout le contenu est dans `js/data.js`. Pour ajouter une question, complète le tableau `questions` d'un thème :
+Tout le contenu est dans `js/data.js`. Une carte = un personnage + deux choix, avec leurs effets sur les piliers (`p`, `s`, `e`, `v`) :
 
 ```js
-{ type: "qcm", q: "…", options: ["…", "…"], answer: 0, why: "Explication." }
-{ type: "vf",  q: "…", answer: true, why: "Explication." }
+{
+  theme: "s", avatar: "worker", who: "Un délégué syndical",
+  text: "« Le SMIC ne suffit plus pour vivre. »",
+  right: { label: "Augmenter", fx: { s: 14, p: 8, v: -4 },
+    result: "Le SMIC passe à 1 400 € nets.",
+    note: "Vivre dignement de son travail.",
+    measure: "SMIC à 1 400 € nets" },
+  left:  { label: "Geler", fx: { s: -14, p: -10 },
+    result: "Salaires gelés, la pauvreté grimpe.",
+    note: "Le programme refuse les salaires de misère." }
+}
 ```
+
+`right` = choix conforme au programme · `left` = statu quo / option libérale. Avatars : `suit`, `worker`, `youth`, `scientist`, `general`, `eu`, `citizen`.
 
 ---
 

@@ -1,5 +1,5 @@
 /* Service worker — cache hors-ligne pour « Place au Peuple 2027 » */
-const CACHE = "ppp2027-v1";
+const CACHE = "ppp2027-v2";
 const ASSETS = [
   "./",
   "./index.html",
