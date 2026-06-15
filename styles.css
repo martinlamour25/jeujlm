@@ -401,3 +401,57 @@ body {
   .card-avatar { width: 88px; height: 88px; } .card-avatar svg { width: 50px; height: 50px; }
   .g-ring { width: 52px; height: 52px; }
 }
+
+/* =========================================================
+   AJOUTS — charte « blocs 3D » (affiches Mélenchon 2027) + cinématique
+   ========================================================= */
+
+/* Texte en blocs 3D extrudés, comme les slogans des affiches de campagne */
+.block-text {
+  text-transform: uppercase; font-family: var(--font-display); font-weight: 800;
+  letter-spacing: 0.5px; color: #fff; line-height: 0.98;
+  --bt: #7a0e1e;
+  text-shadow:
+    1px 1px 0 var(--bt), 2px 2px 0 var(--bt), 3px 3px 0 var(--bt),
+    4px 4px 0 var(--bt), 5px 5px 0 var(--bt), 6px 9px 14px rgba(0,0,0,0.55);
+}
+
+/* Cinématique d'ouverture (multi-slides) */
+.intro.cine { padding: 0; }
+.cine-scene { position: absolute; inset: 0; z-index: 0; }
+.cine-scene svg { width: 100%; height: 100%; object-fit: cover; }
+.cine-vignette { position: absolute; inset: 0; z-index: 1;
+  background: radial-gradient(120% 90% at 50% 35%, transparent 30%, rgba(10,3,14,0.85) 100%); }
+.cine-content { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center; padding: 30px; gap: 14px; }
+.cine-kicker { font-family: var(--font-display); font-weight: 800; letter-spacing: 4px;
+  font-size: 0.9rem; opacity: 0; animation: fadeUp 0.6s ease 0.15s forwards; }
+.cine-title { font-size: clamp(2.4rem, 13vw, 4.2rem); opacity: 0; transform: translateY(16px) scale(0.96);
+  animation: cineTitle 0.7s cubic-bezier(.2,1.3,.4,1) 0.35s forwards; }
+@keyframes cineTitle { to { opacity: 1; transform: none; } }
+.cine-lines { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; max-width: 32ch; }
+.cine-lines span { color: var(--c-cream); font-size: 1.02rem; line-height: 1.4; opacity: 0;
+  animation: fadeUp 0.5s ease forwards; }
+.cine-lines span:nth-child(1) { animation-delay: 0.7s; }
+.cine-lines span:nth-child(2) { animation-delay: 1.0s; }
+.cine-lines span:nth-child(3) { animation-delay: 1.3s; }
+.cine-hint { position: absolute; bottom: calc(26px + var(--safe-bot)); left: 0; right: 0; z-index: 3;
+  text-align: center; color: var(--c-muted); font-size: 0.78rem; opacity: 0; animation: fadeUp 0.6s ease 1.6s forwards; }
+.cine-phi { width: 80px; height: 80px; margin-top: 6px; opacity: 0; animation: yearPop 0.8s cubic-bezier(.2,1.4,.4,1) 0.9s forwards; }
+.cine-phi svg { width: 100%; height: 100%; }
+
+/* Ambiances par slide */
+.intro.cine.dark { background: #160410; }
+.intro.cine.dark .cine-kicker { color: #ff7a59; }
+.intro.cine.dark .cine-title { --bt: #3a0a0a; }
+.intro.cine.dark .cine-scene { filter: saturate(0.85) brightness(0.85); }
+.intro.cine.rise { background: #2a0a2f; }
+.intro.cine.rise .cine-kicker { color: var(--c-gold); }
+.intro.cine.rise .cine-title { --bt: #7a0e1e; }
+.intro.cine.win { background: radial-gradient(120% 90% at 50% 40%, #5a1430, #160410 80%); }
+.intro.cine.win .cine-kicker { color: var(--c-gold); }
+.intro.cine.win .cine-title { --bt: #b3091f; color: #fff; }
+.intro.cine.win .cine-vignette { background: radial-gradient(120% 90% at 50% 40%, transparent 40%, rgba(10,3,14,0.7) 100%); }
+
+/* Titres d'acte et de victoire en blocs 3D */
+.act-title { text-transform: uppercase; }

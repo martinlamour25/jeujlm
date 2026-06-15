@@ -81,20 +81,52 @@
     }
     return g + "</svg>";
   }
+  // Cinématique d'ouverture : le chaos du bilan Macron → le peuple se lève → victoire.
+  const CINE = [
+    { scene: "france_chaos", cls: "dark", kicker: "FRANCE · 2027", title: "LE BILAN",
+      lines: ["Hôpitaux saturés, 49.3 à répétition.", "Dette record, services publics à l'os.", "La colère gronde partout."], ms: 3400 },
+    { scene: "france_chaos", cls: "dark", kicker: "PENDANT CE TEMPS…", title: "LE POGNON DE DINGUE",
+      lines: ["Les milliardaires n'ont jamais été si riches.", "« En même temps »… rien ne change.", "Macron quitte le navire."], ms: 3300 },
+    { scene: "meeting", cls: "rise", kicker: "MAIS LE PEUPLE…", title: "SE LÈVE",
+      lines: ["Des millions dans la rue.", "Une marée humaine, un seul mot d'ordre :", "« Place au peuple ! »"], ms: 3100 },
+    { scene: "election_win", cls: "win", kicker: "SECOND TOUR · MAI 2027", title: "LA FRANCE INSOUMISE\nL'EMPORTE !",
+      lines: ["63 % au second tour. Le peuple a tranché.", "Jean-Luc Mélenchon est élu Président.", "À toi, maintenant, de gouverner."], ms: 4200 }
+  ];
   function playIntro(done) {
     const intro = $("#intro");
-    $("#introLogo").innerHTML = ICONS.phi;
-    $("#introCrowd").innerHTML = buildCrowd();
-    $("#introTitle").textContent = "Président·e du Peuple";
-    intro.classList.add("run");
-    let ended = false;
-    const finish = () => {
-      if (ended) return; ended = true;
+    intro.hidden = false;
+    let i = -1, timer = null, ended = false;
+    function finish() {
+      if (ended) return; ended = true; clearTimeout(timer);
       intro.classList.add("out");
-      setTimeout(() => { intro.hidden = true; if (done) done(); }, 600);
-    };
-    $("#introSkip").onclick = () => { firstGesture(); finish(); };
-    setTimeout(finish, 4200);
+      setTimeout(() => { intro.hidden = true; intro.className = "intro"; if (done) done(); }, 600);
+    }
+    function renderSlide() {
+      const s = CINE[i];
+      intro.className = "intro cine " + s.cls + " run";
+      intro.innerHTML =
+        '<div class="cine-scene">' + ((typeof SCENES !== "undefined" && SCENES[s.scene]) || "") + "</div>" +
+        '<div class="cine-vignette"></div>' +
+        '<div class="cine-content">' +
+        '<p class="cine-kicker">' + s.kicker + "</p>" +
+        '<h1 class="cine-title block-text">' + s.title.replace(/\n/g, "<br>") + "</h1>" +
+        '<div class="cine-lines">' + s.lines.map((l) => "<span>" + l + "</span>").join("") + "</div>" +
+        (s.cls === "win" ? '<div class="cine-phi">' + ICONS.phi + "</div>" : "") +
+        "</div>" +
+        '<button class="intro-skip" id="introSkip">Passer ›</button>' +
+        '<p class="cine-hint">Touche pour continuer</p>';
+      $("#introSkip").onclick = (e) => { e.stopPropagation(); firstGesture(); finish(); };
+      if (s.cls === "win") { SOUND.sfx("fanfare"); SOUND.setMusicLevel(2); }
+      else if (s.cls === "rise") { SOUND.sfx("hero"); SOUND.setMusicLevel(1); }
+      else { SOUND.sfx("breaking"); SOUND.setMusicLevel(0); }
+      haptic(s.cls === "dark" ? [10, 60, 10] : 14);
+    }
+    function advance() {
+      i++; if (i >= CINE.length) { finish(); return; }
+      renderSlide(); clearTimeout(timer); timer = setTimeout(advance, CINE[i].ms);
+    }
+    intro.onclick = () => { firstGesture(); if (!SOUND.isMuted()) SOUND.startMusic(); advance(); };
+    advance();
   }
 
   /* ---------- Audio : premier geste ---------- */
@@ -150,7 +182,7 @@
     const prev = BALANCE.diff[S.diff].preview;
     KEYS.forEach((k) => {
       const a = $("#arr-" + k); if (!a) return;
-      const c = S.current && CARDS[S.current][side]; const v = c && c.fx ? c.fx[k] : 0;
+      const c = S.current && CARDS[S.current][S.sideMap[side]]; const v = c && c.fx ? c.fx[k] : 0;
       if (!v || prev === "none" || intensity < 0.18) { a.className = "g-arrow"; a.textContent = ""; return; }
       a.className = "g-arrow show " + (v > 0 ? "up" : "down");
       a.style.opacity = Math.min(1, intensity);
@@ -169,10 +201,12 @@
   /* ---------- Démarrage ---------- */
   function newGame(mode) {
     const cfg = BALANCE.diff[difficulty] || BALANCE.diff.normal;
-    S = { mode, diff: difficulty, flags: {}, rep: {},
+    S = { mode, diff: difficulty, flags: {}, rep: {}, seen: {}, recent: [],
+      sideMap: { left: "left", right: "right" },
       g: { p: cfg.start, s: cfg.start, e: cfg.start, v: cfg.start },
       turn: 0, month: 0, measures: [], heads: [], voix: 0, combo: 0, maxCombo: 0,
       queue: [], storyIdx: 0, lastId: null, current: null };
+    SOUND.setMusicLevel(0);
     busy = false;
     buildGauges();
     $("#playScore").textContent = "0";
@@ -204,8 +238,8 @@
       if (S.queue[i].in <= 0) {
         const id = S.queue[i].id; S.queue.splice(i, 1);
         const c = CARDS[id];
-        if (c && (!c.cond || c.cond(S.flags))) return id;
-        i--; // sauté : on continue
+        if (c && !S.seen[id] && (!c.cond || c.cond(S.flags))) return id; // arc one-shot, pas de doublon
+        i--;
       }
     }
     return null;
@@ -213,11 +247,13 @@
 
   /* ---------- Sélection de la prochaine carte ---------- */
   function pickInfinite() {
-    // Crise plus probable avec le temps.
-    const eligible = POOL.filter((id) => {
+    // Évite les répétitions récentes (anti-doublon).
+    const recent = S.recent.slice(-Math.min(10, POOL.length - 2));
+    let eligible = POOL.filter((id) => {
       const c = CARDS[id];
-      return id !== S.lastId && (!c.cond || c.cond(S.flags));
+      return !recent.includes(id) && (!c.cond || c.cond(S.flags));
     });
+    if (!eligible.length) eligible = POOL.filter((id) => id !== S.lastId);
     const crisisProb = clamp(0.12 + S.month * 0.02, 0, 0.55);
     const pool = (Math.random() < crisisProb)
       ? eligible.filter((id) => CARDS[id].crisis) : [];
@@ -227,6 +263,7 @@
 
   function nextCard() {
     updateMandate();
+    if (S.mode === "infinite") SOUND.setMusicLevel(Math.min(4, Math.floor(S.month / 21)));
     const ready = popReady();
     if (ready) return renderCard(ready);
 
@@ -235,7 +272,7 @@
         const item = STORY[S.storyIdx++];
         if (typeof item === "object" && item.act) { return showAct(item); }
         const c = CARDS[item];
-        if (c && (!c.cond || c.cond(S.flags))) return renderCard(item);
+        if (c && !S.seen[item] && (!c.cond || c.cond(S.flags))) return renderCard(item);
       }
       return endGame("story_end", null);
     } else {
@@ -245,10 +282,13 @@
 
   /* ---------- Overlay d'acte ---------- */
   function showAct(act) {
+    S.actNum = (S.actNum || 0) + 1;
+    SOUND.setMusicLevel(Math.min(4, S.actNum)); // chaque acte = musique plus rapide/rythmée
     const ov = $("#actOverlay");
     $("#actScene").innerHTML = (SCENES && SCENES[act.scene]) || "";
     $("#actKicker").textContent = act.act;
     $("#actTitle").textContent = act.title;
+    $("#actTitle").className = "act-title block-text";
     ov.hidden = false; ov.classList.remove("out");
     requestAnimationFrame(() => ov.classList.add("show"));
     SOUND.sfx("crisis");
@@ -265,6 +305,11 @@
   /* ---------- Rendu d'une carte ---------- */
   function renderCard(id) {
     S.current = id; S.lastId = id;
+    S.seen[id] = true;
+    S.recent.push(id); if (S.recent.length > 12) S.recent.shift();
+    // Alterne aléatoirement le côté du bon choix (le "programme" n'est plus toujours à droite).
+    const flip = Math.random() < 0.5;
+    S.sideMap = { left: flip ? "right" : "left", right: flip ? "left" : "right" };
     const c = CARDS[id]; const f = S.flags; const theme = GAUGES[c.tag];
     const card = $("#card");
 
@@ -286,10 +331,10 @@
 
     $("#cardWho").textContent = (typeof CHARACTERS[c.char] === "string" ? CHARACTERS[c.char] : (CHARACTERS[c.char] && CHARACTERS[c.char].name)) || "—";
     $("#cardText").innerHTML = resolve(c.text, f);
-    $("#choiceLlabel").textContent = c.left.label;
-    $("#choiceRlabel").textContent = c.right.label;
-    $("#stampL").textContent = c.left.label;
-    $("#stampR").textContent = c.right.label;
+    $("#choiceLlabel").textContent = c[S.sideMap.left].label;
+    $("#choiceRlabel").textContent = c[S.sideMap.right].label;
+    $("#stampL").textContent = c[S.sideMap.left].label;
+    $("#stampR").textContent = c[S.sideMap.right].label;
     renderPeek();
     setHints(0);
     clearPreview();
@@ -382,7 +427,7 @@
   function commit(side) {
     if (busy || !S.current) return;
     busy = true;
-    const c = CARDS[S.current]; const opt = c[side];
+    const c = CARDS[S.current]; const logical = S.sideMap[side]; const opt = c[logical];
     const dir = side === "right" ? 1 : -1;
     SOUND.sfx("swipe"); haptic(12);
     clearPreview();
@@ -409,8 +454,8 @@
       $("#playScore").textContent = S.measures.length;
     }
 
-    // Élan populaire (combo) + voix
-    const program = !opt.betray && (side === "right" || !!opt.measure);
+    // Élan populaire (combo) + voix — basé sur le CONTENU (choix conforme), pas le côté
+    const program = !opt.betray && (logical === "right" || !!opt.measure);
     let gain = 0;
     if (program) {
       S.combo++; S.maxCombo = Math.max(S.maxCombo, S.combo);

@@ -60,6 +60,11 @@ const CHARACTERS = {
   glucksmann: "Raph Glucksmann · le centre mou",
   ruffin: "Frankie Ruffin · le dissident",
   zemmour: "Érik Zemmour · le pamphlétaire",
+  // --- Scène internationale ---
+  trumpworld: "Donald Trump · le bully en chef",
+  netanyahou: "Benyamin Netanyahou · la guerre sans fin",
+  poutine: "Vladimir Poutine · l'autocrate",
+  musk: "Elon Musk · le milliardaire de X",
   // --- Le héros ---
   jlm: "Jean-Luc Mélenchon"
 };
@@ -159,13 +164,15 @@ const CARDS = {
   trump_tariffs: {
     char: "trump", scene: "monde", tag: "v", topical: true, crisis: true,
     text: "« La France a osé envoyer des troupes au Groenland. Je vous colle 25 % de droits de douane. »",
-    left: { label: "S'écraser", fx: { v: -14, p: -8, s: -4 }, set: ["submit_trump"],
+    left: { label: "S'écraser", fx: { v: -14, p: -8, s: -4 }, set: ["submit_trump"], betray: true,
       result: "Tu cèdes et achètes des armes américaines pour calmer Washington. La souveraineté s'efface.",
-      note: "Une France vassale n'est plus une France indépendante." },
+      note: "Une France vassale n'est plus une France indépendante.",
+      quip: "Le golfeur en chef encaisse ton honneur avec le sourire.", head: "LA FRANCE PAIE LA RANÇON" },
     right: { label: "Riposter", fx: { v: 12, p: 8, s: -5 }, set: ["defy_trump"],
       result: "Tu actives la riposte douanière européenne et défends le droit international au Groenland.",
       note: "La France indépendante ne se range derrière aucune puissance.",
-      measure: "Riposte souveraine aux tarifs", then: { id: "trump_retaliation", in: 2 } }
+      measure: "Riposte souveraine aux tarifs", then: { id: "trump_retaliation", in: 2 },
+      quip: "« America first » ? Ici, c'est le peuple d'abord.", head: "L'EUROPE RIPOSTE" }
   },
   trump_retaliation: {
     char: "general", scene: "otan", tag: "v", crisis: true,
@@ -252,13 +259,15 @@ const CARDS = {
   canicule: {
     char: "scientist", scene: "canicule", tag: "e", topical: true, crisis: true,
     text: "« Canicule record : plus de 46 °C, des milliers de morts, des incendies géants. Réponse d'urgence ? »",
-    left: { label: "Tout climatiser", fx: { e: -14, p: -3 },
+    left: { label: "Tout climatiser", fx: { e: -14, p: -3 }, betray: true,
       result: "On climatise à tout-va. La facture énergétique et carbone explose, fuite en avant.",
-      note: "Sans planification, chaque crise en aggrave une autre." },
+      note: "Sans planification, chaque crise en aggrave une autre.",
+      quip: "On éteint l'incendie à l'essence. Brillant.", head: "LA FRANCE SUFFOQUE" },
     right: { label: "Plan climat d'urgence", fx: { e: 14, s: 6, v: -4 }, set: ["climate_plan"],
       result: "Règle verte constitutionnelle, rénovation thermique massive, forêts et eau protégées.",
       note: "Ne pas prélever ni produire plus que ce que la nature peut reconstituer.",
-      measure: "Règle verte constitutionnelle" }
+      measure: "Règle verte constitutionnelle",
+      quip: "Les climatosceptiques ouvrent enfin la fenêtre.", head: "LA RÈGLE VERTE DANS LA CONSTITUTION" }
   },
   cop30: {
     char: "diplomat", scene: "monde", tag: "e", topical: true,
@@ -283,26 +292,57 @@ const CARDS = {
       measure: "Sortie programmée du nucléaire" }
   },
   ukraine: {
-    char: "diplomat", scene: "monde", tag: "v", topical: true,
-    text: "« La trêve en Ukraine est fragile et sans cesse violée. Quelle position pour la France ? »",
-    left: { label: "Escalade militaire", fx: { v: -8, p: -6, s: -4 },
-      result: "Tu t'engages dans une logique d'escalade et de course aux armements.",
-      note: "Le programme défend la paix par le droit, pas la surenchère." },
-    right: { label: "Diplomatie & ONU", fx: { v: 12, p: 6 }, set: ["peace_un"],
-      result: "Tu pousses une conférence de paix sous mandat de l'ONU, seul cadre légitime.",
-      note: "La France au service de la paix : la sécurité collective passe par l'ONU.",
-      measure: "Conférence de paix sous l'ONU" }
+    char: "poutine", scene: "warzone", tag: "v", topical: true, crisis: true,
+    text: "« La trêve, je la respecte… quand ça m'arrange. Alors, la France se couche ou s'aligne sur Washington ? »",
+    left: { label: "Escalade / alignement", fx: { v: -8, p: -6, s: -4 }, betray: true,
+      result: "Tu choisis la surenchère militaire dans le sillage des grandes puissances.",
+      note: "Le programme défend la paix par le droit, pas la course aux armements.",
+      quip: "Poutine sourit : la guerre, c'est bon pour ses affaires. Washington aussi.",
+      head: "LA FRANCE DANS L'ENGRENAGE" },
+    right: { label: "Paix par l'ONU", fx: { v: 12, p: 6 }, set: ["peace_un"],
+      result: "Ni soumission ni va-t-en-guerre : tu pousses une conférence de paix sous mandat de l'ONU.",
+      note: "Non-alignement : la sécurité collective passe par l'ONU, pas par les blocs.",
+      measure: "Conférence de paix sous l'ONU",
+      quip: "L'autocrate déteste les médiateurs indépendants.", head: "LA FRANCE POUR LA PAIX" }
   },
   gaza: {
-    char: "diplomat", scene: "monde", tag: "v", topical: true,
-    text: "« À Gaza, le cessez-le-feu vacille et les morts s'accumulent. La France se tait ou agit ? »",
-    left: { label: "Se taire", fx: { v: -8, p: -8 },
-      result: "Le silence diplomatique de la France choque une partie de l'opinion.",
-      note: "Le programme défend le droit international partout, sans deux poids deux mesures." },
-    right: { label: "Reconnaître & sanctionner", fx: { v: 10, p: 8, s: -3 }, set: ["intl_law"],
-      result: "Tu agis pour le respect du droit international et la protection des civils.",
-      note: "Faire respecter le droit international et la Charte de l'ONU.",
-      measure: "Défense du droit international" }
+    char: "netanyahou", scene: "warzone", tag: "v", topical: true, crisis: true,
+    text: "« Mon offensive continue, cessez-le-feu ou pas. La France va-t-elle encore me vendre des armes ? »",
+    left: { label: "Vendre les armes", fx: { v: -10, p: -10 }, betray: true,
+      result: "La France continue ses livraisons et son silence. L'opinion est scandalisée.",
+      note: "Le droit international vaut partout, sans deux poids deux mesures.",
+      quip: "Les marchands d'armes trinquent au champagne.", head: "LA FRANCE COMPLICE" },
+    right: { label: "Embargo & droit international", fx: { v: 10, p: 8, s: -3 }, set: ["intl_law"],
+      result: "Embargo sur les armes, reconnaissance de l'État de Palestine, protection des civils.",
+      note: "Faire respecter le droit international et la Charte de l'ONU, sans exception.",
+      measure: "Défense du droit international",
+      quip: "Netanyahou fulmine : la France n'est plus son fournisseur.", head: "LA FRANCE FAIT RESPECTER LE DROIT" }
+  },
+  musk_x: {
+    char: "musk", scene: "numerique", tag: "v", topical: true,
+    text: "« Je possède X, des fusées, et bientôt votre débat public. Laissez mes algorithmes faire la 'liberté d'expression'. »",
+    left: { label: "Le laisser faire", fx: { v: -10, p: -8 }, betray: true,
+      result: "Désinformation, ingérence, manipulation : un milliardaire étranger pèse sur ta démocratie.",
+      note: "La révolution numérique est d'intérêt général, pas la propriété d'un oligarque.",
+      quip: "Le tech-bro tweete sa victoire en majuscules.", head: "LA DÉMOCRATIE LIVRÉE AUX ALGORITHMES" },
+    right: { label: "Réguler les réseaux", fx: { v: 10, p: 8, s: -2 }, set: ["ai_reg"],
+      result: "Régulation des plateformes, transparence des algorithmes, neutralité du net, logiciels libres.",
+      note: "Reprendre la maîtrise publique des infrastructures et des données.",
+      measure: "Régulation des réseaux & des algorithmes",
+      quip: "Elon menace de partir sur Mars. Promis ?", head: "LES RÉSEAUX REMIS AU PAS" }
+  },
+  trump_greenland: {
+    char: "trumpworld", scene: "monde", tag: "v", topical: true, crisis: true,
+    text: "« Je veux le Groenland, et l'Europe paiera l'OTAN à 5 % du PIB. Sinon : tarifs ! Deal ? »",
+    left: { label: "Dire amen", fx: { v: -14, p: -6, s: -4 }, betray: true,
+      result: "Tu cèdes au chantage : achats d'armes US et budgets militaires gonflés sur le dos du social.",
+      note: "Une France vassale n'est plus indépendante.",
+      quip: "Trump te tape dans le dos. Ça fait toujours un peu mal.", head: "LA FRANCE À GENOUX" },
+    right: { label: "Tenir tête", fx: { v: 13, p: 8, s: -3 }, set: ["defy_trump"],
+      result: "Tu défends le droit international, la souveraineté du Groenland et une riposte européenne unie.",
+      note: "Indépendance et non-alignement : la France ne se soumet à aucune puissance.",
+      measure: "Front commun face au chantage",
+      quip: "« Qu'il vienne la chercher, ma souveraineté. »", head: "L'EUROPE TIENT TÊTE AU BULLY" }
   },
   ai_act: {
     char: "tech", scene: "numerique", tag: "v", topical: true,
@@ -674,11 +714,11 @@ const STORY = [
   { act: "ACTE I", title: "2027 — La prise du pouvoir", year: 2027, scene: "palais" },
   "invest", "smic", "medef_tax", "capital_flight", "macron_emt", "vote16", "jlm_pep", "media",
   { act: "ACTE II", title: "2028-2029 — Les fronts s'ouvrent", year: 2028, scene: "ue" },
-  "eu_austerity", "philippe_horloges", "trump_tariffs", "trump_retaliation", "ormuz", "retraite",
+  "eu_austerity", "philippe_horloges", "trump_tariffs", "trump_retaliation", "trump_greenland", "ormuz", "retraite",
   "hopital", "bardella_tiktok", "mercosur", "farmers_revolt", "energy_common", "lepen_recup",
   { act: "ACTE III", title: "2030-2031 — Tempêtes", year: 2030, scene: "canicule" },
   "canicule", "jlm_planif", "cop30", "nuclear", "darmanin_ordre", "censure", "krach",
-  "retailleau_bouc", "ukraine", "gaza", "attal_ecole", "ai_act", "glucksmann_centre", "outremer", "zemmour_declin",
+  "retailleau_bouc", "ukraine", "gaza", "attal_ecole", "ai_act", "musk_x", "glucksmann_centre", "outremer", "zemmour_declin",
   { act: "ACTE IV", title: "2032 — Le bilan", year: 2032, scene: "palais" },
   "hollande_flamby", "ruffin_ego", "jlm_energie", "corruption", "bilan"
 ];
@@ -696,7 +736,8 @@ const POOL = [
   // Adversaires + Mélenchon (mode Survie)
   "macron_emt", "lepen_recup", "bardella_tiktok", "hollande_flamby", "darmanin_ordre",
   "retailleau_bouc", "attal_ecole", "philippe_horloges", "glucksmann_centre", "ruffin_ego",
-  "zemmour_declin", "jlm_pep", "jlm_planif", "jlm_energie"
+  "zemmour_declin", "jlm_pep", "jlm_planif", "jlm_energie",
+  "trump_greenland", "musk_x"
 ];
 
 const SLOGANS = [

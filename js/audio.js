@@ -47,7 +47,15 @@ const SOUND = (function () {
 
   /* ---------- Musique : boucle d'arpèges + nappe + basse ---------- */
   let tension = 0; // 0..1 : intensifie la musique quand un pilier faiblit
+  let level = 0;   // 0..4 : monte à chaque acte (tempo + rythme)
   function setTension(x) { tension = Math.max(0, Math.min(1, x)); }
+  function period() { return Math.max(165, 372 - level * 46); } // BPM croissant
+  function setMusicLevel(n) {
+    n = Math.max(0, Math.min(4, n | 0));
+    if (n === level) return;
+    level = n;
+    if (musicTimer) { clearInterval(musicTimer); musicTimer = setInterval(tickMusic, period()); }
+  }
 
   function tickMusic() {
     if (!ctx || muted) return;
@@ -61,16 +69,28 @@ const SOUND = (function () {
     const idx = [0, 2, 4, 2, 5, 4, 2, 0][step % 8];
     note(SCALE[idx], t, 0.5, "sine", 0.32, musicGain);
     if (step % 4 === 2) note(SCALE[idx] * 2, t, 0.4, "triangle", 0.12, musicGain);
-    // percussion de tension : se renforce quand ça chauffe
-    if (tension > 0.4 && step % 2 === 1) note(70, t, 0.12, "square", 0.12 * tension, musicGain);
-    if (tension > 0.7) note(SCALE[(idx + 4) % 8] * 2, t, 0.25, "sawtooth", 0.06, musicGain);
+    // PERCUSSION qui se renforce avec l'acte (level) et la tension
+    if (level >= 1) { // grosse caisse
+      const k = ctx.createOscillator(), kg = ctx.createGain();
+      k.frequency.setValueAtTime(140, t); k.frequency.exponentialRampToValueAtTime(45, t + 0.12);
+      kg.gain.setValueAtTime(0.18 + level * 0.05, t); kg.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+      k.connect(kg); kg.connect(musicGain); k.start(t); k.stop(t + 0.18);
+    }
+    if (level >= 2 && step % 2 === 1) { // charley (bruit court)
+      const n = ctx.createOscillator(), ng = ctx.createGain();
+      n.type = "square"; n.frequency.value = 5200;
+      ng.gain.setValueAtTime(0.05 + level * 0.02, t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+      n.connect(ng); ng.connect(musicGain); n.start(t); n.stop(t + 0.06);
+    }
+    if ((level >= 3 || tension > 0.6) && step % 4 === 2) // toms de tension
+      note(110, t, 0.16, "sawtooth", 0.12, musicGain);
     step++;
   }
 
   function startMusic() {
     ensure();
     if (!ctx || musicTimer) return;
-    musicTimer = setInterval(tickMusic, 360);
+    musicTimer = setInterval(tickMusic, period());
   }
   function stopMusic() { if (musicTimer) { clearInterval(musicTimer); musicTimer = null; } }
 
@@ -136,5 +156,5 @@ const SOUND = (function () {
   function toggle() { setMuted(!muted); return muted; }
   function isMuted() { return muted; }
 
-  return { unlock, sfx, startMusic, stopMusic, toggle, isMuted, setMuted, setTension, started: () => started };
+  return { unlock, sfx, startMusic, stopMusic, toggle, isMuted, setMuted, setTension, setMusicLevel, started: () => started };
 })();

@@ -27,7 +27,22 @@ Pas un quiz : un **jeu de choix à la "swipe"** (dans l'esprit de _Reigns_), ten
 
 Chaque décision dévoile sa **conséquence** et une note **« 📖 L'Avenir en commun »** : on apprend le programme en gouvernant. Cartes tirées au hasard, **fins multiples**, rejouabilité → l'effet « encore une carte ».
 
-## 🆕 Nouveautés (édition « Fun »)
+## 🎬 Nouveautés (édition « cinématique »)
+
+- **Cinématique d'ouverture** : le chaos du bilan Macron (hôpitaux à l'os, 49.3,
+  « pognon de dingue »…), le peuple qui se lève, puis la **victoire de la France
+  insoumise au second tour 2027** — avant de prendre les rênes.
+- **Le bon choix alterne** désormais entre la gauche et la droite (fini le
+  « toujours à droite ») — il faut vraiment lire la carte.
+- **Anti-doublons** : plus de cartes répétées dans une même partie.
+- **Dirigeants du monde à étriller** : Trump (Groenland & tarifs), Netanyahou
+  (Gaza), Poutine (Ukraine), Elon Musk (X & désinformation) — répliques
+  sarcastiques inspirées de l'actu.
+- **Musique qui monte en pression** : tempo et rythme s'intensifient à chaque acte.
+- **Mélenchon plus réaliste** (nouvel avatar) et style graphique **« blocs 3D »**
+  inspiré des affiches de la campagne Mélenchon 2027.
+
+## 🆕 Édition « Fun »
 
 - **Adversaires politiques caricaturés** : affronte Manu Macron (« en même temps »),
   Marinette Le Pen, Jordy Bardella, Flamby Hollande, Gégé Darmanin, Brunito
