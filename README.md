@@ -27,6 +27,27 @@ Pas un quiz : un **jeu de choix à la "swipe"** (dans l'esprit de _Reigns_), ten
 
 Chaque décision dévoile sa **conséquence** et une note **« 📖 L'Avenir en commun »** : on apprend le programme en gouvernant. Cartes tirées au hasard, **fins multiples**, rejouabilité → l'effet « encore une carte ».
 
+## 🆕 Nouveautés (édition « Fun »)
+
+- **Adversaires politiques caricaturés** : affronte Manu Macron (« en même temps »),
+  Marinette Le Pen, Jordy Bardella, Flamby Hollande, Gégé Darmanin, Brunito
+  Retailleau, Gaby Attal, Edmond Philippe, Raph Glucksmann, Frankie Ruffin, Érik
+  Zemmour — chacun avec son avatar et ses répliques inspirées de l'actualité.
+- **Jean-Luc Mélenchon** intervient en mentor (avatar dédié) pour relancer la
+  marée populaire (« On ne lâche rien ! »).
+- **Élan populaire 🔥** : enchaîne les décisions conformes au programme pour des
+  combos et des **voix**.
+- **Aperçu d'impact** au glissement de la carte (flèches sur les jauges).
+- **4 niveaux de difficulté** (Découverte → Hardcore).
+- **Punchlines** satiriques + **« La Une du Peuple »** générée en fin de partie.
+- **Image de bilan partageable** (PNG) aux couleurs de la campagne.
+- **Plus de jus** : secousses d'écran, particules ✊/💸, pile de cartes, et
+  **musique adaptative** (monte en tension) + nouveaux effets sonores.
+- Le **SMIC est porté à 1 800 € nets dès 2027** (programme actualisé).
+- **50 cartes**, 28 portraits, 17 décors, arcs narratifs et fins multiples.
+
+> Voir aussi `docs/SPECS-FUN.md` pour la feuille de route complète.
+
 ## ✨ Caractéristiques
 
 - 📱 **Natif mobile** : mécanique de **swipe** au pouce, une seule main, plein écran, safe-areas iOS, vibrations.

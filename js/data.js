@@ -47,7 +47,21 @@ const CHARACTERS = {
   pm: "Ton Premier ministre",
   tech: "PDG d'une multinationale de l'IA",
   diplomat: "L'envoyé·e de l'ONU",
-  judge: "La magistrate anticorruption"
+  judge: "La magistrate anticorruption",
+  // --- Adversaires politiques (caricatures satiriques, prénoms détournés) ---
+  macron: "Manu Macron · « en même temps »",
+  lepen: "Marinette Le Pen · l'extrême droite",
+  bardella: "Jordy Bardella · l'influenceur",
+  hollande: "Flamby Hollande · l'ex-Président",
+  darmanin: "Gégé Darmanin · l'ordre à tout prix",
+  retailleau: "Brunito Retailleau · la droite dure",
+  attal: "Gaby Attal · le jeune premier",
+  philippe: "Edmond Philippe · le maître des horloges",
+  glucksmann: "Raph Glucksmann · le centre mou",
+  ruffin: "Frankie Ruffin · le dissident",
+  zemmour: "Érik Zemmour · le pamphlétaire",
+  // --- Le héros ---
+  jlm: "Jean-Luc Mélenchon"
 };
 
 /* =========================================================
@@ -68,15 +82,17 @@ const CARDS = {
       measure: "Processus constituant lancé" }
   },
   smic: {
-    char: "worker", scene: "usine", tag: "s",
+    char: "worker", scene: "usine", tag: "s", rarity: "common",
     text: "« Le SMIC ne suffit plus pour vivre. Vous l'augmentez, oui ou non ? »",
-    left: { label: "Geler", fx: { s: -14, p: -10 },
+    left: { label: "Geler", fx: { s: -14, p: -10 }, betray: true, rep: { worker: -1, lobby: 1 },
       result: "Salaires gelés « pour la compétitivité ». La pauvreté laborieuse grimpe.",
-      note: "Personne ne doit travailler à plein temps et rester pauvre." },
-    right: { label: "1 400 € nets", fx: { s: 14, p: 8, v: -5 }, set: ["raised_smic"],
-      result: "Le SMIC passe immédiatement à 1 400 € nets. Le pouvoir d'achat repart, le patronat fulmine.",
-      note: "SMIC à 1 400 € nets pour vivre dignement de son travail.",
-      measure: "SMIC à 1 400 € nets" }
+      note: "Personne ne doit travailler à plein temps et rester pauvre.",
+      quip: "Le patronat applaudit. Ton caddie, lui, reste vide.", head: "SALAIRES GELÉS : LE PEUPLE TRINQUE" },
+    right: { label: "1 800 € nets", fx: { s: 14, p: 8, v: -5 }, set: ["raised_smic"], rep: { worker: 1, lobby: -1 },
+      result: "Le SMIC passe immédiatement à 1 800 € nets. Le pouvoir d'achat repart, le patronat fulmine.",
+      note: "SMIC à 1 800 € nets dès 2027 pour vivre dignement de son travail.",
+      measure: "SMIC à 1 800 € nets", quip: "Le CAC 40 a fait un malaise. Les caissières respirent.",
+      head: "SMIC À 1 800 € : LE TRAVAIL ENFIN PAYÉ" }
   },
   medef_tax: {
     char: "lobby", scene: "bourse", tag: "s",
@@ -461,6 +477,181 @@ const CARDS = {
       measure: "Droits nouveaux des salariés" }
   },
 
+  /* ---------- ADVERSAIRES POLITIQUES (caricatures satiriques) ---------- */
+  macron_emt: {
+    char: "macron", scene: "plateau", tag: "p", rarity: "topical",
+    text: "« Taxez les riches… mais rassurez les marchés. En même temps, voyons ! »",
+    left: { label: "En même temps", fx: { s: -8, p: -8, v: -2 }, betray: true,
+      result: "Le « en même temps » accouche d'un compromis mou qui ne change rien.",
+      note: "Gouverner, c'est choisir un camp : celui du peuple.",
+      quip: "Le « en même temps » a encore accouché de rien.", head: "LE CENTRISME PATAUGE ENCORE" },
+    right: { label: "Trancher", fx: { s: 8, p: 8 }, rep: { macron: -1 },
+      result: "Tu refuses le « en même temps » : un cap clair pour les classes populaires.",
+      note: "Le programme tranche net : partage des richesses, services publics.",
+      quip: "Jupiter est redescendu de l'Olympe, dépité.", head: "FINI LE « EN MÊME TEMPS »" }
+  },
+  lepen_recup: {
+    char: "lepen", scene: "meeting", tag: "p", rarity: "topical",
+    text: "« La colère sociale ? Je vais la récupérer et la retourner contre les étrangers. »",
+    left: { label: "La laisser prospérer", fx: { p: -10, s: -4 }, betray: true,
+      result: "L'extrême droite prospère sur le désespoir que tu n'as pas soigné.",
+      note: "On combat l'extrême droite par la justice sociale, jamais en l'imitant.",
+      quip: "Marinette se frotte les mains.", head: "LE RN EN EMBUSCADE" },
+    right: { label: "Répondre par le social", fx: { s: 8, p: 8 }, rep: { lepen: -1 },
+      result: "Du concret social et la fraternité contre la haine : tu coupes l'herbe sous le pied du RN.",
+      note: "La fraternité et l'égalité contre la division identitaire.",
+      quip: "Marinette range ses pancartes.", head: "LE PEUPLE CHOISIT LA FRATERNITÉ" }
+  },
+  bardella_tiktok: {
+    char: "bardella", scene: "numerique", tag: "s", rarity: "topical",
+    text: "« Sur TikTok, j'ai déjà séduit la jeunesse. Bonne chance pour me rattraper 😎 »",
+    left: { label: "Ignorer les jeunes", fx: { p: -8, s: -4 }, betray: true,
+      result: "Pendant ce temps, Jordy fait deux millions de vues sur ton inaction.",
+      note: "Émanciper la jeunesse vaut mieux que la séduire à coups de filtres.",
+      quip: "Le gendre idéal engrange les likes.", head: "LA JEUNESSE DÉLAISSÉE" },
+    right: { label: "Du concret pour les jeunes", fx: { s: 8, p: 8 }, rep: { bardella: -1 },
+      result: "Allocation d'autonomie, transports gratuits, avenir : mieux qu'un filtre TikTok.",
+      note: "Donner un avenir matériel à la jeunesse, pas du vent.",
+      measure: "Gratuité des transports pour les jeunes",
+      quip: "Jordy n'a plus que ses likes.", head: "LA JEUNESSE REPREND LA MAIN" }
+  },
+  hollande_flamby: {
+    char: "hollande", scene: "palais", tag: "s", rarity: "rare",
+    text: "« Moi aussi j'avais dit 'mon ennemi, c'est la finance'… puis j'ai fait l'inverse. Ça va mieux ? »",
+    left: { label: "Suivre son exemple", fx: { s: -12, p: -12 }, betray: true,
+      result: "Tu enfiles le casque de scooter, direction le renoncement.",
+      note: "Mettre la finance au pas : pour de vrai, pas en discours.",
+      quip: "Flamby fond à vue d'œil.", head: "LE GRAND RENONCEMENT, SAISON 2" },
+    right: { label: "Ne pas trahir, cette fois", fx: { s: 8, p: 10 }, rep: { hollande: -1 },
+      result: "Cette fois, l'« ennemi finance » est vraiment mis au pas. Pas de Flamby.",
+      note: "Séparer les banques, taxer la spéculation, contrôler les capitaux.",
+      quip: "Le scooter restera au garage.", head: "LA FINANCE ENFIN MISE AU PAS" }
+  },
+  darmanin_ordre: {
+    char: "darmanin", scene: "manif", tag: "p", rarity: "topical", crisis: true,
+    text: "« Du désordre dans la rue ! Donnez-moi les pleins pouvoirs pour 'rétablir l'ordre'. »",
+    left: { label: "Pleins pouvoirs", fx: { p: -14, v: -4 }, betray: true, set: ["repressed"],
+      result: "L'ordre règne… comme dans un commissariat. Les libertés reculent.",
+      note: "Rompre avec la doctrine du maintien de l'ordre violent.",
+      quip: "L'ordre règne, la démocratie trinque.", head: "DÉRIVE AUTORITAIRE" },
+    right: { label: "Garantir les libertés", fx: { p: 12 }, rep: { darmanin: -1 },
+      result: "Droit de manifester garanti, police au service des citoyens : l'ordre juste.",
+      note: "L'intervention populaire s'accueille, elle ne se réprime pas.",
+      quip: "Gégé remballe ses LBD.", head: "LES LIBERTÉS PROTÉGÉES" }
+  },
+  retailleau_bouc: {
+    char: "retailleau", scene: "plateau", tag: "p", rarity: "topical",
+    text: "« Tous vos problèmes viennent de l'immigration. Durcissons, encore et encore ! »",
+    left: { label: "Surenchérir", fx: { p: -8, s: -6, v: -2 }, betray: true,
+      result: "On désigne des boucs émissaires ; pendant ce temps, les milliardaires prospèrent.",
+      note: "Le vrai clivage est social, pas identitaire.",
+      quip: "Les puissants adorent quand on regarde ailleurs.", head: "LA DROITE DURE DICTE L'AGENDA" },
+    right: { label: "Refuser la division", fx: { p: 8, s: 6 }, rep: { retailleau: -1 },
+      result: "Services publics partout, dignité pour toutes et tous : tu refuses les divisions.",
+      note: "Répondre à la peur par l'égalité réelle et la fraternité.",
+      quip: "Brunito ravale son discours.", head: "LE PEUPLE REFUSE LA DIVISION" }
+  },
+  attal_ecole: {
+    char: "attal", scene: "ville", tag: "s", rarity: "topical",
+    text: "« Uniforme, 'choc des savoirs', tri des élèves : voilà MA réforme de l'école. »",
+    left: { label: "Trier les élèves", fx: { s: -8, p: -6 }, betray: true,
+      result: "L'école du tri social, en uniforme. Les inégalités se reproduisent.",
+      note: "L'instruction émancipe, elle ne trie pas.",
+      quip: "L'uniforme ne cache pas les inégalités.", head: "L'ÉCOLE DU TRI" },
+    right: { label: "École émancipatrice", fx: { s: 10, p: 8 }, rep: { attal: -1 },
+      result: "École publique, gratuite, émancipatrice : on instruit, on n'aligne pas.",
+      note: "Une école de l'égalité, gratuite et ambitieuse pour tous.",
+      measure: "École publique émancipatrice",
+      quip: "Gaby range ses uniformes.", head: "L'ÉCOLE DE L'ÉGALITÉ" }
+  },
+  philippe_horloges: {
+    char: "philippe", scene: "bourse", tag: "s", rarity: "topical",
+    text: "« En 'maître des horloges', je vous le dis : l'heure est à l'austérité. Coupez ! »",
+    left: { label: "Couper les budgets", fx: { s: -12, p: -8, v: -4 }, betray: true, set: ["austerity"],
+      result: "La barbe approuve. Les services publics, beaucoup moins.",
+      note: "L'austérité tue les services publics : le programme bifurque.",
+      quip: "Le maître des horloges a sonné l'austérité.", head: "L'AUSTÉRITÉ REVIENT" },
+    right: { label: "Refuser l'austérité", fx: { s: 8, p: 6, v: 4 }, rep: { philippe: -1 },
+      result: "Tu remets les horloges à l'heure du peuple : investissement, pas saignée.",
+      note: "Investir dans l'humain et la transition plutôt que couper.",
+      quip: "Edmond a perdu le fil du temps.", head: "STOP À L'AUSTÉRITÉ" }
+  },
+  glucksmann_centre: {
+    char: "glucksmann", scene: "ue", tag: "p", rarity: "common",
+    text: "« Unissons la gauche… mais au centre. Et surtout, pas de vagues avec Bruxelles. »",
+    left: { label: "Se diluer au centre", fx: { p: -8, v: -6 }, betray: true,
+      result: "La « gauche raisonnable » : raisonnablement inutile. L'espoir s'éteint.",
+      note: "Ni austérité ni demi-mesures : la rupture démocratique et sociale.",
+      quip: "Une gauche tiède refroidit le peuple.", head: "LA GAUCHE SE DILUE" },
+    right: { label: "Rupture, pas accompagnement", fx: { p: 8, v: 6 }, rep: { glucksmann: -1 },
+      result: "Une gauche de rupture, claire et populaire, qui ne gère pas le système mais le change.",
+      note: "Désobéir aux traités et rompre avec l'ordre libéral.",
+      quip: "Raph rajuste son écharpe européenne, vexé.", head: "CAP À GAUCHE TOUTE" }
+  },
+  ruffin_ego: {
+    char: "ruffin", scene: "usine", tag: "s", rarity: "common",
+    text: "« Je me suis émancipé de votre mouvement. Le peuple, c'est MOI qui le comprends ! »",
+    left: { label: "Polémiquer", fx: { p: -6 }, betray: true,
+      result: "La gauche se divise en querelles d'ego. La droite jubile.",
+      note: "L'union populaire se construit sur le contenu, pas sur les personnes.",
+      quip: "La division : le meilleur allié des puissants.", head: "LA GAUCHE SE CHAMAILLE" },
+    right: { label: "L'union sur le programme", fx: { p: 8, s: 6 },
+      result: "Plutôt que la guerre d'ego, tu tends la main : l'union se fait sur L'Avenir en commun.",
+      note: "Rassembler le grand nombre autour d'un programme partagé.",
+      quip: "Frankie remballe sa chemise à carreaux.", head: "L'UNION SUR LE PROGRAMME" }
+  },
+  zemmour_declin: {
+    char: "zemmour", scene: "plateau", tag: "p", rarity: "common",
+    text: "« La France décline, la civilisation s'effondre, et c'est la faute des autres ! »",
+    left: { label: "Entrer dans son jeu", fx: { p: -8, s: -4 }, betray: true,
+      result: "Tu joues sa partition du déclin et de la peur. Le pamphlétaire exulte.",
+      note: "Face au déclinisme, porter la France aux frontières de l'Humanité.",
+      quip: "Le poison du déclinisme se répand.", head: "LE POISON DU DÉCLINISME" },
+    right: { label: "Opposer l'avenir", fx: { p: 8, e: 4 }, rep: { zemmour: -1 },
+      result: "Au déclin, tu opposes le progrès humain : la mer, l'espace, le numérique, la fraternité.",
+      note: "Le déclinisme est un renoncement : nous, nous voyons grand.",
+      quip: "Érik retourne à ses pamphlets poussiéreux.", head: "L'AVENIR CONTRE LE DÉCLIN" }
+  },
+
+  /* ---------- JEAN-LUC MÉLENCHON (allié / mentor) ---------- */
+  jlm_pep: {
+    char: "jlm", scene: "meeting", tag: "p", rarity: "rare", hero: true,
+    text: "« Alors, on lâche rien ? Le peuple est là, derrière toi. Allez, on y va ! »",
+    left: { label: "Souffler un peu", fx: { p: -3 },
+      result: "Tu lèves le pied. La dynamique retombe un peu.",
+      note: "Une campagne populaire se nourrit du mouvement permanent.",
+      quip: "Le doute n'a jamais soulevé une marée.", head: "TEMPS MORT" },
+    right: { label: "On ne lâche rien !", fx: { p: 12, s: 4 },
+      result: "La marée populaire se lève : meetings pleins, élan retrouvé, militants gonflés à bloc.",
+      note: "La force, c'est le nombre et la conviction. Place au peuple !",
+      quip: "« Qu'ils s'en aillent tous ! »", head: "MARÉE POPULAIRE" }
+  },
+  jlm_planif: {
+    char: "jlm", scene: "usine", tag: "e", rarity: "rare", hero: true,
+    text: "« La planification écologique, c'est le projet du siècle. On accélère, camarade ? »",
+    left: { label: "Temporiser", fx: { e: -4 },
+      result: "Tu temporises. Chaque mois perdu, la planète le paie.",
+      note: "Planifier, c'est anticiper : le temps perdu ne se rattrape pas.",
+      quip: "Le climat n'attend pas les hésitants.", head: "L'ÉCOLOGIE EN PAUSE" },
+    right: { label: "Accélérer la bifurcation", fx: { e: 12, s: 2 },
+      result: "Grand plan de bifurcation : industrie verte, emplois, sobriété choisie.",
+      note: "Fixer le cap, mobiliser l'État et financer la transition, secteur par secteur.",
+      measure: "Grand plan de bifurcation écologique",
+      quip: "« Place au peuple, et à la planète ! »", head: "LA BIFURCATION EN MARCHE" }
+  },
+  jlm_energie: {
+    char: "jlm", scene: "meeting", tag: "p", rarity: "rare", hero: true, topical: true,
+    text: "« Les éditorialistes répètent : 'mais où trouve-t-il toute cette énergie ?'. Montre-leur. »",
+    left: { label: "Lever le pied", fx: { p: -3 },
+      result: "Tu ralentis la campagne. Les plateaux télé reprennent la main.",
+      note: "Le terrain et la conviction font gagner les campagnes populaires.",
+      quip: "Les éditorialistes respirent.", head: "LA CAMPAGNE RALENTIT" },
+    right: { label: "Sillonner le pays", fx: { p: 11 },
+      result: "Meetings, terrain, vidéos : la campagne est partout. L'énergie, c'est celle du peuple.",
+      note: "Une campagne se gagne sur le terrain et dans les têtes, pas dans les studios.",
+      quip: "« Où trouve-t-il cette énergie ? » — Dans le peuple, pardi.", head: "L'ÉNERGIE DU PEUPLE" }
+  },
+
   /* ---------- ACTE IV — 2032 : le bilan ---------- */
   bilan: {
     char: "citizen", scene: "palais", tag: "p", finale: true,
@@ -481,14 +672,15 @@ const CARDS = {
    ========================================================= */
 const STORY = [
   { act: "ACTE I", title: "2027 — La prise du pouvoir", year: 2027, scene: "palais" },
-  "invest", "smic", "medef_tax", "capital_flight", "vote16", "media",
+  "invest", "smic", "medef_tax", "capital_flight", "macron_emt", "vote16", "jlm_pep", "media",
   { act: "ACTE II", title: "2028-2029 — Les fronts s'ouvrent", year: 2028, scene: "ue" },
-  "eu_austerity", "trump_tariffs", "trump_retaliation", "ormuz", "retraite",
-  "hopital", "mercosur", "farmers_revolt", "energy_common",
+  "eu_austerity", "philippe_horloges", "trump_tariffs", "trump_retaliation", "ormuz", "retraite",
+  "hopital", "bardella_tiktok", "mercosur", "farmers_revolt", "energy_common", "lepen_recup",
   { act: "ACTE III", title: "2030-2031 — Tempêtes", year: 2030, scene: "canicule" },
-  "canicule", "cop30", "nuclear", "censure", "krach", "ukraine", "gaza", "ai_act", "outremer",
+  "canicule", "jlm_planif", "cop30", "nuclear", "darmanin_ordre", "censure", "krach",
+  "retailleau_bouc", "ukraine", "gaza", "attal_ecole", "ai_act", "glucksmann_centre", "outremer", "zemmour_declin",
   { act: "ACTE IV", title: "2032 — Le bilan", year: 2032, scene: "palais" },
-  "corruption", "bilan"
+  "hollande_flamby", "ruffin_ego", "jlm_energie", "corruption", "bilan"
 ];
 
 /* =========================================================
@@ -500,7 +692,11 @@ const POOL = [
   "retraite", "hopital", "mercosur", "energy_common", "canicule", "cop30", "nuclear",
   "ukraine", "gaza", "ai_act", "krach", "outremer", "jeunesse", "corruption",
   "manif_repression", "ecole", "pesticides", "conges", "feminisme", "monnaie",
-  "traite_ref", "recherche", "ess"
+  "traite_ref", "recherche", "ess",
+  // Adversaires + Mélenchon (mode Survie)
+  "macron_emt", "lepen_recup", "bardella_tiktok", "hollande_flamby", "darmanin_ordre",
+  "retailleau_bouc", "attal_ecole", "philippe_horloges", "glucksmann_centre", "ruffin_ego",
+  "zemmour_declin", "jlm_pep", "jlm_planif", "jlm_energie"
 ];
 
 const SLOGANS = [

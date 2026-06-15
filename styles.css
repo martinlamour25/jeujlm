@@ -325,7 +325,77 @@ body {
   .intro-logo { width: 72px; height: 72px; }
 }
 
-@media (prefers-reduced-motion: reduce) { * { animation-duration: 0.001s !important; } }
+/* =========================================================
+   AJOUTS PHASE 1 — juice, combos, difficulté, caricatures, Une
+   ========================================================= */
+
+/* Bande tricolore (clin d'œil identité Mélenchon 2027) */
+.home-title::after { content: ""; display: block; width: 120px; height: 8px; margin: 14px auto 0;
+  border-radius: 4px; background: linear-gradient(90deg, #3f7fe0 33%, #fff7f9 33% 66%, #ff2b46 66%); }
+
+/* Sélecteur de difficulté */
+.diff-select { margin-bottom: 16px; }
+.diff-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--c-muted); display: block; margin-bottom: 8px; text-align: center; }
+.diff-chips { display: flex; gap: 6px; }
+.diff-chip { flex: 1; padding: 10px 4px; border-radius: 12px; border: 1.5px solid var(--c-line);
+  background: var(--c-glass); color: var(--c-muted); font-weight: 700; font-size: 0.78rem; cursor: pointer;
+  transition: all 0.15s; }
+.diff-chip.is-on { background: linear-gradient(135deg, var(--c-red), var(--c-red-2)); color: #fff; border-color: transparent; }
+.diff-chip:active { transform: scale(0.95); }
+
+/* Flèches d'aperçu d'impact sur les jauges */
+.g-arrow { position: absolute; top: -16px; font-weight: 900; font-size: 0.95rem; opacity: 0;
+  transition: opacity 0.1s; pointer-events: none; }
+.g-arrow.up { color: var(--c-ok); } .g-arrow.down { color: var(--c-ko); }
+
+/* Badge de combo / élan populaire */
+.combo-badge { align-self: center; margin: -2px 0 6px; font-family: var(--font-display); font-weight: 800;
+  font-size: 0.95rem; color: var(--c-gold); background: rgba(255,209,102,0.14);
+  border: 1px solid rgba(255,209,102,0.4); border-radius: 999px; padding: 5px 14px; }
+.combo-badge[hidden] { display: none; }
+.combo-badge em { font-style: normal; color: var(--c-ok); }
+.combo-badge.pulse { animation: comboPulse 0.4s cubic-bezier(.2,1.5,.4,1); }
+@keyframes comboPulse { 0% { transform: scale(1); } 40% { transform: scale(1.22); } 100% { transform: scale(1); } }
+
+/* Carte fantôme (pile de cartes) */
+.card--peek { z-index: 1 !important; transform: translate(-50%, 14px) scale(0.94) !important;
+  opacity: 0.4; filter: saturate(0.7) brightness(0.8); pointer-events: none; }
+.card--peek::after { display: none; }
+.peek-phi { margin: auto; width: 70px; height: 70px; opacity: 0.5; }
+.peek-phi svg { width: 100%; height: 100%; }
+
+/* Carte héros (Mélenchon) & rare */
+.card.is-hero { background: linear-gradient(170deg, #5a1430, #2a0a2f); }
+.card.is-hero::before { box-shadow: inset 0 0 0 3px rgba(255,209,102,0.6); opacity: 0.9; }
+.card.is-rare .card-portrait { box-shadow: 0 0 0 3px var(--c-gold), 0 0 30px -4px var(--c-gold) !important; }
+
+/* Particules */
+.particle { position: absolute; z-index: 9; pointer-events: none; transform: translate(-50%,-50%);
+  animation: particleFly 0.85s ease-out forwards; }
+@keyframes particleFly { to { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.4); opacity: 0; } }
+
+/* Secousse d'écran */
+.shake { animation: shakeAnim 0.32s cubic-bezier(.36,.07,.19,.97); }
+@keyframes shakeAnim {
+  10%,90% { transform: translateX(calc(var(--shk,6px) * -0.4)); }
+  30%,70% { transform: translateX(var(--shk,6px)); }
+  50% { transform: translateX(calc(var(--shk,6px) * -1)); } }
+
+/* Punchline & chip voix */
+.quip { display: block; margin-top: 8px; color: var(--c-gold); font-style: italic; font-weight: 600; }
+.d-chip.voix { color: var(--c-gold); border-color: rgba(255,209,102,0.5); }
+
+/* Une du Peuple (écran de fin) */
+.une { width: 100%; background: #fff7f9; color: #1a0820; border-radius: 10px; padding: 10px 14px;
+  margin: 6px 0 4px; box-shadow: var(--shadow); transform: rotate(-1deg); }
+.une[hidden] { display: none; }
+.une-masthead { display: block; font-family: var(--font-display); font-weight: 800; font-size: 0.7rem;
+  letter-spacing: 2px; color: #ff2b46; border-bottom: 2px solid #1a0820; padding-bottom: 3px; margin-bottom: 5px; }
+.une-head { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; line-height: 1.05; color: #1a0820; }
+.eml-voix { color: var(--c-gold); font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; }
+
+@media (prefers-reduced-motion: reduce) { * { animation-duration: 0.001s !important; } .particle { display: none; } }
 @media (max-height: 700px) {
   .home-top { margin-top: 2vh; } .logo-phi { width: 70px; height: 70px; }
   .card-avatar { width: 88px; height: 88px; } .card-avatar svg { width: 50px; height: 50px; }

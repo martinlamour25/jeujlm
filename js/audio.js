@@ -46,16 +46,24 @@ const SOUND = (function () {
   }
 
   /* ---------- Musique : boucle d'arpèges + nappe + basse ---------- */
+  let tension = 0; // 0..1 : intensifie la musique quand un pilier faiblit
+  function setTension(x) { tension = Math.max(0, Math.min(1, x)); }
+
   function tickMusic() {
     if (!ctx || muted) return;
     const t = ctx.currentTime + 0.02;
     const chord = step % 4;
     // basse
     if (step % 2 === 0) note(BASS[chord], t, 1.4, "triangle", 0.5, musicGain);
-    // arpège
+    // nappe douce (pad) tenue
+    if (step % 4 === 0) note(BASS[chord] * 2, t, 1.7, "sine", 0.10 + tension * 0.06, musicGain);
+    // arpège principal
     const idx = [0, 2, 4, 2, 5, 4, 2, 0][step % 8];
     note(SCALE[idx], t, 0.5, "sine", 0.32, musicGain);
     if (step % 4 === 2) note(SCALE[idx] * 2, t, 0.4, "triangle", 0.12, musicGain);
+    // percussion de tension : se renforce quand ça chauffe
+    if (tension > 0.4 && step % 2 === 1) note(70, t, 0.12, "square", 0.12 * tension, musicGain);
+    if (tension > 0.7) note(SCALE[(idx + 4) % 8] * 2, t, 0.25, "sawtooth", 0.06, musicGain);
     step++;
   }
 
@@ -93,6 +101,23 @@ const SOUND = (function () {
       case "lose":
         [392, 329.63, 261.63, 196].forEach((f, i) =>
           note(f, t + i * 0.16, 0.5, "sawtooth", 0.22)); break;
+      case "combo": {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = "triangle"; o.frequency.setValueAtTime(440, t);
+        o.frequency.exponentialRampToValueAtTime(1100, t + 0.18);
+        g.gain.setValueAtTime(0.2, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+        o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.24); break;
+      }
+      case "coin": // mesure adoptée : petit carillon
+        note(1318.5, t, 0.12, "sine", 0.22); note(1760, t + 0.08, 0.18, "sine", 0.18); break;
+      case "breaking": // alerte info à deux tons
+        note(740, t, 0.14, "square", 0.2); note(988, t + 0.16, 0.18, "square", 0.2);
+        note(740, t + 0.36, 0.14, "square", 0.16); break;
+      case "fanfare": // victoire éclatante
+        [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) =>
+          note(f, t + i * 0.1, 0.6, "triangle", 0.26)); break;
+      case "hero": // arrivée de Mélenchon
+        [330, 392, 494, 587].forEach((f, i) => note(f, t + i * 0.09, 0.5, "sine", 0.24)); break;
     }
   }
 
@@ -111,5 +136,5 @@ const SOUND = (function () {
   function toggle() { setMuted(!muted); return muted; }
   function isMuted() { return muted; }
 
-  return { unlock, sfx, startMusic, stopMusic, toggle, isMuted, setMuted, started: () => started };
+  return { unlock, sfx, startMusic, stopMusic, toggle, isMuted, setMuted, setTension, started: () => started };
 })();

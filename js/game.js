@@ -27,11 +27,22 @@
   const haptic = (p) => { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) {} };
   const resolve = (x, f) => (typeof x === "function" ? x(f) : x);
 
-  /* ---------- Constantes ---------- */
+  /* ---------- Constantes & équilibrage ---------- */
   const KEYS = ["p", "s", "e", "v"];
-  const START = 50;
   const BEST_M = "ppp2027.best.measures";
   const BEST_S = "ppp2027.best.survival";
+  const DIFF_KEY = "ppp2027.diff";
+
+  const BALANCE = {
+    comboBase: 60,           // voix par bonne décision
+    diff: {
+      decouverte: { start: 62, drift: 0, grace: 4, preview: "num",   label: "Découverte" },
+      normal:     { start: 50, drift: 1, grace: 3, preview: "arrow", label: "Normal" },
+      insoumis:   { start: 44, drift: 2, grace: 2, preview: "weak",  label: "Insoumis·e" },
+      hardcore:   { start: 38, drift: 3, grace: 0, preview: "none",  label: "Hardcore" }
+    }
+  };
+  let difficulty = localStorage.getItem(DIFF_KEY) || "normal";
 
   /* ---------- État ---------- */
   let S = null;
@@ -116,6 +127,7 @@
       el.className = "gauge2"; el.dataset.g = k; el.style.setProperty("--gc", def.color);
       el.innerHTML =
         '<div class="g-delta" id="delta-' + k + '"></div>' +
+        '<div class="g-arrow" id="arr-' + k + '"></div>' +
         '<div class="g-ring" id="ring-' + k + '"><span class="g-ico">' + ICONS[def.icon] + "</span></div>" +
         '<div class="g-name">' + def.name + "</div>";
       wrap.appendChild(el);
@@ -123,12 +135,29 @@
     paintGauges();
   }
   function paintGauges() {
+    let lowest = 100;
     KEYS.forEach((k) => {
       const ring = $("#ring-" + k); const v = clamp(S.g[k], 0, 100);
       ring.style.setProperty("--p", v);
       ring.parentElement.classList.toggle("danger", v <= 22);
+      lowest = Math.min(lowest, v);
+    });
+    // Tension musicale : monte quand un pilier faiblit.
+    SOUND.setTension(clamp((40 - lowest) / 40, 0, 1));
+  }
+  // Aperçu d'impact pendant le drag (flèches ↑/↓ sur les jauges).
+  function previewImpact(side, intensity) {
+    const prev = BALANCE.diff[S.diff].preview;
+    KEYS.forEach((k) => {
+      const a = $("#arr-" + k); if (!a) return;
+      const c = S.current && CARDS[S.current][side]; const v = c && c.fx ? c.fx[k] : 0;
+      if (!v || prev === "none" || intensity < 0.18) { a.className = "g-arrow"; a.textContent = ""; return; }
+      a.className = "g-arrow show " + (v > 0 ? "up" : "down");
+      a.style.opacity = Math.min(1, intensity);
+      a.textContent = prev === "num" ? (v > 0 ? "+" + v : "" + v) : (v > 0 ? "▲" : "▼");
     });
   }
+  function clearPreview() { KEYS.forEach((k) => { const a = $("#arr-" + k); if (a) { a.className = "g-arrow"; a.textContent = ""; } }); }
   function flashDelta(k, d) {
     if (!d) return;
     const el = $("#delta-" + k);
@@ -139,11 +168,15 @@
 
   /* ---------- Démarrage ---------- */
   function newGame(mode) {
-    S = { mode, flags: {}, g: { p: START, s: START, e: START, v: START },
-      turn: 0, month: 0, measures: [], queue: [], storyIdx: 0, lastId: null, current: null };
+    const cfg = BALANCE.diff[difficulty] || BALANCE.diff.normal;
+    S = { mode, diff: difficulty, flags: {}, rep: {},
+      g: { p: cfg.start, s: cfg.start, e: cfg.start, v: cfg.start },
+      turn: 0, month: 0, measures: [], heads: [], voix: 0, combo: 0, maxCombo: 0,
+      queue: [], storyIdx: 0, lastId: null, current: null };
     busy = false;
     buildGauges();
     $("#playScore").textContent = "0";
+    $("#comboBadge").hidden = true;
     updateMandate();
     show("play");
     SOUND.sfx("click");
@@ -241,20 +274,28 @@
     card.classList.toggle("is-crisis", !!c.crisis);
     card.style.setProperty("--accent", theme.color);
 
+    card.classList.toggle("is-hero", !!c.hero);
+    card.classList.toggle("is-rare", c.rarity === "rare" || c.rarity === "legendary");
     $("#cardScene").innerHTML = (SCENES && SCENES[c.scene]) || "";
-    $("#cardRibbon").hidden = !c.topical;
+    const ribbon = $("#cardRibbon");
+    ribbon.hidden = !c.topical;
+    ribbon.textContent = c.crisis ? "🔴 BREAKING" : "⚡ ACTUALITÉ";
     const av = $("#cardAvatar");
     av.innerHTML = (CHAR_ART && CHAR_ART[c.char]) || FALLBACK_PORTRAIT;
     av.style.boxShadow = "0 0 0 3px " + theme.color + "55, 0 10px 24px -6px rgba(0,0,0,.6)";
 
-    $("#cardWho").textContent = CHARACTERS[c.char] || "—";
+    $("#cardWho").textContent = (typeof CHARACTERS[c.char] === "string" ? CHARACTERS[c.char] : (CHARACTERS[c.char] && CHARACTERS[c.char].name)) || "—";
     $("#cardText").innerHTML = resolve(c.text, f);
     $("#choiceLlabel").textContent = c.left.label;
     $("#choiceRlabel").textContent = c.right.label;
     $("#stampL").textContent = c.left.label;
     $("#stampR").textContent = c.right.label;
+    renderPeek();
     setHints(0);
-    if (c.crisis) SOUND.sfx("crisis");
+    clearPreview();
+    if (c.hero) SOUND.sfx("hero");
+    else if (c.crisis && c.topical) SOUND.sfx("breaking");
+    else if (c.crisis) SOUND.sfx("crisis");
 
     requestAnimationFrame(() => {
       card.style.transition = "transform .45s cubic-bezier(.2,1,.3,1), opacity .35s ease";
@@ -262,6 +303,42 @@
       card.style.opacity = "1";
       busy = false;
     });
+  }
+
+  // Effet « pile de cartes » : carte fantôme derrière.
+  function renderPeek() {
+    const p = $("#cardPeek"); if (!p) return;
+    if (!p.dataset.init) { p.innerHTML = '<div class="peek-phi">' + ICONS.phi + "</div>"; p.dataset.init = "1"; }
+  }
+
+  // Petite secousse d'écran.
+  function shake(intensity) {
+    const app = $("#app"); app.style.setProperty("--shk", (intensity || 6) + "px");
+    app.classList.remove("shake"); void app.offsetWidth; app.classList.add("shake");
+  }
+
+  // Gerbe d'emojis depuis le centre de la carte.
+  function burst(emoji, n) {
+    const deck = $("#deck"); const rect = deck.getBoundingClientRect();
+    for (let i = 0; i < (n || 10); i++) {
+      const el = document.createElement("div"); el.className = "particle"; el.textContent = emoji;
+      el.style.left = rect.width / 2 + "px"; el.style.top = rect.height / 2 + "px";
+      const ang = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 120;
+      el.style.setProperty("--dx", Math.cos(ang) * dist + "px");
+      el.style.setProperty("--dy", (Math.sin(ang) * dist - 40) + "px");
+      el.style.fontSize = (16 + Math.random() * 16) + "px";
+      deck.appendChild(el);
+      setTimeout(() => el.remove(), 900);
+    }
+  }
+
+  function updateCombo(gain) {
+    const b = $("#comboBadge");
+    if (S.combo >= 2) {
+      b.hidden = false; $("#comboX").textContent = S.combo;
+      $("#comboVoix").textContent = "+" + (gain || 0);
+      b.classList.remove("pulse"); void b.offsetWidth; b.classList.add("pulse");
+    } else { b.hidden = true; }
   }
 
   function setHints(dx) {
@@ -272,6 +349,8 @@
     $("#hintL").style.opacity = r < 0 ? -r * 0.9 : 0;
     $("#choiceR").classList.toggle("hot", r > 0.25);
     $("#choiceL").classList.toggle("hot", r < -0.25);
+    if (Math.abs(r) < 0.18) clearPreview();
+    else previewImpact(r > 0 ? "right" : "left", Math.abs(r));
   }
 
   /* ---------- Swipe ---------- */
@@ -306,6 +385,7 @@
     const c = CARDS[S.current]; const opt = c[side];
     const dir = side === "right" ? 1 : -1;
     SOUND.sfx("swipe"); haptic(12);
+    clearPreview();
 
     const card = $("#card");
     card.style.transition = "transform .42s cubic-bezier(.4,0,.6,1), opacity .42s ease";
@@ -313,33 +393,58 @@
     card.style.opacity = "0";
     setHints(0);
 
-    // Effets
+    // Effets sur les jauges
     const fx = opt.fx || {};
     KEYS.forEach((k) => { if (fx[k]) { S.g[k] = clamp(S.g[k] + fx[k], 0, 100); flashDelta(k, fx[k]); } });
 
-    // Drapeaux + arcs
+    // Réputation des personnages
+    if (opt.rep) Object.keys(opt.rep).forEach((id) => { S.rep[id] = clamp((S.rep[id] || 0) + opt.rep[id], -3, 3); });
+
+    // Drapeaux + arcs + mesures
     if (opt.set) opt.set.forEach((fl) => (S.flags[fl] = true));
     if (opt.then) enqueue(opt.then);
+    if (opt.head) S.heads.push(opt.head);
     if (opt.measure && S.measures.indexOf(opt.measure) === -1) {
       S.measures.push(opt.measure);
       $("#playScore").textContent = S.measures.length;
     }
 
+    // Élan populaire (combo) + voix
+    const program = !opt.betray && (side === "right" || !!opt.measure);
+    let gain = 0;
+    if (program) {
+      S.combo++; S.maxCombo = Math.max(S.maxCombo, S.combo);
+      const mult = 1 + Math.floor(S.combo / 2) * 0.5;
+      gain = Math.round(BALANCE.comboBase * mult);
+      S.voix += gain;
+      if (S.combo >= 3) SOUND.sfx("combo");
+      if (opt.measure) { SOUND.sfx("coin"); burst("✊", 12); }
+      else burst("✊", 5);
+    } else if (opt.betray) {
+      if (S.combo >= 2) toast("💔 Élan populaire brisé !");
+      S.combo = 0; burst("💸", 8);
+    }
+    updateCombo(gain); S.lastGain = gain;
+
     S.turn++; S.month += 3;
-    // Pression du pouvoir : difficulté (drift croissant, surtout en survie).
     applyPressure();
-    // Décrément des arcs en attente.
     S.queue.forEach((q) => (q.in--));
     paintGauges();
+
+    // Secousse si crise ou pilier en danger
+    if (c.crisis || KEYS.some((k) => S.g[k] <= 22)) shake(c.crisis ? 9 : 6);
 
     setTimeout(() => showFeedback(opt), 260);
   }
 
   function applyPressure() {
-    let drift = 1;
-    if (S.mode === "infinite") drift = 1 + Math.floor(S.month / 9);
-    else drift = S.turn > 6 ? 2 : 1;
-    // pilier le plus haut subit la pression (force l'équilibre), + un aléatoire
+    const cfg = BALANCE.diff[S.diff] || BALANCE.diff.normal;
+    if (S.turn < cfg.grace) return;            // garde-fou : pas de pression au début
+    let drift = cfg.drift;
+    if (S.mode === "infinite") drift = cfg.drift + Math.floor(S.month / 10);
+    else if (S.turn > 8) drift += 1;
+    if (drift <= 0) return;
+    // le pilier le plus haut subit la pression (force l'équilibre) + un aléatoire
     const sorted = KEYS.slice().sort((a, b) => S.g[b] - S.g[a]);
     S.g[sorted[0]] = clamp(S.g[sorted[0]] - drift, 0, 100);
     const r = KEYS[(Math.random() * KEYS.length) | 0];
@@ -348,13 +453,13 @@
 
   function showFeedback(opt) {
     const fx = opt.fx || {};
-    const dead = KEYS.find((k) => S.g[k] <= 0);
-    SOUND.sfx(opt.measure ? "good" : (Object.values(fx).some((x) => x < 0) ? "bad" : "good"));
+    if (!opt.measure) SOUND.sfx(Object.values(fx).some((x) => x < 0) ? "bad" : "good");
     const chips = KEYS.filter((k) => fx[k]).map((k) =>
       '<span class="d-chip ' + (fx[k] > 0 ? "up" : "down") + '" style="--gc:' + GAUGES[k].color + '">' +
       '<span class="d-ico">' + ICONS[GAUGES[k].icon] + "</span>" + (fx[k] > 0 ? "+" : "") + fx[k] + "</span>").join("");
-    $("#feedbackDeltas").innerHTML = chips;
-    $("#feedbackResult").innerHTML = opt.result;
+    let voixChip = S.lastGain ? '<span class="d-chip voix">🔥 +' + S.lastGain + " voix</span>" : "";
+    $("#feedbackDeltas").innerHTML = chips + voixChip;
+    $("#feedbackResult").innerHTML = opt.result + (opt.quip ? ' <span class="quip">' + opt.quip + "</span>" : "");
     $("#feedbackNote").innerHTML = "<strong>📖 L'Avenir en commun —</strong> " + opt.note;
     $("#feedbackTag").innerHTML = opt.measure ? "✅ Mesure adoptée : " + opt.measure : "📖 L'Avenir en commun";
     if (opt.measure) toast("✅ " + opt.measure);
@@ -385,6 +490,7 @@
       $("#endKicker").textContent = "Présidence interrompue";
       $("#endTitle").textContent = d.title;
       $("#endSub").innerHTML = d.text + " Mais le combat continue. ✊";
+      setUne("defeat", deadKey);
       SOUND.sfx("lose");
     } else {
       // Fin du mode histoire
@@ -402,7 +508,8 @@
         $("#endTitle").textContent = "Mandat accompli";
         $("#endSub").innerHTML = "Tu as tenu jusqu'en 2032, mais sans aller au bout de la rupture démocratique. Le combat continue.";
       }
-      SOUND.sfx("win");
+      setUne("win", null);
+      SOUND.sfx("fanfare");
     }
 
     $("#endMeasures").textContent = S.measures.length;
@@ -410,18 +517,34 @@
     $("#endGrade").textContent = grade(kind, S.measures.length);
 
     const list = $("#endMeasureList");
-    list.innerHTML = S.measures.length
+    const vline = '<p class="eml-voix">🔥 ' + S.voix.toLocaleString("fr-FR") + " voix rassemblées · meilleur combo ×" + S.maxCombo + "</p>";
+    list.innerHTML = vline + (S.measures.length
       ? '<p class="eml-title">Mesures de L\'Avenir en commun adoptées</p><div class="eml-chips">' +
         S.measures.map((m) => '<span class="eml-chip">✓ ' + m + "</span>").join("") + "</div>"
-      : '<p class="eml-title">Aucune mesure adoptée… rejoue pour appliquer le programme&nbsp;!</p>';
+      : '<p class="eml-title">Aucune mesure adoptée… rejoue pour appliquer le programme&nbsp;!</p>');
 
     show("end");
     if (kind !== "defeat") startConfetti();
   }
 
+  function setUne(kind, deadKey) {
+    const une = $("#une"), head = $("#uneHead");
+    let txt;
+    if (kind === "win") {
+      txt = S.flags.sixth_republic ? "LA 6ᵉ RÉPUBLIQUE EST PROCLAMÉE"
+        : (S.heads.length ? S.heads[S.heads.length - 1] : "MANDAT ACCOMPLI");
+    } else {
+      txt = { p: "LE PEUPLE DESTITUE LE POUVOIR", s: "LA FRANCE SE SOULÈVE",
+        e: "LA PLANÈTE EN FEU, LE PAYS SUFFOQUE", v: "LA FRANCE PLACÉE SOUS TUTELLE" }[deadKey] || "FIN DE PARTIE";
+    }
+    head.textContent = txt; une.hidden = false;
+  }
+
   function grade(kind, n) {
+    const bonus = S.maxCombo >= 6 ? 1 : 0;
     if (kind === "defeat") return "✊";
-    if (n >= 18) return "A+"; if (n >= 14) return "A"; if (n >= 10) return "B"; if (n >= 6) return "C"; return "D";
+    if (n + bonus >= 18) return "A+"; if (n + bonus >= 14) return "A";
+    if (n + bonus >= 10) return "B"; if (n + bonus >= 6) return "C"; return "D";
   }
 
   /* ---------- Confettis ---------- */
@@ -453,12 +576,67 @@
   /* ---------- Partage ---------- */
   async function shareResult() {
     const text = "✊ Dans « Président·e du Peuple », j'ai gouverné selon L'Avenir en commun : " +
-      S.measures.length + " mesures adoptées" + (S.mode === "infinite" ? ", " + S.month + " mois tenus" : "") +
-      " !\nÀ toi de tenir le mandat jusqu'en 2032. #PlaceAuPeuple #2027";
+      S.measures.length + " mesures adoptées, " + S.voix.toLocaleString("fr-FR") + " voix" +
+      (S.mode === "infinite" ? ", " + S.month + " mois tenus" : "") +
+      " !\nÀ toi de tenir le mandat jusqu'en 2032. #PlaceAuPeuple #Mélenchon2027";
     try {
       if (navigator.share) await navigator.share({ title: "Président·e du Peuple", text });
       else { await navigator.clipboard.writeText(text); toast("Bilan copié — à partager&nbsp;!"); }
     } catch (e) {}
+  }
+
+  // Image de bilan partageable (1080×1350).
+  function shareImage() {
+    const cv = $("#shareCanvas"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, "#3d0e3f"); grad.addColorStop(1, "#25082f");
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+    // bande tricolore (clin d'œil identité 2027)
+    ["#3f7fe0", "#fff7f9", "#ff2b46"].forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(0, 14 + i * 10, W, 10); });
+    // masthead
+    ctx.textAlign = "center"; ctx.fillStyle = "#ffd166";
+    ctx.font = "700 38px Inter, sans-serif"; ctx.fillText("✊  LA UNE DU PEUPLE", W / 2, 130);
+    // gros titre (Une)
+    ctx.fillStyle = "#fff7f9"; ctx.font = "800 76px 'Bricolage Grotesque', Inter, sans-serif";
+    wrapText(ctx, $("#uneHead").textContent || "MANDAT", W / 2, 250, W - 140, 80);
+    // sous-titre = titre de fin
+    ctx.fillStyle = "#ff8aa0"; ctx.font = "700 44px Inter, sans-serif";
+    ctx.fillText($("#endTitle").textContent, W / 2, 560);
+    // stats
+    ctx.fillStyle = "#fff7f9"; ctx.font = "800 120px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillText(String(S.measures.length), W / 2 - 280, 760);
+    ctx.fillText(S.mode === "infinite" ? String(S.month) : String(Math.min(5, Math.round(S.turn / STORY.filter((x) => typeof x === "string").length * 5))), W / 2, 760);
+    ctx.fillText(String(S.voix > 999 ? (S.voix / 1000).toFixed(1) + "k" : S.voix), W / 2 + 280, 760);
+    ctx.fillStyle = "#d7b9d6"; ctx.font = "600 30px Inter, sans-serif";
+    ctx.fillText("mesures", W / 2 - 280, 810);
+    ctx.fillText(S.mode === "infinite" ? "mois tenus" : "années", W / 2, 810);
+    ctx.fillText("voix", W / 2 + 280, 810);
+    // mesures phares
+    ctx.fillStyle = "#2bd97a"; ctx.font = "600 34px Inter, sans-serif"; ctx.textAlign = "center";
+    S.measures.slice(0, 5).forEach((m, i) => ctx.fillText("✓ " + m, W / 2, 920 + i * 56));
+    // pied
+    ctx.fillStyle = "#ffd166"; ctx.font = "800 40px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillText("Président·e du Peuple — L'Avenir en commun", W / 2, H - 110);
+    ctx.fillStyle = "#d7b9d6"; ctx.font = "600 32px Inter, sans-serif";
+    ctx.fillText("#PlaceAuPeuple  ·  #Mélenchon2027", W / 2, H - 60);
+
+    cv.toBlob((blob) => {
+      const file = new File([blob], "bilan-president-du-peuple.png", { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: "Président·e du Peuple", text: "Mon bilan ✊ #Mélenchon2027" }).catch(() => {});
+      } else {
+        const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+        a.download = file.name; a.click(); toast("Image de bilan téléchargée&nbsp;!");
+      }
+    }, "image/png");
+  }
+  function wrapText(ctx, text, x, y, maxW, lh) {
+    const words = String(text).split(" "); let line = "", yy = y;
+    for (const w of words) {
+      if (ctx.measureText(line + w).width > maxW && line) { ctx.fillText(line.trim(), x, yy); line = ""; yy += lh; }
+      line += w + " ";
+    }
+    ctx.fillText(line.trim(), x, yy);
   }
 
   /* ---------- Modale ---------- */
@@ -473,9 +651,11 @@
     "<li><b>Tes choix ont des suites&nbsp;:</b> ils déclenchent des arcs, et les personnages se souviennent.</li>" +
     "<li><b>La pression du pouvoir grignote tes piliers chaque mois</b> : garde l'équilibre.</li>" +
     "<li><b>Un pilier à zéro = chute</b> (censure, révolte, effondrement, tutelle).</li>" +
-    "<li><b>Mode Histoire&nbsp;:</b> mène le quinquennat jusqu'à la 6ᵉ République. <b>Mode Survie&nbsp;:</b> tiens le plus longtemps possible.</li>" +
+    "<li><b>Élan populaire 🔥 :</b> enchaîne les décisions conformes au programme pour des combos et des voix.</li>" +
+    "<li><b>Affronte tes adversaires</b> (Macron, Le Pen, Bardella…) et reçois l'appui de Jean-Luc Mélenchon.</li>" +
+    "<li><b>4 difficultés</b> et 2 modes (Histoire / Survie). En fin de partie : ta <em>Une du Peuple</em> à partager.</li>" +
     "</ul>" +
-    "<p>Chaque décision dévoile sa conséquence et une note <em>L'Avenir en commun</em>.</p>";
+    "<p>Chaque décision dévoile sa conséquence, une punchline et une note <em>L'Avenir en commun</em>.</p>";
 
   const ABOUT_HTML =
     "<p><b>Président·e du Peuple</b> est un <b>jeu citoyen non officiel</b>, pour faire découvrir le programme " +
@@ -503,6 +683,14 @@
 
     $("#endReplay").addEventListener("click", () => { if (!SOUND.isMuted()) SOUND.startMusic(); newGame(S ? S.mode : "story"); });
     $("#endShare").addEventListener("click", shareResult);
+    $("#endImage").addEventListener("click", shareImage);
+
+    // Sélecteur de difficulté
+    $$(".diff-chip").forEach((chip) => chip.addEventListener("click", () => {
+      $$(".diff-chip").forEach((c) => c.classList.remove("is-on"));
+      chip.classList.add("is-on"); difficulty = chip.dataset.d;
+      localStorage.setItem(DIFF_KEY, difficulty); SOUND.sfx("click");
+    }));
 
     $("#audioBtn").addEventListener("click", () => {
       const muted = SOUND.toggle();
@@ -521,6 +709,7 @@
 
   function init() {
     initHome(); bind(); registerSW(); refreshAudioBtn();
+    $$(".diff-chip").forEach((c) => c.classList.toggle("is-on", c.dataset.d === difficulty));
     playIntro();
   }
   document.addEventListener("DOMContentLoaded", init);

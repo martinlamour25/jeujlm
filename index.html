@@ -63,6 +63,15 @@
         <div class="topbar-title">Choisis ton aventure</div>
         <div style="width:40px"></div>
       </header>
+      <div class="diff-select" id="diffSelect">
+        <span class="diff-label">Difficulté</span>
+        <div class="diff-chips">
+          <button class="diff-chip" data-d="decouverte">Découverte</button>
+          <button class="diff-chip is-on" data-d="normal">Normal</button>
+          <button class="diff-chip" data-d="insoumis">Insoumis·e</button>
+          <button class="diff-chip" data-d="hardcore">Hardcore</button>
+        </div>
+      </div>
       <div class="mode-list">
         <button class="mode-card" id="modeStory">
           <div class="mode-ico">📖</div>
@@ -96,9 +105,12 @@
 
       <div class="gauges" id="gauges"></div>
 
+      <div class="combo-badge" id="comboBadge" hidden>🔥 <span id="comboX">2</span>× <em id="comboVoix">+0</em></div>
+
       <div class="deck" id="deck">
         <div class="swipe-hint swipe-hint--l" id="hintL"></div>
         <div class="swipe-hint swipe-hint--r" id="hintR"></div>
+        <div class="card card--peek" id="cardPeek" aria-hidden="true"></div>
         <div class="card" id="card">
           <div class="card-scene" id="cardScene" aria-hidden="true"></div>
           <div class="card-ribbon" id="cardRibbon" hidden>⚡ ACTUALITÉ</div>
@@ -134,6 +146,10 @@
         <div class="end-emblem" id="endEmblem"></div>
         <p class="kicker" id="endKicker">Fin de mandat</p>
         <h2 class="end-title" id="endTitle">—</h2>
+        <div class="une" id="une" hidden>
+          <span class="une-masthead">LA UNE DU PEUPLE</span>
+          <strong class="une-head" id="uneHead">—</strong>
+        </div>
         <p class="end-sub" id="endSub"></p>
         <div class="end-stats">
           <div class="stat"><strong id="endMeasures">0</strong><span>mesures adoptées</span></div>
@@ -144,8 +160,12 @@
       </div>
       <div class="screen-actions end-actions">
         <button class="btn btn--primary btn--big" id="endReplay">Rejouer</button>
-        <button class="btn btn--ghost" id="endShare">Partager mon bilan</button>
+        <div class="home-row">
+          <button class="btn btn--ghost" id="endShare">Partager</button>
+          <button class="btn btn--ghost" id="endImage">Image de bilan</button>
+        </div>
       </div>
+      <canvas id="shareCanvas" width="1080" height="1350" style="display:none"></canvas>
     </section>
   </main>
 
