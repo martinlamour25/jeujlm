@@ -65,6 +65,10 @@ const CHARACTERS = {
   netanyahou: "Benyamin Netanyahou · la guerre sans fin",
   poutine: "Vladimir Poutine · l'autocrate",
   musk: "Elon Musk · le milliardaire de X",
+  // --- Médias & oligarques ---
+  bollore: "Vincent Bolloré · l'empire médiatique",
+  hanouna: "L'animateur de la télé-poubelle",
+  cnews: "L'éditorialiste qui hurle",
   // --- Le héros ---
   jlm: "Jean-Luc Mélenchon"
 };
@@ -692,6 +696,129 @@ const CARDS = {
       quip: "« Où trouve-t-il cette énergie ? » — Dans le peuple, pardi.", head: "L'ÉNERGIE DU PEUPLE" }
   },
 
+  /* ---------- MÉDIAS & OLIGARQUES ---------- */
+  bollore_rachat: {
+    char: "bollore", scene: "studio_tv", tag: "p", rarity: "topical",
+    text: "« Je rachète le dernier média indépendant. Bientôt, toute la presse pensera… comme moi. »",
+    left: { label: "Laisser faire", fx: { p: -12, v: -4 }, betray: true,
+      result: "Un seul milliardaire tient désormais journaux, chaînes et maisons d'édition. Le pluralisme s'éteint.",
+      note: "La concentration des médias est un poison pour la démocratie.",
+      quip: "La « liberté de la presse », version actionnaire unique.", head: "L'EMPIRE AVALE LA PRESSE" },
+    right: { label: "Loi anti-concentration", fx: { p: 14, s: 2 },
+      result: "Loi anti-concentration, soutien aux médias indépendants et coopératifs : on libère l'info.",
+      note: "Garantir le pluralisme et l'indépendance des médias face aux milliardaires.",
+      measure: "Loi anti-concentration des médias",
+      quip: "Bolloré ravale son chéquier.", head: "LA PRESSE LIBÉRÉE DES MILLIARDAIRES" }
+  },
+  hanouna_show: {
+    char: "hanouna", scene: "studio_tv", tag: "p", rarity: "topical",
+    text: "« Viens dans mon émission ! On va « débattre » : 12 chroniqueurs qui hurlent et toi au milieu. »",
+    left: { label: "Jouer le cirque", fx: { p: -10 }, betray: true,
+      result: "Tu te fais ridiculiser dans un brouhaha de prime time. Le fond ? On s'en fiche, place au clash.",
+      note: "La télé-poubelle transforme le débat en spectacle vide.",
+      quip: "Standing ovation du public chauffé à blanc. Bravo.", head: "LE GRAND N'IMPORTE QUOI" },
+    right: { label: "Refuser le cirque", fx: { p: 12, s: 2 },
+      result: "Tu boudes le clash et finances un audiovisuel public indépendant et de qualité.",
+      note: "Un service public de l'information fort, libéré de l'audimat et des annonceurs.",
+      measure: "Audiovisuel public renforcé",
+      quip: "L'animateur reste seul avec ses 12 chroniqueurs.", head: "LE SERVICE PUBLIC PLUTÔT QUE LE CIRQUE" }
+  },
+  cnews_propagande: {
+    char: "cnews", scene: "studio_tv", tag: "p", rarity: "topical",
+    text: "« Notre chaîne d'info répète ta « menace » en boucle, 24h/24, sur fond de musique anxiogène. »",
+    left: { label: "Se justifier chez eux", fx: { p: -8, v: -2 }, betray: true,
+      result: "Tu joues sur leur terrain : panique, peur, division. Tu as déjà perdu le match.",
+      note: "Ne pas laisser des chaînes d'opinion dicter l'agenda et le vocabulaire.",
+      quip: "Le bandeau rouge clignote : « TOUT VA MAL ». Comme d'habitude.", head: "LE MATRAQUAGE CONTINUE" },
+    right: { label: "Garantir le pluralisme", fx: { p: 12 },
+      result: "Conseil de déontologie des médias, respect du pluralisme, fin des chaînes mono-opinion.",
+      note: "Un vrai contre-pouvoir citoyen sur les médias pour garantir l'honnêteté de l'info.",
+      measure: "Conseil de déontologie des médias",
+      quip: "Le doigt levé de l'éditorialiste retombe, tout penaud.", head: "LE PLURALISME L'EMPORTE" }
+  },
+
+  /* ---------- ÉVÉNEMENTS SUBIS (aléatoires, non choisis) ---------- */
+  ev_cnews: {
+    event: true, hits: "p", char: "cnews", scene: "studio_tv", tag: "p",
+    text: "⚡ Une chaîne d'info matraque ton nom en boucle, 24h/24, sur fond de musique angoissante.",
+    left: { label: "Encaisser le coup", fx: { p: -12 },
+      result: "Le matraquage médiatique fait chuter ta cote. Difficile de lutter contre H24 de propagande.",
+      note: "D'où l'urgence d'un vrai pluralisme et d'un conseil de déontologie des médias.",
+      quip: "« Débat » du jour : toi, en pire.", head: "MATRAQUAGE MÉDIATIQUE" }
+  },
+  ev_hanouna: {
+    event: true, hits: "p", char: "hanouna", scene: "studio_tv", tag: "p",
+    text: "⚡ En prime time, on te tourne en ridicule devant deux millions de téléspectateurs.",
+    left: { label: "Encaisser le coup", fx: { p: -10 },
+      result: "Le clash fait de l'audience, ton image en prend un coup. Le fond ? Personne n'en parle.",
+      note: "La bataille culturelle se gagne aussi en libérant l'audiovisuel public.",
+      quip: "Standing ovation du public chauffé à blanc.", head: "PRIME TIME ASSASSIN" }
+  },
+  ev_bollore: {
+    event: true, hits: "p", char: "bollore", scene: "studio_tv", tag: "p",
+    text: "⚡ L'empire Bolloré rachète encore trois titres et oriente toutes les « Unes » contre toi.",
+    left: { label: "Encaisser le coup", fx: { p: -10, v: -3 },
+      result: "Un milliardaire décide de ce que pensent des millions de gens. La démocratie vacille.",
+      note: "Briser les monopoles médiatiques est vital pour la souveraineté populaire.",
+      quip: "La pluralité d'opinions ? Réservée à l'actionnaire.", head: "L'EMPIRE CONTRE-ATTAQUE" }
+  },
+  ev_extreme_droite: {
+    event: true, hits: "p", char: "lepen", scene: "manif", tag: "p",
+    text: "⚡ L'extrême droite organise des manifestations monstres en récupérant la colère sociale.",
+    left: { label: "Encaisser le coup", fx: { p: -12, s: -3 },
+      result: "Faute de réponse sociale assez visible, la rue est captée par les marchands de haine.",
+      note: "On combat l'extrême droite par la justice sociale et la fraternité, vite et fort.",
+      quip: "Pas de solution, mais beaucoup de mégaphones.", head: "LA RUE RÉCUPÉRÉE" }
+  },
+  ev_notation: {
+    event: true, hits: "v", char: "banker", scene: "bourse", tag: "v",
+    text: "⚡ Les agences de notation dégradent la France. Les marchés s'affolent, les taux montent.",
+    left: { label: "Encaisser le coup", fx: { v: -12, s: -3 },
+      result: "Trois lettres en moins, et voilà la « pression des marchés ». Le chantage de la dette.",
+      note: "Reprendre le contrôle démocratique de la monnaie et de la dette.",
+      quip: "Trois lettres pour faire trembler tout un pays.", head: "LA FRANCE DÉGRADÉE" }
+  },
+  ev_speculation: {
+    event: true, hits: "v", char: "lobby", scene: "bourse", tag: "v",
+    text: "⚡ Vague de spéculation contre la dette française : les marchés testent ta détermination.",
+    left: { label: "Encaisser le coup", fx: { v: -10 },
+      result: "La spéculation fait grimper le coût de la dette pour tenter de te faire plier.",
+      note: "Contrôle des capitaux et pôle bancaire public : protéger l'économie réelle.",
+      quip: "Les vautours sentent le sang. Mauvais calcul.", head: "ATTAQUE SPÉCULATIVE" }
+  },
+  ev_canicule: {
+    event: true, hits: "e", char: "scientist", scene: "canicule", tag: "e",
+    text: "⚡ Canicule record et méga-incendies imprévus ravagent le Sud du pays.",
+    left: { label: "Encaisser le coup", fx: { e: -12, s: -2 },
+      result: "Le dérèglement climatique frappe sans prévenir. Chaque retard se paie cash.",
+      note: "Seule la planification écologique réduit notre vulnérabilité.",
+      quip: "L'été dure désormais six mois.", head: "LE SUD EN FEU" }
+  },
+  ev_secheresse: {
+    event: true, hits: "e", char: "farmer", scene: "champ", tag: "e",
+    text: "⚡ Sécheresse historique : nappes à sec, récoltes perdues, agriculteurs en détresse.",
+    left: { label: "Encaisser le coup", fx: { e: -10, s: -3 },
+      result: "L'eau manque, les conflits d'usage explosent. Le productivisme montre ses limites.",
+      note: "Faire de l'eau un bien commun et planifier son partage.",
+      quip: "Les méga-bassines n'ont rempli que les profits.", head: "LA TERRE A SOIF" }
+  },
+  ev_greve_patronale: {
+    event: true, hits: "s", char: "medef", scene: "usine", tag: "s",
+    text: "⚡ Le patronat orchestre un « mur de l'investissement » : grève des embauches pour te punir.",
+    left: { label: "Encaisser le coup", fx: { s: -10 },
+      result: "Le grand capital fait du chantage à l'emploi pour bloquer tes réformes sociales.",
+      note: "Droit de regard des salariés et pôle public pour répondre au chantage.",
+      quip: "Les milliardaires font la grève… du partage.", head: "CHANTAGE À L'EMPLOI" }
+  },
+  ev_marronnier: {
+    event: true, hits: "p", char: "cnews", scene: "studio_tv", tag: "p",
+    text: "⚡ Marronnier de l'« insécurité » monté en boucle pour faire oublier le social.",
+    left: { label: "Encaisser le coup", fx: { p: -8 },
+      result: "On agite la peur pour détourner du partage des richesses. Vieille recette.",
+      note: "Répondre par le concret social et le rétablissement des services publics.",
+      quip: "Le fait divers du jour cache le milliard du jour.", head: "DIVERSION GÉNÉRALE" }
+  },
+
   /* ---------- ACTE IV — 2032 : le bilan ---------- */
   bilan: {
     char: "citizen", scene: "palais", tag: "p", finale: true,
@@ -712,13 +839,13 @@ const CARDS = {
    ========================================================= */
 const STORY = [
   { act: "ACTE I", title: "2027 — La prise du pouvoir", year: 2027, scene: "palais" },
-  "invest", "smic", "medef_tax", "capital_flight", "macron_emt", "vote16", "jlm_pep", "media",
+  "invest", "smic", "medef_tax", "capital_flight", "macron_emt", "vote16", "jlm_pep", "media", "bollore_rachat",
   { act: "ACTE II", title: "2028-2029 — Les fronts s'ouvrent", year: 2028, scene: "ue" },
   "eu_austerity", "philippe_horloges", "trump_tariffs", "trump_retaliation", "trump_greenland", "ormuz", "retraite",
   "hopital", "bardella_tiktok", "mercosur", "farmers_revolt", "energy_common", "lepen_recup",
   { act: "ACTE III", title: "2030-2031 — Tempêtes", year: 2030, scene: "canicule" },
   "canicule", "jlm_planif", "cop30", "nuclear", "darmanin_ordre", "censure", "krach",
-  "retailleau_bouc", "ukraine", "gaza", "attal_ecole", "ai_act", "musk_x", "glucksmann_centre", "outremer", "zemmour_declin",
+  "retailleau_bouc", "ukraine", "gaza", "cnews_propagande", "attal_ecole", "ai_act", "musk_x", "hanouna_show", "glucksmann_centre", "outremer", "zemmour_declin",
   { act: "ACTE IV", title: "2032 — Le bilan", year: 2032, scene: "palais" },
   "hollande_flamby", "ruffin_ego", "jlm_energie", "corruption", "bilan"
 ];
@@ -737,10 +864,17 @@ const POOL = [
   "macron_emt", "lepen_recup", "bardella_tiktok", "hollande_flamby", "darmanin_ordre",
   "retailleau_bouc", "attal_ecole", "philippe_horloges", "glucksmann_centre", "ruffin_ego",
   "zemmour_declin", "jlm_pep", "jlm_planif", "jlm_energie",
-  "trump_greenland", "musk_x"
+  "trump_greenland", "musk_x", "bollore_rachat", "hanouna_show", "cnews_propagande"
 ];
 
 const SLOGANS = [
   "Place au peuple !", "L'avenir en commun.", "Le pouvoir au peuple.",
   "On ne lâche rien.", "Un autre monde est possible.", "Résistance et alternative."
 ];
+
+/* Événements subis : un seul choix réel (le côté gauche est recopié à droite). */
+const EVENTS = [
+  "ev_cnews", "ev_hanouna", "ev_bollore", "ev_extreme_droite", "ev_notation",
+  "ev_speculation", "ev_canicule", "ev_secheresse", "ev_greve_patronale", "ev_marronnier"
+];
+EVENTS.forEach(function (id) { var c = CARDS[id]; if (c) { c.right = c.left; c.event = true; } });

@@ -27,7 +27,20 @@ Pas un quiz : un **jeu de choix à la "swipe"** (dans l'esprit de _Reigns_), ten
 
 Chaque décision dévoile sa **conséquence** et une note **« 📖 L'Avenir en commun »** : on apprend le programme en gouvernant. Cartes tirées au hasard, **fins multiples**, rejouabilité → l'effet « encore une carte ».
 
-## 🎬 Nouveautés (édition « cinématique »)
+## 🐢 Nouveautés (édition « tortue & événements »)
+
+- **Les bons choix n'enlèvent jamais de points** : appliquer le programme, c'est
+  toujours gagnant. La difficulté vient d'ailleurs (voir ci-dessous).
+- **Événements subis** (non choisis) : matraquage CNews, prime time Hanouna,
+  rachats Bolloré, manifs d'extrême droite, dégradation des agences de notation,
+  spéculation, canicule, sécheresse, grève patronale… **Ils frappent plus fort la
+  jauge la plus haute** → impossible de tout maxer tranquillement.
+- **Médias & oligarques** à combattre : **Bolloré, Hanouna, CNews** (loi
+  anti-concentration, audiovisuel public, conseil de déontologie).
+- **Mascotte : la tortue rose insoumise** 🐢 (accueil, aide, écran de fin).
+- Humour & références d'actualité étoffés. Voir `docs/SPECS-V2.md`.
+
+## 🎬 Édition « cinématique »
 
 - **Cinématique d'ouverture** : le chaos du bilan Macron (hôpitaux à l'os, 49.3,
   « pognon de dingue »…), le peuple qui se lève, puis la **victoire de la France

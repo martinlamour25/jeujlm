@@ -1,5 +1,5 @@
 /* Service worker — cache hors-ligne pour « Président·e du Peuple » */
-const CACHE = "ppp2027-v5";
+const CACHE = "ppp2027-v6";
 const ASSETS = [
   "./",
   "./index.html",
@@ -9,7 +9,12 @@ const ASSETS = [
   "./js/data.js",
   "./js/game.js",
   "./manifest.webmanifest",
-  "./icons/icon.svg"
+  "./icons/icon.svg",
+  "./assets/turtle/turtle-megaphone.png",
+  "./assets/turtle/turtle-tract.png",
+  "./assets/turtle/turtle-balai.png",
+  "./assets/turtle/turtle-don.png",
+  "./assets/turtle/turtle-scooter.png"
 ];
 
 self.addEventListener("install", (e) => {

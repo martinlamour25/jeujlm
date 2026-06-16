@@ -26,6 +26,14 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const haptic = (p) => { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) {} };
   const resolve = (x, f) => (typeof x === "function" ? x(f) : x);
+  // Les bons choix (côté "programme") n'enlèvent JAMAIS de points : on retire les malus.
+  // Les mauvais choix et les événements subis gardent leurs malus.
+  function effFx(card, logical) {
+    const fx = (card[logical] && card[logical].fx) || {};
+    if (card.event || logical !== "right") return fx;
+    const o = {}; for (const k in fx) if (fx[k] > 0) o[k] = fx[k];
+    return o;
+  }
 
   /* ---------- Constantes & équilibrage ---------- */
   const KEYS = ["p", "s", "e", "v"];
@@ -182,7 +190,7 @@
     const prev = BALANCE.diff[S.diff].preview;
     KEYS.forEach((k) => {
       const a = $("#arr-" + k); if (!a) return;
-      const c = S.current && CARDS[S.current][S.sideMap[side]]; const v = c && c.fx ? c.fx[k] : 0;
+      const fx = S.current ? effFx(CARDS[S.current], S.sideMap[side]) : {}; const v = fx[k] || 0;
       if (!v || prev === "none" || intensity < 0.18) { a.className = "g-arrow"; a.textContent = ""; return; }
       a.className = "g-arrow show " + (v > 0 ? "up" : "down");
       a.style.opacity = Math.min(1, intensity);
@@ -261,11 +269,36 @@
     return list[(Math.random() * list.length) | 0];
   }
 
+  // Événement aléatoire SUBI (non choisi) : matraquage médiatique, manif d'extrême
+  // droite, agences de notation… Plus probable quand un pilier est très haut.
+  function maybeEvent() {
+    if (!EVENTS || !EVENTS.length) return false;
+    const cfg = BALANCE.diff[S.diff] || BALANCE.diff.normal;
+    if (S.turn < cfg.grace + 1) return false;
+    if (S.turn - (S.lastEventTurn == null ? -9 : S.lastEventTurn) < 3) return false;
+    const maxG = Math.max.apply(null, KEYS.map((k) => S.g[k]));
+    let p = 0.08 + cfg.drift * 0.03 + (maxG > 78 ? 0.18 : maxG > 65 ? 0.08 : 0) +
+      (S.mode === "infinite" ? Math.min(0.15, S.month / 240) : 0);
+    if (Math.random() > p) return false;
+    S.lastEventTurn = S.turn;
+    renderCard(pickEvent());
+    return true;
+  }
+  function pickEvent() {
+    const top = KEYS.slice().sort((a, b) => S.g[b] - S.g[a])[0];
+    const targeted = EVENTS.filter((id) => CARDS[id].hits === top);
+    const pool = (Math.random() < 0.65 && targeted.length) ? targeted : EVENTS;
+    let id = pool[(Math.random() * pool.length) | 0];
+    if (id === S.lastId && pool.length > 1) id = pool[(pool.indexOf(id) + 1) % pool.length];
+    return id;
+  }
+
   function nextCard() {
     updateMandate();
     if (S.mode === "infinite") SOUND.setMusicLevel(Math.min(4, Math.floor(S.month / 21)));
     const ready = popReady();
     if (ready) return renderCard(ready);
+    if (maybeEvent()) return;
 
     if (S.mode === "story") {
       while (S.storyIdx < STORY.length) {
@@ -321,10 +354,14 @@
 
     card.classList.toggle("is-hero", !!c.hero);
     card.classList.toggle("is-rare", c.rarity === "rare" || c.rarity === "legendary");
+    card.classList.toggle("is-event", !!c.event);
     $("#cardScene").innerHTML = (SCENES && SCENES[c.scene]) || "";
     const ribbon = $("#cardRibbon");
-    ribbon.hidden = !c.topical;
-    ribbon.textContent = c.crisis ? "🔴 BREAKING" : "⚡ ACTUALITÉ";
+    ribbon.hidden = !(c.topical || c.event);
+    ribbon.textContent = c.event ? "🔴 IMPRÉVU" : (c.crisis ? "🔴 BREAKING" : "⚡ ACTUALITÉ");
+    // Événement subi : un seul bouton « Encaisser », pas de vrai choix.
+    $("#choiceL").style.display = c.event ? "none" : "";
+    $("#choiceR").classList.toggle("full", !!c.event);
     const av = $("#cardAvatar");
     av.innerHTML = (CHAR_ART && CHAR_ART[c.char]) || FALLBACK_PORTRAIT;
     av.style.boxShadow = "0 0 0 3px " + theme.color + "55, 0 10px 24px -6px rgba(0,0,0,.6)";
@@ -438,8 +475,8 @@
     card.style.opacity = "0";
     setHints(0);
 
-    // Effets sur les jauges
-    const fx = opt.fx || {};
+    // Effets sur les jauges (bons choix : malus retirés via effFx)
+    const fx = effFx(c, logical);
     KEYS.forEach((k) => { if (fx[k]) { S.g[k] = clamp(S.g[k] + fx[k], 0, 100); flashDelta(k, fx[k]); } });
 
     // Réputation des personnages
@@ -455,7 +492,7 @@
     }
 
     // Élan populaire (combo) + voix — basé sur le CONTENU (choix conforme), pas le côté
-    const program = !opt.betray && (logical === "right" || !!opt.measure);
+    const program = !c.event && !opt.betray && (logical === "right" || !!opt.measure);
     let gain = 0;
     if (program) {
       S.combo++; S.maxCombo = Math.max(S.maxCombo, S.combo);
@@ -479,7 +516,7 @@
     // Secousse si crise ou pilier en danger
     if (c.crisis || KEYS.some((k) => S.g[k] <= 22)) shake(c.crisis ? 9 : 6);
 
-    setTimeout(() => showFeedback(opt), 260);
+    setTimeout(() => showFeedback(opt, fx), 260);
   }
 
   function applyPressure() {
@@ -496,8 +533,8 @@
     S.g[r] = clamp(S.g[r] - Math.max(1, drift - 1), 0, 100);
   }
 
-  function showFeedback(opt) {
-    const fx = opt.fx || {};
+  function showFeedback(opt, fx) {
+    fx = fx || opt.fx || {};
     if (!opt.measure) SOUND.sfx(Object.values(fx).some((x) => x < 0) ? "bad" : "good");
     const chips = KEYS.filter((k) => fx[k]).map((k) =>
       '<span class="d-chip ' + (fx[k] > 0 ? "up" : "down") + '" style="--gc:' + GAUGES[k].color + '">' +
@@ -525,13 +562,12 @@
     if (S.measures.length > bestM()) localStorage.setItem(BEST_M, String(S.measures.length));
     if (survivedMonths > bestS()) localStorage.setItem(BEST_S, String(survivedMonths));
 
-    const emblem = $("#endEmblem");
-    emblem.style.opacity = "1";
+    const mascot = $("#endMascot");
     $("#endYearsLbl").textContent = S.mode === "infinite" ? "mois tenus" : "années tenues";
 
     if (kind === "defeat") {
       const d = DEFEATS[deadKey];
-      emblem.innerHTML = ICONS.trophy; emblem.style.opacity = ".5";
+      mascot.src = "assets/turtle/turtle-balai.png"; // la tortue balaie les dégâts
       $("#endKicker").textContent = "Présidence interrompue";
       $("#endTitle").textContent = d.title;
       $("#endSub").innerHTML = d.text + " Mais le combat continue. ✊";
@@ -541,7 +577,7 @@
       // Fin du mode histoire
       const healthy = KEYS.every((k) => S.g[k] >= 35);
       const sixth = S.flags.sixth_republic;
-      emblem.innerHTML = ICONS.phi;
+      mascot.src = "assets/turtle/turtle-megaphone.png"; // la tortue haranguе la foule
       $("#endKicker").textContent = "Mandat accompli · 2032";
       if (sixth && healthy && S.measures.length >= 16) {
         $("#endTitle").textContent = "Raz-de-marée populaire !";
@@ -689,6 +725,7 @@
   function closeModal() { $("#modal").hidden = true; }
 
   const HOW_HTML =
+    '<img src="assets/turtle/turtle-tract.png" alt="" class="modal-mascot" />' +
     '<p class="lead">Tu viens d\'être élu·e Président·e en 2027. Des personnages te soumettent un dilemme.</p>' +
     "<ul>" +
     "<li><b>◀ ▶</b> Glisse la carte à gauche ou à droite (ou les deux boutons) pour décider.</li>" +
