@@ -484,3 +484,17 @@ body {
   50% { box-shadow: 0 0 0 6px rgba(255,43,70,0.28), var(--shadow-red); transform: scale(1.02); } }
 .home-foot strong { color: var(--c-gold); }
 @media (prefers-reduced-motion: reduce) { .btn--pulse { animation: none; } }
+
+/* =========================================================
+   AJOUTS — ergonomie de l'aide « Comment jouer » (mobile)
+   ========================================================= */
+.how-hero { text-align: center; margin: -6px 0 10px; }
+.how-hero img { width: 92px; filter: drop-shadow(0 8px 14px rgba(0,0,0,0.4)); }
+.modal-mascot { display: none; } /* ancien flottant supprimé */
+.modal-body ul.how { list-style: none; display: flex; flex-direction: column; gap: 12px; margin: 14px 0; padding: 0; }
+.modal-body ul.how li { display: flex; gap: 12px; align-items: flex-start; line-height: 1.45; }
+.modal-body ul.how .how-ico { flex: 0 0 30px; width: 30px; height: 30px; border-radius: 9px;
+  background: var(--c-glass-2); display: grid; place-items: center; font-size: 1.05rem; }
+.modal-body ul.how li b { color: var(--c-gold); font-weight: 700; }
+.how-foot { color: var(--c-gold); font-weight: 600; text-align: center; margin-top: 4px; }
+.modal-body .lead { font-size: 1.05rem; color: var(--c-white); text-align: center; }

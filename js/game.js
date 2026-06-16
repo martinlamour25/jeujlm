@@ -373,7 +373,7 @@
     av.innerHTML = (CHAR_ART && CHAR_ART[c.char]) || FALLBACK_PORTRAIT;
     av.style.boxShadow = "0 0 0 3px " + theme.color + "55, 0 10px 24px -6px rgba(0,0,0,.6)";
 
-    $("#cardWho").textContent = (typeof CHARACTERS[c.char] === "string" ? CHARACTERS[c.char] : (CHARACTERS[c.char] && CHARACTERS[c.char].name)) || "—";
+    $("#cardWho").textContent = (typeof CHARACTERS[c.char] === "string" ? CHARACTERS[c.char] : (CHARACTERS[c.char] && CHARACTERS[c.char].name)) || "";
     $("#cardText").innerHTML = resolve(c.text, f);
     $("#choiceLlabel").textContent = c[S.sideMap.left].label;
     $("#choiceRlabel").textContent = c[S.sideMap.right].label;
@@ -549,7 +549,7 @@
     let voixChip = S.lastGain ? '<span class="d-chip voix">🔥 +' + S.lastGain + " voix</span>" : "";
     $("#feedbackDeltas").innerHTML = chips + voixChip;
     $("#feedbackResult").innerHTML = opt.result + (opt.quip ? ' <span class="quip">' + opt.quip + "</span>" : "");
-    $("#feedbackNote").innerHTML = "<strong>📖 L'Avenir en commun —</strong> " + opt.note;
+    $("#feedbackNote").innerHTML = "<strong>📖 L'Avenir en commun :</strong> " + opt.note;
     $("#feedbackTag").innerHTML = opt.measure ? "✅ Mesure adoptée : " + opt.measure : "📖 L'Avenir en commun";
     if (opt.measure) toast("✅ " + opt.measure);
     $("#feedback").classList.add("show");
@@ -666,7 +666,7 @@
   function shareText() {
     return "✊ J'ai gouverné selon L'Avenir en commun dans « Président·e du Peuple » : " +
       S.measures.length + " mesures, " + S.voix.toLocaleString("fr-FR") + " voix" +
-      (S.mode === "infinite" ? ", " + S.month + " mois tenus" : "") + " — bilan « " +
+      (S.mode === "infinite" ? ", " + S.month + " mois tenus" : "") + "  ·  bilan « " +
       $("#endTitle").textContent + " ».\n\n🐢 Tiens-tu le mandat jusqu'en 2032 ? Joue (gratuit) : " +
       GAME_URL + "\n#PlaceAuPeuple #Mélenchon2027";
   }
@@ -674,7 +674,7 @@
     const text = shareText();
     try {
       if (navigator.share) await navigator.share({ title: "Président·e du Peuple", text, url: GAME_URL });
-      else { await navigator.clipboard.writeText(text); toast("Lien + bilan copiés — à partager&nbsp;! 🔥"); }
+      else { await navigator.clipboard.writeText(text); toast("Lien + bilan copiés, à partager&nbsp;! 🔥"); }
     } catch (e) {}
   }
 
@@ -773,7 +773,7 @@
         navigator.share({ files: [file], title: "Président·e du Peuple", text: shareText(), url: GAME_URL }).catch(() => {});
       } else {
         const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-        a.download = file.name; a.click(); toast("Image enregistrée — partage-la&nbsp;! 🔥");
+        a.download = file.name; a.click(); toast("Image enregistrée, partage-la&nbsp;! 🔥");
       }
     }, "image/png");
   }
@@ -791,19 +791,18 @@
   function closeModal() { $("#modal").hidden = true; }
 
   const HOW_HTML =
-    '<img src="assets/turtle/turtle-tract.png" alt="" class="modal-mascot" />' +
-    '<p class="lead">Tu viens d\'être élu·e Président·e en 2027. Des personnages te soumettent un dilemme.</p>' +
-    "<ul>" +
-    "<li><b>◀ ▶</b> Glisse la carte à gauche ou à droite (ou les deux boutons) pour décider.</li>" +
-    "<li><b>4 piliers</b> évoluent : ✊ Peuple, ⚖️ Social, 🌍 Planète, 🕊️ Souveraineté.</li>" +
-    "<li><b>Tes choix ont des suites&nbsp;:</b> ils déclenchent des arcs, et les personnages se souviennent.</li>" +
-    "<li><b>La pression du pouvoir grignote tes piliers chaque mois</b> : garde l'équilibre.</li>" +
-    "<li><b>Un pilier à zéro = chute</b> (censure, révolte, effondrement, tutelle).</li>" +
-    "<li><b>Élan populaire 🔥 :</b> enchaîne les décisions conformes au programme pour des combos et des voix.</li>" +
-    "<li><b>Affronte tes adversaires</b> (Macron, Le Pen, Bardella…) et reçois l'appui de Jean-Luc Mélenchon.</li>" +
-    "<li><b>4 difficultés</b> et 2 modes (Histoire / Survie). En fin de partie : ta <em>Une du Peuple</em> à partager.</li>" +
+    '<div class="how-hero"><img src="assets/turtle/turtle-tract.png" alt="" /></div>' +
+    '<p class="lead">Tu viens d\'être élu·e Président·e en 2027. Des personnages viennent te voir avec un dilemme.</p>' +
+    '<ul class="how">' +
+    '<li><span class="how-ico">👆</span><span>Glisse la carte à gauche ou à droite (ou les deux boutons) pour décider.</span></li>' +
+    '<li><span class="how-ico">📊</span><span>Tes décisions font bouger 4 piliers : <b>Peuple</b>, <b>Social</b>, <b>Planète</b>, <b>Souveraineté</b>.</span></li>' +
+    '<li><span class="how-ico">🔗</span><span>Tes choix ont des suites : ils déclenchent des événements et les personnages s\'en souviennent.</span></li>' +
+    '<li><span class="how-ico">⏳</span><span>La pression du pouvoir et les crises grignotent tes piliers : garde l\'équilibre.</span></li>' +
+    '<li><span class="how-ico">💥</span><span>Si un pilier tombe à zéro, c\'est la chute (censure, révolte, effondrement, tutelle).</span></li>' +
+    '<li><span class="how-ico">🔥</span><span>Enchaîne les bons choix pour gagner des combos et des voix. Les bons choix ne coûtent jamais de points.</span></li>' +
+    '<li><span class="how-ico">🐢</span><span>Affronte Macron, Le Pen, Bardella, Bolloré… et reçois l\'appui de Jean-Luc Mélenchon.</span></li>' +
     "</ul>" +
-    "<p>Chaque décision dévoile sa conséquence, une punchline et une note <em>L'Avenir en commun</em>.</p>";
+    '<p class="how-foot">En fin de partie, partage ta <em>Une du Peuple</em> et défie tes amis !</p>';
 
   const ABOUT_HTML =
     "<p><b>Président·e du Peuple</b> est un <b>jeu citoyen non officiel</b>, pour faire découvrir le programme " +

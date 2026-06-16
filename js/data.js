@@ -148,7 +148,7 @@ const CARDS = {
       result: "Tu t'achètes une couverture médiatique… au prix de la démocratie.",
       note: "La concentration des médias est un poison pour le débat public." },
     right: { label: "Briser les monopoles", fx: { p: 12, v: -3 }, set: ["free_media"],
-      result: "Tu garanties l'indépendance des médias et brises les concentrations.",
+      result: "Tu garantis l'indépendance des médias et brises les concentrations.",
       note: "Libérer l'information de la mainmise des milliardaires.",
       measure: "Indépendance des médias" }
   },
@@ -428,7 +428,7 @@ const CARDS = {
       result: "La répression fait des blessés. La colère monte d'un cran.",
       note: "Rompre avec la doctrine du maintien de l'ordre violent." },
     right: { label: "Garantir le droit", fx: { p: 12, v: -2 },
-      result: "Tu garanties le droit de manifester. Le dialogue prime sur la matraque.",
+      result: "Tu garantis le droit de manifester. Le dialogue prime sur la matraque.",
       note: "L'intervention populaire doit être accueillie, pas réprimée.",
       measure: "Droit de manifester garanti" }
   },
@@ -693,7 +693,7 @@ const CARDS = {
     right: { label: "Sillonner le pays", fx: { p: 11 },
       result: "Meetings, terrain, vidéos : la campagne est partout. L'énergie, c'est celle du peuple.",
       note: "Une campagne se gagne sur le terrain et dans les têtes, pas dans les studios.",
-      quip: "« Où trouve-t-il cette énergie ? » — Dans le peuple, pardi.", head: "L'ÉNERGIE DU PEUPLE" }
+      quip: "« Où trouve-t-il cette énergie ? » Dans le peuple, pardi.", head: "L'ÉNERGIE DU PEUPLE" }
   },
 
   /* ---------- MÉDIAS & OLIGARQUES ---------- */
@@ -838,15 +838,15 @@ const CARDS = {
    sont sautées si leur cond() est fausse).
    ========================================================= */
 const STORY = [
-  { act: "ACTE I", title: "2027 — La prise du pouvoir", year: 2027, scene: "palais" },
+  { act: "ACTE I", title: "2027 · La prise du pouvoir", year: 2027, scene: "palais" },
   "invest", "smic", "medef_tax", "capital_flight", "macron_emt", "vote16", "jlm_pep", "media", "bollore_rachat",
-  { act: "ACTE II", title: "2028-2029 — Les fronts s'ouvrent", year: 2028, scene: "ue" },
+  { act: "ACTE II", title: "2028-2029 · Les fronts s'ouvrent", year: 2028, scene: "ue" },
   "eu_austerity", "philippe_horloges", "trump_tariffs", "trump_retaliation", "trump_greenland", "ormuz", "retraite",
   "hopital", "bardella_tiktok", "mercosur", "farmers_revolt", "energy_common", "lepen_recup",
-  { act: "ACTE III", title: "2030-2031 — Tempêtes", year: 2030, scene: "canicule" },
+  { act: "ACTE III", title: "2030-2031 · Tempêtes", year: 2030, scene: "canicule" },
   "canicule", "jlm_planif", "cop30", "nuclear", "darmanin_ordre", "censure", "krach",
   "retailleau_bouc", "ukraine", "gaza", "cnews_propagande", "attal_ecole", "ai_act", "musk_x", "hanouna_show", "glucksmann_centre", "outremer", "zemmour_declin",
-  { act: "ACTE IV", title: "2032 — Le bilan", year: 2032, scene: "palais" },
+  { act: "ACTE IV", title: "2032 · Le bilan", year: 2032, scene: "palais" },
   "hollande_flamby", "ruffin_ego", "jlm_energie", "corruption", "bilan"
 ];
 
