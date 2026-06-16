@@ -293,12 +293,13 @@
     return true;
   }
   function pickEvent() {
+    const recent = S.recent.slice(-10);
+    let avail = EVENTS.filter((id) => !recent.includes(id)); // anti-doublon
+    if (!avail.length) avail = EVENTS.slice();
     const top = KEYS.slice().sort((a, b) => S.g[b] - S.g[a])[0];
-    const targeted = EVENTS.filter((id) => CARDS[id].hits === top);
-    const pool = (Math.random() < 0.65 && targeted.length) ? targeted : EVENTS;
-    let id = pool[(Math.random() * pool.length) | 0];
-    if (id === S.lastId && pool.length > 1) id = pool[(pool.indexOf(id) + 1) % pool.length];
-    return id;
+    const targeted = avail.filter((id) => CARDS[id].hits === top);
+    const pool = (Math.random() < 0.6 && targeted.length) ? targeted : avail;
+    return pool[(Math.random() * pool.length) | 0];
   }
 
   function nextCard() {
@@ -543,15 +544,19 @@
 
   function showFeedback(opt, fx) {
     fx = fx || opt.fx || {};
-    if (!opt.measure) SOUND.sfx(Object.values(fx).some((x) => x < 0) ? "bad" : "good");
+    const ev = S.current && CARDS[S.current] && CARDS[S.current].event;
+    // Un imprévu n'est PAS une mauvaise réponse : son de crise neutre, pas le buzzer.
+    if (ev) SOUND.sfx("crisis");
+    else if (!opt.measure) SOUND.sfx(Object.values(fx).some((x) => x < 0) ? "bad" : "good");
     const chips = KEYS.filter((k) => fx[k]).map((k) =>
       '<span class="d-chip ' + (fx[k] > 0 ? "up" : "down") + '" style="--gc:' + GAUGES[k].color + '">' +
       '<span class="d-ico">' + ICONS[GAUGES[k].icon] + "</span>" + (fx[k] > 0 ? "+" : "") + fx[k] + "</span>").join("");
     let voixChip = S.lastGain ? '<span class="d-chip voix">🔥 +' + S.lastGain + " voix</span>" : "";
     $("#feedbackDeltas").innerHTML = chips + voixChip;
     $("#feedbackResult").innerHTML = opt.result + (opt.quip ? ' <span class="quip">' + opt.quip + "</span>" : "");
-    $("#feedbackNote").innerHTML = "<strong>📖 L'Avenir en commun :</strong> " + opt.note;
-    $("#feedbackTag").innerHTML = opt.measure ? "✅ Mesure adoptée : " + opt.measure : "📖 L'Avenir en commun";
+    $("#feedbackNote").innerHTML = (ev ? "<strong>⚡ Imprévu :</strong> " : "<strong>📖 L'Avenir en commun :</strong> ") + opt.note;
+    $("#feedbackTag").innerHTML = ev ? "⚡ Imprévu · ni bonne ni mauvaise réponse"
+      : (opt.measure ? "✅ Mesure adoptée : " + opt.measure : "📖 L'Avenir en commun");
     if (opt.measure) toast("✅ " + opt.measure);
     $("#feedback").classList.add("show");
   }
