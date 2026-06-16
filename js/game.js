@@ -686,67 +686,84 @@
     ctx.strokeStyle = "rgba(255,255,255,0.14)"; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
     ctx.strokeStyle = color; ctx.beginPath();
     ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (Math.max(0, val) / 100)); ctx.stroke();
-    ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.font = "800 40px 'Bricolage Grotesque', Inter, sans-serif";
-    ctx.fillText(Math.round(val) + "", cx, cy + 14);
-    ctx.fillStyle = "#e9d3e8"; ctx.font = "700 24px Inter, sans-serif"; ctx.fillText(label, cx, cy + r + 40);
+    ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.font = "800 38px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillText(Math.round(val) + "", cx, cy + 13);
+    ctx.fillStyle = "#e9d3e8"; ctx.font = "700 23px Inter, sans-serif"; ctx.fillText(label, cx, cy + r + 38);
   }
-  function wrapText(ctx, text, x, y, maxW, lh) {
-    const words = String(text).split(" "); let line = "", yy = y;
+  function wrapLines(ctx, text, maxW) {
+    const words = String(text).split(" "); const lines = []; let line = "";
     for (const w of words) {
-      if (ctx.measureText(line + w).width > maxW && line) { ctx.fillText(line.trim(), x, yy); line = ""; yy += lh; }
-      line += w + " ";
+      const t = line ? line + " " + w : w;
+      if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t;
     }
-    ctx.fillText(line.trim(), x, yy); return yy;
+    if (line) lines.push(line); return lines;
+  }
+  function fitLines(ctx, text, maxW, startPx, minPx, weight) {
+    let px = startPx, lines;
+    do { ctx.font = weight + " " + px + "px 'Bricolage Grotesque', Inter, sans-serif";
+      lines = wrapLines(ctx, text, maxW); px -= 3; } while (lines.length > 2 && px > minPx);
+    return { lines: lines, px: px + 3 };
   }
 
   // Image de bilan personnalisée, fun & partageable (1080×1350) avec lien + tortue.
   async function shareImage() {
     const cv = $("#shareCanvas"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
     const win = S.outcome !== "defeat";
-    // fond
     const grad = ctx.createLinearGradient(0, 0, W, H);
     grad.addColorStop(0, "#4a1450"); grad.addColorStop(1, "#1c0622");
     ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = "rgba(255,255,255,0.04)";
-    for (let i = 0; i < 40; i++) ctx.fillRect((i * 53) % W, (i * 89) % H, 3, 3);
-    // bande tricolore
-    ["#3f7fe0", "#fff7f9", "#ff2b46"].forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(0, 18 + i * 11, W, 11); });
-    // masthead
-    ctx.textAlign = "center"; ctx.fillStyle = "#ffd166"; ctx.font = "800 40px 'Bricolage Grotesque', Inter, sans-serif";
-    ctx.fillText("✊  PRÉSIDENT·E DU PEUPLE", W / 2, 130);
+    for (let i = 0; i < 60; i++) ctx.fillRect((i * 53) % W, (i * 89) % H, 3, 3);
+    ["#3f7fe0", "#fff7f9", "#ff2b46"].forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(0, 16 + i * 11, W, 11); });
+
+    ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = "#ffd166"; ctx.font = "800 40px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillText("✊  PRÉSIDENT·E DU PEUPLE", W / 2, 120);
     ctx.fillStyle = "#d7b9d6"; ctx.font = "600 28px Inter, sans-serif";
-    ctx.fillText("Mode " + (S.mode === "infinite" ? "Survie" : "Histoire") + " · " + ((BALANCE.diff[S.diff] || {}).label || ""), W / 2, 172);
-    // titre de fin (bloc 3D simulé)
-    ctx.fillStyle = win ? "#ffd166" : "#ff8aa0";
-    ctx.font = "800 70px 'Bricolage Grotesque', Inter, sans-serif";
-    let y = wrapText(ctx, ($("#endTitle").textContent || "").toUpperCase(), W / 2, 270, W - 120, 76);
-    // Une (bandeau journal)
-    const uy = y + 50;
-    ctx.fillStyle = "#fff7f9"; ctx.fillRect(70, uy, W - 140, 130);
-    ctx.fillStyle = "#ff2b46"; ctx.font = "800 24px 'Bricolage Grotesque', Inter, sans-serif"; ctx.textAlign = "left";
-    ctx.fillText("LA UNE DU PEUPLE", 95, uy + 38);
-    ctx.fillStyle = "#1a0820"; ctx.font = "800 36px 'Bricolage Grotesque', Inter, sans-serif";
-    wrapText(ctx, $("#uneHead").textContent || "", W / 2, uy + 86, W - 200, 40);
+    ctx.fillText("Mode " + (S.mode === "infinite" ? "Survie" : "Histoire") + " · " + ((BALANCE.diff[S.diff] || {}).label || ""), W / 2, 162);
+
+    // Titre de fin (auto-ajusté, centré)
+    const tFit = fitLines(ctx, ($("#endTitle").textContent || "").toUpperCase(), W - 140, 64, 40, "800");
+    ctx.fillStyle = win ? "#ffd166" : "#ff8aa0"; ctx.font = "800 " + tFit.px + "px 'Bricolage Grotesque', Inter, sans-serif";
+    const tLh = tFit.px + 10; let ty = 250;
+    tFit.lines.forEach((l, i) => ctx.fillText(l, W / 2, ty + i * tLh));
+
+    // Bandeau « Une » (taille adaptée au texte, centré)
+    const hFit = fitLines(ctx, $("#uneHead").textContent || "", W - 220, 38, 24, "800");
+    const bandTop = ty + (tFit.lines.length - 1) * tLh + 46;
+    const hLh = hFit.px + 8;
+    const bandH = 70 + hFit.lines.length * hLh;
+    ctx.fillStyle = "#fff7f9"; ctx.fillRect(60, bandTop, W - 120, bandH);
+    ctx.fillStyle = "#ff2b46"; ctx.fillRect(60, bandTop, W - 120, 6);
+    ctx.fillStyle = "#ff2b46"; ctx.font = "800 22px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillText("LA UNE DU PEUPLE", W / 2, bandTop + 38);
+    ctx.fillStyle = "#1a0820"; ctx.font = "800 " + hFit.px + "px 'Bricolage Grotesque', Inter, sans-serif";
+    hFit.lines.forEach((l, i) => ctx.fillText(l, W / 2, bandTop + 70 + i * hLh));
+
     // 4 jauges finales
-    const gy = uy + 270;
-    const cols = [["p", "✊ Peuple"], ["s", "⚖ Social"], ["e", "🌱 Planète"], ["v", "🕊 Souver."]];
-    cols.forEach((c, i) => ringOn(ctx, 175 + i * 245, gy, 80, S.g[c[0]], GAUGES[c[0]].color, c[1]));
-    // stats
-    const sy = gy + 230;
-    ctx.textAlign = "center";
-    const stat = (x, big, lab) => { ctx.fillStyle = "#ffd166"; ctx.font = "800 92px 'Bricolage Grotesque', Inter, sans-serif"; ctx.fillText(big, x, sy);
-      ctx.fillStyle = "#d7b9d6"; ctx.font = "600 28px Inter, sans-serif"; ctx.fillText(lab, x, sy + 44); };
+    const gy = 712;
+    [["p", "✊ Peuple"], ["s", "⚖ Social"], ["e", "🌱 Planète"], ["v", "🕊 Souver."]]
+      .forEach((c, i) => ringOn(ctx, 165 + i * 250, gy, 78, S.g[c[0]], GAUGES[c[0]].color, c[1]));
+
+    // Stats (centrées)
+    const sy = 940;
+    const stat = (x, big, lab) => {
+      ctx.fillStyle = "#ffd166"; ctx.font = "800 86px 'Bricolage Grotesque', Inter, sans-serif"; ctx.fillText(big, x, sy);
+      ctx.fillStyle = "#d7b9d6"; ctx.font = "600 27px Inter, sans-serif"; ctx.fillText(lab, x, sy + 42);
+    };
     stat(W / 2 - 300, String(S.measures.length), "mesures");
     stat(W / 2, S.voix > 999 ? (S.voix / 1000).toFixed(1) + "k" : String(S.voix), "voix");
     stat(W / 2 + 300, $("#endGrade").textContent, "bilan");
-    // tortue mascotte
+
+    // Tortue mascotte (bas-gauche, ne chevauche pas le texte)
     const im = await loadImg(win ? "assets/turtle/turtle-megaphone.png" : "assets/turtle/turtle-balai.png");
-    if (im) { const tw = 300, th = tw * (im.height / im.width || 1.2); ctx.drawImage(im, W - tw - 30, H - th - 150, tw, th); }
-    // pied : LIEN bien visible + incitation
-    ctx.textAlign = "center"; ctx.fillStyle = "#ff5c6e"; ctx.fillRect(0, H - 132, W, 132);
-    ctx.fillStyle = "#fff7f9"; ctx.font = "800 38px 'Bricolage Grotesque', Inter, sans-serif";
-    ctx.fillText("🐢 À toi de jouer — tiens le mandat jusqu'en 2032 !", W / 2, H - 78);
-    ctx.font = "800 44px 'Bricolage Grotesque', Inter, sans-serif"; ctx.fillStyle = "#fff";
+    if (im) { const tw = 196, th = tw * (im.height / im.width || 1.2); ctx.drawImage(im, 8, H - 132 - th + 70, tw, th); }
+
+    // Pied : LIEN bien visible + incitation (texte court pour ne pas croiser la tortue)
+    ctx.fillStyle = "#ff5c6e"; ctx.fillRect(0, H - 130, W, 130);
+    ctx.fillStyle = "#fff7f9"; ctx.font = "800 33px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillText("Tiens-tu le mandat jusqu'en 2032 ?", W / 2, H - 78);
+    ctx.fillStyle = "#fff"; ctx.font = "800 44px 'Bricolage Grotesque', Inter, sans-serif";
     ctx.fillText(GAME_URL_SHORT, W / 2, H - 28);
 
     cv.toBlob((blob) => {
@@ -759,6 +776,14 @@
         a.download = file.name; a.click(); toast("Image enregistrée — partage-la&nbsp;! 🔥");
       }
     }, "image/png");
+  }
+  function wrapText(ctx, text, x, y, maxW, lh) {
+    const words = String(text).split(" "); let line = "", yy = y;
+    for (const w of words) {
+      if (ctx.measureText(line + w).width > maxW && line) { ctx.fillText(line.trim(), x, yy); line = ""; yy += lh; }
+      line += w + " ";
+    }
+    ctx.fillText(line.trim(), x, yy); return yy;
   }
 
   /* ---------- Modale ---------- */
