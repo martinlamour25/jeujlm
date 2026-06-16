@@ -714,58 +714,59 @@
     grad.addColorStop(0, "#4a1450"); grad.addColorStop(1, "#1c0622");
     ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = "rgba(255,255,255,0.04)";
-    for (let i = 0; i < 60; i++) ctx.fillRect((i * 53) % W, (i * 89) % H, 3, 3);
-    ["#3f7fe0", "#fff7f9", "#ff2b46"].forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(0, 16 + i * 11, W, 11); });
+    for (let i = 0; i < 50; i++) ctx.fillRect((i * 53) % W, (i * 89) % H, 3, 3);
+    ["#3f7fe0", "#fff7f9", "#ff2b46"].forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(0, 14 + i * 9, W, 9); });
 
     ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
-    ctx.fillStyle = "#ffd166"; ctx.font = "800 40px 'Bricolage Grotesque', Inter, sans-serif";
-    ctx.fillText("✊  PRÉSIDENT·E DU PEUPLE", W / 2, 120);
-    ctx.fillStyle = "#d7b9d6"; ctx.font = "600 28px Inter, sans-serif";
-    ctx.fillText("Mode " + (S.mode === "infinite" ? "Survie" : "Histoire") + " · " + ((BALANCE.diff[S.diff] || {}).label || ""), W / 2, 162);
+    ctx.fillStyle = "#ffd166"; ctx.font = "800 34px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillText("✊  PRÉSIDENT·E DU PEUPLE", W / 2, 86);
+    ctx.fillStyle = "#d7b9d6"; ctx.font = "600 23px Inter, sans-serif";
+    ctx.fillText("Mode " + (S.mode === "infinite" ? "Survie" : "Histoire") + " · " + ((BALANCE.diff[S.diff] || {}).label || ""), W / 2, 120);
 
     // Titre de fin (auto-ajusté, centré)
-    const tFit = fitLines(ctx, ($("#endTitle").textContent || "").toUpperCase(), W - 140, 64, 40, "800");
+    const tFit = fitLines(ctx, ($("#endTitle").textContent || "").toUpperCase(), W - 120, 52, 34, "800");
     ctx.fillStyle = win ? "#ffd166" : "#ff8aa0"; ctx.font = "800 " + tFit.px + "px 'Bricolage Grotesque', Inter, sans-serif";
-    const tLh = tFit.px + 10; let ty = 250;
+    const tLh = tFit.px + 8; const ty = 180;
     tFit.lines.forEach((l, i) => ctx.fillText(l, W / 2, ty + i * tLh));
 
     // Bandeau « Une » (taille adaptée au texte, centré)
-    const hFit = fitLines(ctx, $("#uneHead").textContent || "", W - 220, 38, 24, "800");
-    const bandTop = ty + (tFit.lines.length - 1) * tLh + 46;
-    const hLh = hFit.px + 8;
-    const bandH = 70 + hFit.lines.length * hLh;
-    ctx.fillStyle = "#fff7f9"; ctx.fillRect(60, bandTop, W - 120, bandH);
-    ctx.fillStyle = "#ff2b46"; ctx.fillRect(60, bandTop, W - 120, 6);
-    ctx.fillStyle = "#ff2b46"; ctx.font = "800 22px 'Bricolage Grotesque', Inter, sans-serif";
-    ctx.fillText("LA UNE DU PEUPLE", W / 2, bandTop + 38);
+    const hFit = fitLines(ctx, $("#uneHead").textContent || "", W - 180, 30, 21, "800");
+    const bandTop = ty + (tFit.lines.length - 1) * tLh + 34;
+    const hLh = hFit.px + 6;
+    const bandH = 54 + hFit.lines.length * hLh;
+    ctx.fillStyle = "#fff7f9"; ctx.fillRect(50, bandTop, W - 100, bandH);
+    ctx.fillStyle = "#ff2b46"; ctx.fillRect(50, bandTop, W - 100, 6);
+    ctx.fillStyle = "#ff2b46"; ctx.font = "800 20px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillText("LA UNE DU PEUPLE", W / 2, bandTop + 32);
     ctx.fillStyle = "#1a0820"; ctx.font = "800 " + hFit.px + "px 'Bricolage Grotesque', Inter, sans-serif";
-    hFit.lines.forEach((l, i) => ctx.fillText(l, W / 2, bandTop + 70 + i * hLh));
+    hFit.lines.forEach((l, i) => ctx.fillText(l, W / 2, bandTop + 56 + i * hLh));
 
-    // 4 jauges finales
-    const gy = 712;
+    // 4 jauges finales (anneaux), centrées
+    const gy = bandTop + bandH + 96;
     [["p", "✊ Peuple"], ["s", "⚖ Social"], ["e", "🌱 Planète"], ["v", "🕊 Souver."]]
-      .forEach((c, i) => ringOn(ctx, 165 + i * 250, gy, 78, S.g[c[0]], GAUGES[c[0]].color, c[1]));
+      .forEach((c, i) => ringOn(ctx, W / 2 + (i - 1.5) * 246, gy, 58, S.g[c[0]], GAUGES[c[0]].color, c[1]));
 
     // Stats (centrées)
-    const sy = 940;
+    const sy = gy + 158;
     const stat = (x, big, lab) => {
-      ctx.fillStyle = "#ffd166"; ctx.font = "800 86px 'Bricolage Grotesque', Inter, sans-serif"; ctx.fillText(big, x, sy);
-      ctx.fillStyle = "#d7b9d6"; ctx.font = "600 27px Inter, sans-serif"; ctx.fillText(lab, x, sy + 42);
+      ctx.fillStyle = "#ffd166"; ctx.font = "800 66px 'Bricolage Grotesque', Inter, sans-serif"; ctx.fillText(big, x, sy);
+      ctx.fillStyle = "#d7b9d6"; ctx.font = "600 24px Inter, sans-serif"; ctx.fillText(lab, x, sy + 36);
     };
     stat(W / 2 - 300, String(S.measures.length), "mesures");
     stat(W / 2, S.voix > 999 ? (S.voix / 1000).toFixed(1) + "k" : String(S.voix), "voix");
     stat(W / 2 + 300, $("#endGrade").textContent, "bilan");
 
-    // Tortue mascotte (bas-gauche, ne chevauche pas le texte)
-    const im = await loadImg(win ? "assets/turtle/turtle-megaphone.png" : "assets/turtle/turtle-balai.png");
-    if (im) { const tw = 196, th = tw * (im.height / im.width || 1.2); ctx.drawImage(im, 8, H - 132 - th + 70, tw, th); }
+    // Pied : LIEN bien visible + incitation (bande pleine largeur en bas)
+    const fb = H - 104;
+    ctx.fillStyle = "#ff5c6e"; ctx.fillRect(0, fb, W, 104);
+    ctx.fillStyle = "#fff7f9"; ctx.textAlign = "center"; ctx.font = "800 28px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillText("Tiens-tu le mandat jusqu'en 2032 ?", W / 2, fb + 44);
+    ctx.fillStyle = "#fff"; ctx.font = "800 40px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillText(GAME_URL_SHORT, W / 2, fb + 86);
 
-    // Pied : LIEN bien visible + incitation (texte court pour ne pas croiser la tortue)
-    ctx.fillStyle = "#ff5c6e"; ctx.fillRect(0, H - 130, W, 130);
-    ctx.fillStyle = "#fff7f9"; ctx.font = "800 33px 'Bricolage Grotesque', Inter, sans-serif";
-    ctx.fillText("Tiens-tu le mandat jusqu'en 2032 ?", W / 2, H - 78);
-    ctx.fillStyle = "#fff"; ctx.font = "800 44px 'Bricolage Grotesque', Inter, sans-serif";
-    ctx.fillText(GAME_URL_SHORT, W / 2, H - 28);
+    // Tortue mascotte (bas-gauche, posée sur la bande, sans croiser le texte centré)
+    const im = await loadImg(win ? "assets/turtle/turtle-megaphone.png" : "assets/turtle/turtle-balai.png");
+    if (im) { const tw = 150, th = tw * (im.height / im.width || 1.2); ctx.drawImage(im, 12, fb - th + 56, tw, th); }
 
     cv.toBlob((blob) => {
       if (!blob) { toast("Image indisponible ici (essaie en ligne)"); return; }

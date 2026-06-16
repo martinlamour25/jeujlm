@@ -498,3 +498,6 @@ body {
 .modal-body ul.how li b { color: var(--c-gold); font-weight: 700; }
 .how-foot { color: var(--c-gold); font-weight: 600; text-align: center; margin-top: 4px; }
 .modal-body .lead { font-size: 1.05rem; color: var(--c-white); text-align: center; }
+
+/* Bouton son : un peu plus rentré pour ne pas coller au bord du navigateur */
+.audio-btn { top: calc(12px + var(--safe-top)); right: calc(12px + env(safe-area-inset-right, 0px)); width: 34px; height: 34px; font-size: 0.9rem; opacity: 0.85; }
