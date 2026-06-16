@@ -440,8 +440,7 @@
     $("#hintL").style.opacity = r < 0 ? -r * 0.9 : 0;
     $("#choiceR").classList.toggle("hot", r > 0.25);
     $("#choiceL").classList.toggle("hot", r < -0.25);
-    if (Math.abs(r) < 0.18) clearPreview();
-    else previewImpact(r > 0 ? "right" : "left", Math.abs(r));
+    // Volontairement PAS d'aperçu d'impact (monte/descend) : on garde le mystère.
   }
 
   /* ---------- Swipe ---------- */
