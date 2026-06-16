@@ -546,3 +546,6 @@ body {
 .impact-list { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 .impact-list span { font-size: 0.78rem; background: rgba(43,217,122,0.14); border: 1px solid rgba(43,217,122,0.4);
   color: #b6f5d2; border-radius: 999px; padding: 5px 11px; }
+
+/* Texte de carte : auto-ajusté en JS, JAMAIS de scroll (mobile-friendly) */
+.card-bubble { overflow: hidden !important; }
