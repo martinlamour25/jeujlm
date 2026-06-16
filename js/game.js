@@ -234,11 +234,12 @@
 
   function updateMandate() {
     if (S.mode === "story") {
-      const total = STORY.filter((x) => typeof x === "string").length;
-      const pct = Math.min(100, (S.turn / total) * 100);
-      $("#mandateFill").style.width = pct + "%";
+      // Progression basée sur l'avancée du SCÉNARIO (pas sur le nb de tours,
+      // que les événements gonflent) : la barre suit vraiment l'histoire.
+      const frac = Math.min(1, S.storyIdx / STORY.length);
+      $("#mandateFill").style.width = (frac * 100) + "%";
       $("#mandateLabel").textContent = "Mandat présidentiel";
-      $("#mandateYear").textContent = 2027 + Math.min(5, Math.floor((S.turn / total) * 5));
+      $("#mandateYear").textContent = 2027 + Math.min(5, Math.floor(frac * 5));
     } else {
       $("#mandateFill").style.width = ((S.month % 12) / 12 * 100) + "%";
       $("#mandateLabel").textContent = "Survie";
@@ -282,10 +283,10 @@
     if (!EVENTS || !EVENTS.length) return false;
     const cfg = BALANCE.diff[S.diff] || BALANCE.diff.normal;
     if (S.turn < cfg.grace + 1) return false;
-    if (S.turn - (S.lastEventTurn == null ? -9 : S.lastEventTurn) < 3) return false;
+    if (S.turn - (S.lastEventTurn == null ? -9 : S.lastEventTurn) < 2) return false;
     const maxG = Math.max.apply(null, KEYS.map((k) => S.g[k]));
-    let p = 0.08 + cfg.drift * 0.03 + (maxG > 78 ? 0.18 : maxG > 65 ? 0.08 : 0) +
-      (S.mode === "infinite" ? Math.min(0.15, S.month / 240) : 0);
+    let p = 0.18 + cfg.drift * 0.04 + (maxG > 75 ? 0.18 : maxG > 60 ? 0.09 : 0) +
+      (S.mode === "infinite" ? Math.min(0.18, S.month / 220) : 0);
     if (Math.random() > p) return false;
     S.lastEventTurn = S.turn;
     renderCard(pickEvent());
@@ -366,9 +367,9 @@
     const ribbon = $("#cardRibbon");
     ribbon.hidden = !(c.topical || c.event);
     ribbon.textContent = c.event ? "🔴 IMPRÉVU" : (c.crisis ? "🔴 BREAKING" : "⚡ ACTUALITÉ");
-    // Événement subi : un seul bouton « Encaisser », pas de vrai choix.
-    $("#choiceL").style.display = c.event ? "none" : "";
-    $("#choiceR").classList.toggle("full", !!c.event);
+    // Les événements ont désormais deux vraies options (on subit moins bêtement).
+    $("#choiceL").style.display = "";
+    $("#choiceR").classList.remove("full");
     const av = $("#cardAvatar");
     av.innerHTML = (CHAR_ART && CHAR_ART[c.char]) || FALLBACK_PORTRAIT;
     av.style.boxShadow = "0 0 0 3px " + theme.color + "55, 0 10px 24px -6px rgba(0,0,0,.6)";
