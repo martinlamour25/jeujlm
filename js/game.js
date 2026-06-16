@@ -40,6 +40,8 @@
   const BEST_M = "ppp2027.best.measures";
   const BEST_S = "ppp2027.best.survival";
   const DIFF_KEY = "ppp2027.diff";
+  const GAME_URL = "https://martinlamour25.github.io/jeujlm/";
+  const GAME_URL_SHORT = "martinlamour25.github.io/jeujlm";
 
   const BALANCE = {
     comboBase: 60,           // voix par bonne décision
@@ -558,6 +560,7 @@
   /* ---------- Fin de partie ---------- */
   function endGame(kind, deadKey) {
     SOUND.stopMusic();
+    S.outcome = kind === "defeat" ? "defeat" : "win";
     const survivedMonths = S.month;
     if (S.measures.length > bestM()) localStorage.setItem(BEST_M, String(S.measures.length));
     if (survivedMonths > bestS()) localStorage.setItem(BEST_S, String(survivedMonths));
@@ -655,61 +658,32 @@
   }
 
   /* ---------- Partage ---------- */
+  function shareText() {
+    return "✊ J'ai gouverné selon L'Avenir en commun dans « Président·e du Peuple » : " +
+      S.measures.length + " mesures, " + S.voix.toLocaleString("fr-FR") + " voix" +
+      (S.mode === "infinite" ? ", " + S.month + " mois tenus" : "") + " — bilan « " +
+      $("#endTitle").textContent + " ».\n\n🐢 Tiens-tu le mandat jusqu'en 2032 ? Joue (gratuit) : " +
+      GAME_URL + "\n#PlaceAuPeuple #Mélenchon2027";
+  }
   async function shareResult() {
-    const text = "✊ Dans « Président·e du Peuple », j'ai gouverné selon L'Avenir en commun : " +
-      S.measures.length + " mesures adoptées, " + S.voix.toLocaleString("fr-FR") + " voix" +
-      (S.mode === "infinite" ? ", " + S.month + " mois tenus" : "") +
-      " !\nÀ toi de tenir le mandat jusqu'en 2032. #PlaceAuPeuple #Mélenchon2027";
+    const text = shareText();
     try {
-      if (navigator.share) await navigator.share({ title: "Président·e du Peuple", text });
-      else { await navigator.clipboard.writeText(text); toast("Bilan copié — à partager&nbsp;!"); }
+      if (navigator.share) await navigator.share({ title: "Président·e du Peuple", text, url: GAME_URL });
+      else { await navigator.clipboard.writeText(text); toast("Lien + bilan copiés — à partager&nbsp;! 🔥"); }
     } catch (e) {}
   }
 
-  // Image de bilan partageable (1080×1350).
-  function shareImage() {
-    const cv = $("#shareCanvas"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
-    const grad = ctx.createLinearGradient(0, 0, W, H);
-    grad.addColorStop(0, "#3d0e3f"); grad.addColorStop(1, "#25082f");
-    ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
-    // bande tricolore (clin d'œil identité 2027)
-    ["#3f7fe0", "#fff7f9", "#ff2b46"].forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(0, 14 + i * 10, W, 10); });
-    // masthead
-    ctx.textAlign = "center"; ctx.fillStyle = "#ffd166";
-    ctx.font = "700 38px Inter, sans-serif"; ctx.fillText("✊  LA UNE DU PEUPLE", W / 2, 130);
-    // gros titre (Une)
-    ctx.fillStyle = "#fff7f9"; ctx.font = "800 76px 'Bricolage Grotesque', Inter, sans-serif";
-    wrapText(ctx, $("#uneHead").textContent || "MANDAT", W / 2, 250, W - 140, 80);
-    // sous-titre = titre de fin
-    ctx.fillStyle = "#ff8aa0"; ctx.font = "700 44px Inter, sans-serif";
-    ctx.fillText($("#endTitle").textContent, W / 2, 560);
-    // stats
-    ctx.fillStyle = "#fff7f9"; ctx.font = "800 120px 'Bricolage Grotesque', Inter, sans-serif";
-    ctx.fillText(String(S.measures.length), W / 2 - 280, 760);
-    ctx.fillText(S.mode === "infinite" ? String(S.month) : String(Math.min(5, Math.round(S.turn / STORY.filter((x) => typeof x === "string").length * 5))), W / 2, 760);
-    ctx.fillText(String(S.voix > 999 ? (S.voix / 1000).toFixed(1) + "k" : S.voix), W / 2 + 280, 760);
-    ctx.fillStyle = "#d7b9d6"; ctx.font = "600 30px Inter, sans-serif";
-    ctx.fillText("mesures", W / 2 - 280, 810);
-    ctx.fillText(S.mode === "infinite" ? "mois tenus" : "années", W / 2, 810);
-    ctx.fillText("voix", W / 2 + 280, 810);
-    // mesures phares
-    ctx.fillStyle = "#2bd97a"; ctx.font = "600 34px Inter, sans-serif"; ctx.textAlign = "center";
-    S.measures.slice(0, 5).forEach((m, i) => ctx.fillText("✓ " + m, W / 2, 920 + i * 56));
-    // pied
-    ctx.fillStyle = "#ffd166"; ctx.font = "800 40px 'Bricolage Grotesque', Inter, sans-serif";
-    ctx.fillText("Président·e du Peuple — L'Avenir en commun", W / 2, H - 110);
-    ctx.fillStyle = "#d7b9d6"; ctx.font = "600 32px Inter, sans-serif";
-    ctx.fillText("#PlaceAuPeuple  ·  #Mélenchon2027", W / 2, H - 60);
-
-    cv.toBlob((blob) => {
-      const file = new File([blob], "bilan-president-du-peuple.png", { type: "image/png" });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: "Président·e du Peuple", text: "Mon bilan ✊ #Mélenchon2027" }).catch(() => {});
-      } else {
-        const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-        a.download = file.name; a.click(); toast("Image de bilan téléchargée&nbsp;!");
-      }
-    }, "image/png");
+  function loadImg(src) {
+    return new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+  }
+  function ringOn(ctx, cx, cy, r, val, color, label) {
+    ctx.lineCap = "round"; ctx.lineWidth = 20;
+    ctx.strokeStyle = "rgba(255,255,255,0.14)"; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = color; ctx.beginPath();
+    ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (Math.max(0, val) / 100)); ctx.stroke();
+    ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.font = "800 40px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillText(Math.round(val) + "", cx, cy + 14);
+    ctx.fillStyle = "#e9d3e8"; ctx.font = "700 24px Inter, sans-serif"; ctx.fillText(label, cx, cy + r + 40);
   }
   function wrapText(ctx, text, x, y, maxW, lh) {
     const words = String(text).split(" "); let line = "", yy = y;
@@ -717,7 +691,69 @@
       if (ctx.measureText(line + w).width > maxW && line) { ctx.fillText(line.trim(), x, yy); line = ""; yy += lh; }
       line += w + " ";
     }
-    ctx.fillText(line.trim(), x, yy);
+    ctx.fillText(line.trim(), x, yy); return yy;
+  }
+
+  // Image de bilan personnalisée, fun & partageable (1080×1350) avec lien + tortue.
+  async function shareImage() {
+    const cv = $("#shareCanvas"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
+    const win = S.outcome !== "defeat";
+    // fond
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, "#4a1450"); grad.addColorStop(1, "#1c0622");
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "rgba(255,255,255,0.04)";
+    for (let i = 0; i < 40; i++) ctx.fillRect((i * 53) % W, (i * 89) % H, 3, 3);
+    // bande tricolore
+    ["#3f7fe0", "#fff7f9", "#ff2b46"].forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(0, 18 + i * 11, W, 11); });
+    // masthead
+    ctx.textAlign = "center"; ctx.fillStyle = "#ffd166"; ctx.font = "800 40px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillText("✊  PRÉSIDENT·E DU PEUPLE", W / 2, 130);
+    ctx.fillStyle = "#d7b9d6"; ctx.font = "600 28px Inter, sans-serif";
+    ctx.fillText("Mode " + (S.mode === "infinite" ? "Survie" : "Histoire") + " · " + ((BALANCE.diff[S.diff] || {}).label || ""), W / 2, 172);
+    // titre de fin (bloc 3D simulé)
+    ctx.fillStyle = win ? "#ffd166" : "#ff8aa0";
+    ctx.font = "800 70px 'Bricolage Grotesque', Inter, sans-serif";
+    let y = wrapText(ctx, ($("#endTitle").textContent || "").toUpperCase(), W / 2, 270, W - 120, 76);
+    // Une (bandeau journal)
+    const uy = y + 50;
+    ctx.fillStyle = "#fff7f9"; ctx.fillRect(70, uy, W - 140, 130);
+    ctx.fillStyle = "#ff2b46"; ctx.font = "800 24px 'Bricolage Grotesque', Inter, sans-serif"; ctx.textAlign = "left";
+    ctx.fillText("LA UNE DU PEUPLE", 95, uy + 38);
+    ctx.fillStyle = "#1a0820"; ctx.font = "800 36px 'Bricolage Grotesque', Inter, sans-serif";
+    wrapText(ctx, $("#uneHead").textContent || "", W / 2, uy + 86, W - 200, 40);
+    // 4 jauges finales
+    const gy = uy + 270;
+    const cols = [["p", "✊ Peuple"], ["s", "⚖ Social"], ["e", "🌱 Planète"], ["v", "🕊 Souver."]];
+    cols.forEach((c, i) => ringOn(ctx, 175 + i * 245, gy, 80, S.g[c[0]], GAUGES[c[0]].color, c[1]));
+    // stats
+    const sy = gy + 230;
+    ctx.textAlign = "center";
+    const stat = (x, big, lab) => { ctx.fillStyle = "#ffd166"; ctx.font = "800 92px 'Bricolage Grotesque', Inter, sans-serif"; ctx.fillText(big, x, sy);
+      ctx.fillStyle = "#d7b9d6"; ctx.font = "600 28px Inter, sans-serif"; ctx.fillText(lab, x, sy + 44); };
+    stat(W / 2 - 300, String(S.measures.length), "mesures");
+    stat(W / 2, S.voix > 999 ? (S.voix / 1000).toFixed(1) + "k" : String(S.voix), "voix");
+    stat(W / 2 + 300, $("#endGrade").textContent, "bilan");
+    // tortue mascotte
+    const im = await loadImg(win ? "assets/turtle/turtle-megaphone.png" : "assets/turtle/turtle-balai.png");
+    if (im) { const tw = 300, th = tw * (im.height / im.width || 1.2); ctx.drawImage(im, W - tw - 30, H - th - 150, tw, th); }
+    // pied : LIEN bien visible + incitation
+    ctx.textAlign = "center"; ctx.fillStyle = "#ff5c6e"; ctx.fillRect(0, H - 132, W, 132);
+    ctx.fillStyle = "#fff7f9"; ctx.font = "800 38px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillText("🐢 À toi de jouer — tiens le mandat jusqu'en 2032 !", W / 2, H - 78);
+    ctx.font = "800 44px 'Bricolage Grotesque', Inter, sans-serif"; ctx.fillStyle = "#fff";
+    ctx.fillText(GAME_URL_SHORT, W / 2, H - 28);
+
+    cv.toBlob((blob) => {
+      if (!blob) { toast("Image indisponible ici (essaie en ligne)"); return; }
+      const file = new File([blob], "mon-bilan-president-du-peuple.png", { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: "Président·e du Peuple", text: shareText(), url: GAME_URL }).catch(() => {});
+      } else {
+        const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+        a.download = file.name; a.click(); toast("Image enregistrée — partage-la&nbsp;! 🔥");
+      }
+    }, "image/png");
   }
 
   /* ---------- Modale ---------- */
@@ -744,6 +780,7 @@
     "<em>L'Avenir en commun</em> et soutenir la candidature de Jean-Luc Mélenchon en 2027.</p>" +
     "<p>Les dilemmes et mesures viennent du programme. Les crises s'inspirent de l'actualité 2025-2026 (tarifs de Trump et crise du Groenland, budget d'austérité et 49.3, détroit d'Ormuz, canicules et COP30, Ukraine, Gaza, AI Act…).</p>" +
     "<p>Aucune donnée collectée : seuls tes records restent sur l'appareil.</p>" +
+    '<p>🐢 Joue en ligne &amp; partage : <a href="' + GAME_URL + '" style="color:#ffd166;font-weight:700">martinlamour25.github.io/jeujlm</a></p>' +
     '<p style="color:#d7b9d6;font-size:.85rem">Fait avec passion pour la révolution citoyenne. ✊</p>';
 
   /* ---------- Liaisons ---------- */
