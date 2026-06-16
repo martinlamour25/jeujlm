@@ -17,6 +17,11 @@
     globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M5 7c4 3 10 3 14 0M5 17c4-3 10-3 14 0"/></svg>',
     trophy: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8h20v10a10 10 0 0 1-20 0z"/><path d="M14 12H8v4a6 6 0 0 0 6 6M34 12h6v4a6 6 0 0 1-6 6"/><path d="M24 28v6M18 40h12M20 34h8l2 6H18z"/></svg>'
   };
+  // Le φ utilise un dégradé : il faut un id UNIQUE par copie, sinon plusieurs
+  // SVG partagent "#pg" et le remplissage disparaît quand l'un d'eux est masqué.
+  let _phiN = 0;
+  function phiSVG() { const id = "pg" + (++_phiN); return ICONS.phi.replace(/pg/g, id); }
+
   // Portrait de secours si une clé manque.
   const FALLBACK_PORTRAIT = '<svg viewBox="0 0 200 200"><circle cx="100" cy="80" r="42" fill="#ffd1dc"/><rect x="40" y="120" width="120" height="80" rx="40" fill="#7e5bd8"/></svg>';
 
@@ -121,7 +126,7 @@
         '<p class="cine-kicker">' + s.kicker + "</p>" +
         '<h1 class="cine-title block-text">' + s.title.replace(/\n/g, "<br>") + "</h1>" +
         '<div class="cine-lines">' + s.lines.map((l) => "<span>" + l + "</span>").join("") + "</div>" +
-        (s.cls === "win" ? '<div class="cine-phi">' + ICONS.phi + "</div>" : "") +
+        (s.cls === "win" ? '<div class="cine-phi">' + phiSVG() + "</div>" : "") +
         "</div>" +
         '<button class="intro-skip" id="introSkip">Passer ›</button>' +
         '<p class="cine-hint">Touche pour continuer</p>';
@@ -151,7 +156,7 @@
 
   /* ---------- Accueil ---------- */
   function initHome() {
-    $("#logoPhi").innerHTML = ICONS.phi;
+    $("#logoPhi").innerHTML = phiSVG();
     const m = bestM(), s = bestS();
     if (m > 0 || s > 0) {
       $("#homeBest").hidden = false;
@@ -392,7 +397,7 @@
   // Effet « pile de cartes » : carte fantôme derrière.
   function renderPeek() {
     const p = $("#cardPeek"); if (!p) return;
-    if (!p.dataset.init) { p.innerHTML = '<div class="peek-phi">' + ICONS.phi + "</div>"; p.dataset.init = "1"; }
+    if (!p.dataset.init) { p.innerHTML = '<div class="peek-phi">' + phiSVG() + "</div>"; p.dataset.init = "1"; }
   }
 
   // Petite secousse d'écran.

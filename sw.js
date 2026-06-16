@@ -1,5 +1,5 @@
 /* Service worker — cache hors-ligne pour « Président·e du Peuple » */
-const CACHE = "ppp2027-v8";
+const CACHE = "ppp2027-v9";
 const ASSETS = [
   "./",
   "./index.html",
