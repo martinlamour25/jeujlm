@@ -29,6 +29,7 @@
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
   const haptic = (p) => { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) {} };
   const resolve = (x, f) => (typeof x === "function" ? x(f) : x);
   // Les bons choix (côté "programme") n'enlèvent JAMAIS de points : on retire les malus.
@@ -219,8 +220,9 @@
     S = { mode, diff: difficulty, flags: {}, rep: {}, seen: {}, recent: [],
       sideMap: { left: "left", right: "right" },
       g: { p: cfg.start, s: cfg.start, e: cfg.start, v: cfg.start },
-      turn: 0, month: 0, measures: [], heads: [], voix: 0, combo: 0, maxCombo: 0,
-      queue: [], storyIdx: 0, lastId: null, current: null };
+      turn: 0, month: 0, measures: [], heads: [], impacts: [], voix: 0, combo: 0, maxCombo: 0,
+      queue: [], storyIdx: 0, lastId: null, current: null,
+      rndQueue: (typeof STORY_RANDOM !== "undefined" ? shuffle(STORY_RANDOM.slice()) : []) };
     SOUND.setMusicLevel(0);
     busy = false;
     buildGauges();
@@ -313,6 +315,13 @@
       while (S.storyIdx < STORY.length) {
         const item = STORY[S.storyIdx++];
         if (typeof item === "object" && item.act) { return showAct(item); }
+        if (item === "@rnd") { // emplacement aléatoire : pioche une carte non vue
+          while (S.rndQueue.length) {
+            const id = S.rndQueue.pop(); const rc = CARDS[id];
+            if (rc && !S.seen[id] && (!rc.cond || rc.cond(S.flags))) return renderCard(id);
+          }
+          continue; // pioche épuisée : on saute l'emplacement
+        }
         const c = CARDS[item];
         if (c && !S.seen[item] && (!c.cond || c.cond(S.flags))) return renderCard(item);
       }
@@ -331,6 +340,15 @@
     $("#actKicker").textContent = act.act;
     $("#actTitle").textContent = act.title;
     $("#actTitle").className = "act-title block-text";
+    // Effets concrets déjà obtenus : la France change au fil de l'histoire.
+    const ai = $("#actImpacts");
+    if (ai) {
+      if (S.impacts.length) {
+        ai.innerHTML = '<span class="ai-title">Grâce à tes mesures, la France change déjà :</span>' +
+          S.impacts.slice(-3).map((i) => "<span>" + i + "</span>").join("");
+        ai.hidden = false;
+      } else ai.hidden = true;
+    }
     ov.hidden = false; ov.classList.remove("out");
     requestAnimationFrame(() => ov.classList.add("show"));
     SOUND.sfx("crisis");
@@ -497,6 +515,8 @@
     if (opt.measure && S.measures.indexOf(opt.measure) === -1) {
       S.measures.push(opt.measure);
       $("#playScore").textContent = S.measures.length;
+      const imp = (typeof IMPACTS !== "undefined") && IMPACTS[opt.measure];
+      if (imp && S.impacts.indexOf(imp) === -1) S.impacts.push(imp);
     }
 
     // Élan populaire (combo) + voix — basé sur le CONTENU (choix conforme), pas le côté
@@ -552,15 +572,17 @@
       '<span class="d-ico">' + ICONS[GAUGES[k].icon] + "</span>" + (fx[k] > 0 ? "+" : "") + fx[k] + "</span>").join("");
     let voixChip = S.lastGain ? '<span class="d-chip voix">🔥 +' + S.lastGain + " voix</span>" : "";
     $("#feedbackDeltas").innerHTML = chips + voixChip;
-    $("#feedbackResult").innerHTML = opt.result + (opt.quip ? ' <span class="quip">' + opt.quip + "</span>" : "");
+    const imp = opt.measure && typeof IMPACTS !== "undefined" && IMPACTS[opt.measure];
+    $("#feedbackResult").innerHTML = opt.result + (opt.quip ? ' <span class="quip">' + opt.quip + "</span>" : "")
+      + (imp ? '<span class="impact-line">Concrètement : ' + imp + "</span>" : "");
     $("#feedbackNote").innerHTML = (ev ? "<strong>⚡ Imprévu :</strong> " : "<strong>📖 L'Avenir en commun :</strong> ") + opt.note;
-    $("#feedbackTag").innerHTML = ev ? "⚡ Imprévu · ni bonne ni mauvaise réponse"
-      : (opt.measure ? "✅ Mesure adoptée : " + opt.measure : "📖 L'Avenir en commun");
-    if (opt.measure) toast("✅ " + opt.measure);
+    $("#feedbackTag").innerHTML = ev ? "⚡ Imprévu"
+      : (opt.measure ? "✅ Mesure adoptée" : "📖 L'Avenir en commun");
     $("#feedback").classList.add("show");
   }
 
   function afterFeedback() {
+    if (!$("#feedback").classList.contains("show")) return; // idempotent (clic multiple)
     $("#feedback").classList.remove("show");
     const dead = KEYS.find((k) => S.g[k] <= 0);
     if (dead) { setTimeout(() => endGame("defeat", dead), 320); return; }
@@ -609,6 +631,14 @@
     $("#endMeasures").textContent = S.measures.length;
     $("#endYears").textContent = S.mode === "infinite" ? survivedMonths : Math.min(5, Math.round(S.turn / STORY.filter((x) => typeof x === "string").length * 5));
     $("#endGrade").textContent = grade(kind, S.measures.length);
+
+    const impEl = $("#endImpacts");
+    if (impEl) {
+      impEl.innerHTML = S.impacts.length
+        ? '<p class="eml-title">L\'impact concret de ton mandat</p><div class="impact-list">' +
+          S.impacts.map((i) => "<span>" + i + "</span>").join("") + "</div>"
+        : "";
+    }
 
     const list = $("#endMeasureList");
     const vline = '<p class="eml-voix">🔥 ' + S.voix.toLocaleString("fr-FR") + " voix rassemblées · meilleur combo ×" + S.maxCombo + "</p>";
@@ -834,6 +864,10 @@
 
     $("#playQuit").addEventListener("click", () => { SOUND.stopMusic(); show("home"); });
     $("#feedbackNext").addEventListener("click", afterFeedback);
+    // Cliquer N'IMPORTE OÙ pendant l'explication la fait passer.
+    $("#screen-play").addEventListener("click", () => {
+      if ($("#feedback").classList.contains("show")) afterFeedback();
+    });
 
     $("#endReplay").addEventListener("click", () => { if (!SOUND.isMuted()) SOUND.startMusic(); newGame(S ? S.mode : "story"); });
     $("#endShare").addEventListener("click", shareResult);

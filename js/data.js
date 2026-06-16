@@ -521,6 +521,18 @@ const CARDS = {
       measure: "Droits nouveaux des salariés" }
   },
 
+  prix: {
+    char: "citizen", scene: "ville", tag: "s",
+    text: "« Tout flambe : les courses, le loyer, l'essence. On fait quoi contre l'inflation ? »",
+    left: { label: "Laisser le marché", fx: { s: -10, p: -6 }, betray: true,
+      result: "Tu laisses filer les prix « pour ne pas fausser le marché ». Les marges des géants explosent, pas les salaires.",
+      note: "L'inflation sans réponse, c'est un transfert des ménages vers les profits." },
+    right: { label: "Bloquer les prix", fx: { s: 14, p: 8 },
+      result: "Tu bloques les prix de l'énergie, des carburants et des produits de première nécessité.",
+      note: "Bloquer les prix : que les multinationales paient, pas les citoyens.",
+      measure: "Blocage des prix de l'essentiel" }
+  },
+
   /* ---------- ADVERSAIRES POLITIQUES (caricatures satiriques) ---------- */
   macron_emt: {
     char: "macron", scene: "plateau", tag: "p", rarity: "topical",
@@ -737,222 +749,174 @@ const CARDS = {
       quip: "Le doigt levé de l'éditorialiste retombe, tout penaud.", head: "LE PLURALISME L'EMPORTE" }
   },
 
-  /* ---------- IMPRÉVUS (vrais dilemmes : aucune réponse n'est "la bonne") ---------- */
-  ev_cnews: {
-    event: true, hits: "p", char: "cnews", scene: "studio_tv", tag: "p",
-    text: "⚡ MINUIT. La chaîne du milliardaire matraque ton nom en boucle sur une musique d'angoisse. Au réveil, le pays aura la peur au ventre.",
-    left: { label: "Riposte médiatique totale", fx: { p: -2, s: -6 },
-      result: "Cellule de crise, directs, vidéos virales : ton image tient. Mais ministres et budget sont happés par la bataille du buzz.",
-      note: "Défendre l'image OU avancer sur le fond : il faut trancher.",
-      quip: "La com gagne la nuit ; le réel patientera.", head: "GUERRE DE L'IMAGE" },
-    right: { label: "Garder le cap social", fx: { p: -7, s: -1 },
-      result: "Tu ignores le cirque et continues à gouverner. Le matraquage, lui, laisse des traces dans l'opinion.",
-      note: "Tenir sa ligne se paie d'un peu d'image en moins.",
-      quip: "Digne. Mais le bandeau rouge tourne encore.", head: "LE MATRAQUAGE PASSE" }
-  },
-  ev_hanouna: {
-    event: true, hits: "p", char: "hanouna", scene: "studio_tv", tag: "p",
-    text: "⚡ 20H45. « Grand débat » sur la chaîne du clash : douze chroniqueurs surchauffés, un public chauffé à blanc, et toi au milieu.",
-    left: { label: "Plonger dans l'arène", fx: { p: -2, s: -6 },
-      result: "Tu y vas à fond, équipe mobilisée : deux punchlines marquent. Épuisant, et chronophage pour tout le reste.",
-      note: "Occuper le terrain médiatique coûte du temps de gouvernement.",
-      quip: "Douze contre un, et l'arbitre est acheté.", head: "DANS L'ARÈNE" },
-    right: { label: "Décliner poliment", fx: { p: -7, s: -1 },
-      result: "Tu snobes le cirque pour aller au contact du vrai public. L'audience du show te le fait payer en notoriété.",
-      note: "Refuser le spectacle, c'est renoncer à un coup de projecteur.",
-      quip: "Le plateau tourne à vide ; toi, tu remplis des salles.", head: "SANS MOI" }
-  },
-  ev_bollore: {
-    event: true, hits: "p", char: "bollore", scene: "studio_tv", tag: "p",
-    text: "⚡ OPA SURPRISE. L'empire Bolloré rafle trois médias de plus. Bientôt, toutes les « Unes » de France parleront d'une seule voix.",
-    left: { label: "Loi anti-monopole express", fx: { p: -2, s: -6 },
-      result: "Tu fais voter une loi anti-concentration. Bras de fer juridique long et coûteux, mais l'info reprend son souffle.",
-      note: "Garantir le pluralisme mobilise un énorme capital politique.",
-      quip: "Le milliardaire range son chéquier en grimaçant.", head: "L'INFO RESPIRE" },
-    right: { label: "Bâtir un média public fort", fx: { p: -7, s: -1 },
-      result: "Tu mises sur un service public d'info ambitieux plutôt qu'un bras de fer. Long à installer : l'empire prospère en attendant.",
-      note: "Construire l'alternative prend du temps.",
-      quip: "Un contre-pouvoir public, ça ne se fait pas en un tweet.", head: "L'ALTERNATIVE PUBLIQUE" }
-  },
-  ev_extreme_droite: {
-    event: true, hits: "p", char: "lepen", scene: "manif", tag: "p",
-    text: "⚡ Drapeaux et torches : l'extrême droite défile en masse et tente de capter la colère sociale pour la retourner contre des boucs émissaires.",
-    left: { label: "Réponse sociale immédiate", fx: { p: -2, s: -6 },
-      result: "Pouvoir d'achat, services publics, fraternité : tu assèches le terreau de la haine. La facture sociale est salée.",
-      note: "La meilleure digue contre l'extrême droite : l'égalité réelle.",
-      quip: "On ne combat pas la haine au porte-voix, mais au concret.", head: "LE SOCIAL CONTRE LA HAINE" },
-    right: { label: "Front républicain", fx: { p: -7, s: -1 },
-      result: "Tu mises sur la mobilisation citoyenne et le rappel des valeurs. Sans réponse sociale visible, une partie de la rue doute.",
-      note: "Les grands principes sans le concret laissent un vide.",
-      quip: "Les valeurs c'est bien ; la fin du mois, c'est mieux.", head: "FRONT RÉPUBLICAIN" }
-  },
-  ev_notation: {
-    event: true, hits: "v", char: "banker", scene: "bourse", tag: "v",
-    text: "⚡ 7H02. Les agences de notation dégradent la France : un AA en moins. La City s'affole, les éditos sortent l'apocalypse.",
-    left: { label: "Tenir tête aux marchés", fx: { v: -2, s: -6 },
-      result: "Tu ignores les agences et bloques la fuite des capitaux. Souveraineté préservée, mais l'économie encaisse un choc à court terme.",
-      note: "Désobéir aux marchés a un coût immédiat, pas éternel.",
-      quip: "Les agences notent ; le peuple, lui, vote.", head: "LA FINANCE NE DICTE PAS" },
-    right: { label: "Donner des gages", fx: { v: -7, s: -1 },
-      result: "Tu rassures les marchés par quelques concessions. Le social tient, mais tu leur rends un peu de pouvoir sur ton budget.",
-      note: "Calmer les marchés, c'est leur céder du terrain.",
-      quip: "Trois lettres dictent leur loi : pratique, pour eux.", head: "LES MARCHÉS RASSURÉS" }
-  },
-  ev_speculation: {
-    event: true, hits: "v", char: "lobby", scene: "bourse", tag: "v",
-    text: "⚡ Les requins de la finance parient des milliards CONTRE la dette française. Les taux s'envolent : la pression est maximale.",
-    left: { label: "Pôle bancaire public", fx: { v: -2, s: -6 },
-      result: "Tu adosses l'économie réelle à un pôle public et tiens bon. Lourd à lancer, mais la spéculation finit par caler.",
-      note: "Reprendre la main sur la finance demande des moyens.",
-      quip: "Mauvais calcul, messieurs les spéculateurs.", head: "LA RIPOSTE PUBLIQUE" },
-    right: { label: "Calmer la Bourse", fx: { v: -7, s: -1 },
-      result: "Tu lâches du lest pour apaiser les marchés. Le social est épargné, mais les spéculateurs ont flairé ta limite.",
-      note: "Céder un peu aujourd'hui, c'est les inviter demain.",
-      quip: "Les vautours reviennent toujours au festin.", head: "ACCALMIE FRAGILE" }
-  },
-  ev_canicule: {
-    event: true, hits: "e", char: "scientist", scene: "canicule", tag: "e",
-    text: "⚡ 47 °C À L'OMBRE. Le bitume fond, les forêts brûlent, les hôpitaux débordent. La planète envoie sa facture.",
-    left: { label: "Plan d'adaptation massif", fx: { e: -2, s: -6 },
-      result: "Rénovation, reforestation, plan eau : tu armes durablement le pays. La facture immédiate pèse lourd sur les finances.",
-      note: "Prévenir coûte cher tout de suite, mais protège pour longtemps.",
-      quip: "Mieux vaut un plan qu'un climatiseur géant.", head: "LA FRANCE S'ADAPTE" },
-    right: { label: "Parer au plus pressé", fx: { e: -7, s: -1 },
-      result: "Tu gères l'urgence sans tout bouleverser, pour préserver le budget. La prochaine canicule sera pire.",
-      note: "Le moins-disant climatique se paie plus tard, plein pot.",
-      quip: "On repeint le thermomètre en bleu, ça ira mieux.", head: "URGENCE GÉRÉE" }
-  },
-  ev_inondations: {
-    event: true, hits: "e", char: "citizen", scene: "france_chaos", tag: "e",
-    text: "⚡ Des trombes d'eau engloutissent des villes entières. Familles sur les toits, hélicos en vol : le climat cogne, encore.",
-    left: { label: "Reconstruire et renaturer", fx: { e: -2, s: -6 },
-      result: "Tu désartificialises, restaures les zones humides, relocalises l'habitat exposé. Juste, mais l'addition est très salée.",
-      note: "S'adapter vraiment coûte, mais évite la catastrophe suivante.",
-      quip: "La rivière reprend son lit ; le béton recule.", head: "RECONSTRUIRE AUTREMENT" },
-    right: { label: "Relancer vite l'économie locale", fx: { e: -7, s: -1 },
-      result: "Tu rebâtis vite pour sauver emplois et commerces. On reconstruit dans le lit du fleuve, jusqu'à la prochaine crue.",
-      note: "Le court terme rassure ; le climat, lui, n'oublie pas.",
-      quip: "On rebâtit pareil. Que peut-il bien se passer ?", head: "ON REBÂTIT VITE" }
+  /* ---------- IMPRÉVUS (crises de gouvernement : arbitrer entre deux objectifs légitimes) ---------- */
+  ev_energie: {
+    event: true, hits: "s", char: "worker", scene: "usine", tag: "s",
+    text: "⚡ CHOC ÉNERGÉTIQUE. La guerre relancée par Trump et Netanyahou fait flamber pétrole et gaz. Qui paie la facture : les citoyens, ou les multinationales ?",
+    left: { label: "Bloquer les prix", fx: { s: -2, e: -6 },
+      result: "Tu bloques les prix de l'énergie et des biens essentiels : les ménages sont protégés. Mais subventionner l'énergie, fossile incluse, alourdit l'empreinte carbone.",
+      note: "Le blocage des prix : que les multinationales paient, pas les gens.",
+      quip: "Les pétroliers font la moue ; les familles respirent.", head: "PRIX BLOQUÉS" },
+    right: { label: "Accélérer la sobriété", fx: { s: -6, e: -2 },
+      result: "Tu refuses de subventionner le fossile et accélères sobriété et renouvelables. Plus vert pour demain, mais le choc de facture est rude aujourd'hui.",
+      note: "Sortir des énergies importées : l'indépendance ET le climat.",
+      quip: "L'avenir se gagne, il ne se chauffe pas au mazout.", head: "CAP SOBRIÉTÉ" }
   },
   ev_secheresse: {
     event: true, hits: "e", char: "farmer", scene: "champ", tag: "e",
-    text: "⚡ Six mois sans pluie. Nappes à sec, récoltes grillées, méga-bassines sous tension : à qui revient l'eau qui reste ?",
-    left: { label: "Eau bien commun, partage juste", fx: { e: -2, s: -6 },
-      result: "Rationnement équitable, fin de l'accaparement, soutien aux petits paysans. Cher pour les caisses, juste pour tous.",
-      note: "Faire de l'eau un bien commun a un coût, pas un prix.",
-      quip: "L'eau au peuple, pas aux profiteurs.", head: "L'EAU PARTAGÉE" },
-    right: { label: "Soutenir d'abord l'agro-industrie", fx: { e: -7, s: -1 },
-      result: "Tu sécurises les gros producteurs pour éviter l'effondrement des prix. Les nappes et les petits, eux, trinquent.",
-      note: "Sauver la production aujourd'hui peut épuiser la ressource demain.",
-      quip: "Les méga-bassines débordent ; les rivières, non.", head: "PRODUCTION D'ABORD" }
+    text: "⚡ SÉCHERESSE HISTORIQUE. Nappes à sec, récoltes menacées : il faut arbitrer chaque litre d'eau qui reste.",
+    left: { label: "Priorité aux écosystèmes", fx: { e: -2, s: -6 },
+      result: "Tu protèges rivières et nappes, quitte à rationner durement l'agro-industrie. Le vivant tient ; l'économie agricole encaisse la saison.",
+      note: "L'eau est un bien commun, pas une variable d'ajustement.",
+      quip: "Les rivières d'abord ; les méga-bassines patienteront.", head: "L'EAU AU VIVANT" },
+    right: { label: "Sauver les récoltes", fx: { e: -6, s: -2 },
+      result: "Tu sécurises l'irrigation pour préserver récoltes et emplois agricoles. Les nappes, elles, s'épuisent un peu plus.",
+      note: "Sauver la récolte aujourd'hui peut assécher demain.",
+      quip: "On arrose les champs ; on assèche l'avenir.", head: "SAUVER LES RÉCOLTES" }
   },
-  ev_greve_patronale: {
-    event: true, hits: "s", char: "medef", scene: "usine", tag: "s",
-    text: "⚡ Le grand patronat dégaine son arme : « grève de l'investissement ». Plus d'embauches, plus d'usines, tant que tu n'auras pas plié.",
-    left: { label: "Relance publique massive", fx: { s: -2, v: -6 },
-      result: "Pas d'argent privé ? L'État investit, garantit l'emploi, donne un droit de veto aux salariés. La dette publique grimpe d'un cran.",
-      note: "Quand le privé fait grève, le public peut prendre le relais.",
-      quip: "Grève du patronat ? Le peuple bosse quand même.", head: "L'ÉTAT PREND LE RELAIS" },
-    right: { label: "Apaiser pour débloquer l'embauche", fx: { s: -7, v: -1 },
-      result: "Tu fais des gestes pour relancer l'investissement privé. L'emploi repart un peu, mais tu as cédé du terrain au capital.",
-      note: "Négocier avec le capital, c'est parfois lui donner raison.",
-      quip: "Les milliardaires font la grève du partage.", head: "TRÊVE AVEC LE CAPITAL" }
-  },
-  ev_delocalisation: {
-    event: true, hits: "s", char: "worker", scene: "usine", tag: "s",
-    text: "⚡ 6H. Les grilles de l'usine sont cadenassées : 1 200 emplois « transférés » à l'autre bout du monde pour trois points de marge.",
-    left: { label: "Réquisition en coopérative", fx: { s: -2, v: -6 },
-      result: "Les salariés reprennent l'outil en SCOP, soutenus par l'État. Bras de fer juridique rude, mais l'emploi reste au pays.",
-      note: "Donner aux salariés un droit de reprise sur leur usine.",
-      quip: "L'usine au peuple, pas aux fonds de pension.", head: "L'USINE SAUVÉE" },
-    right: { label: "Indemniser et reconvertir", fx: { s: -7, v: -1 },
-      result: "Tu négocies un plan social en or et une reconversion du site. La ville survit, mais l'usine, elle, est bel et bien partie.",
-      note: "Amortir la chute, à défaut d'empêcher le départ.",
-      quip: "Le patron prend l'avion ; le territoire, le deuil.", head: "PLAN SOCIAL EN OR" }
-  },
-  ev_pandemie: {
-    event: true, hits: "s", char: "nurse", scene: "hopital", tag: "s",
-    text: "⚡ ALERTE OMS. Un nouveau virus circule. Souvenirs de 2020 : masques, lits, impréparation. L'histoire va-t-elle bégayer ?",
-    left: { label: "Tout sur l'hôpital public", fx: { s: -2, v: -6 },
-      result: "Réquisition de production, lits rouverts, gratuité des soins. L'État protège, au prix d'un effort budgétaire colossal.",
-      note: "Un service public fort est la meilleure assurance collective.",
-      quip: "La santé n'a pas de prix, mais elle a un budget public.", head: "L'ÉTAT PROTECTEUR" },
-    right: { label: "S'appuyer sur le privé, vite", fx: { s: -7, v: -1 },
-      result: "Tu commandes en urgence au privé pour aller plus vite. Ça dépanne, mais te voilà dépendant de leurs prix et de leurs stocks.",
-      note: "La rapidité du marché a un prix : la dépendance.",
-      quip: "Les stocks stratégiques ? Bradés avant toi.", head: "AU PRIVÉ LA SANTÉ" }
+  ev_inondations: {
+    event: true, hits: "e", char: "citizen", scene: "france_chaos", tag: "e",
+    text: "⚡ INONDATIONS. Des trombes d'eau engloutissent des villes entières. Comment reconstruire ?",
+    left: { label: "Renaturer et relocaliser", fx: { e: -2, s: -6 },
+      result: "Tu désartificialises, restaures les zones humides, déplaces l'habitat exposé. Coûteux, mais on cesse de défier la rivière.",
+      note: "S'adapter vraiment coûte, mais évite la catastrophe suivante.",
+      quip: "La rivière reprend son lit ; le béton recule.", head: "RECONSTRUIRE AUTREMENT" },
+    right: { label: "Reconstruire vite l'économie", fx: { e: -6, s: -2 },
+      result: "Tu rebâtis à l'identique pour sauver emplois et commerces au plus vite. On reconstruit dans le lit du fleuve.",
+      note: "Le court terme rassure ; le climat, lui, n'oublie pas.",
+      quip: "On rebâtit pareil. Que peut-il arriver ?", head: "RECONSTRUIRE VITE" }
   },
   ev_cyber: {
     event: true, hits: "v", char: "tech", scene: "numerique", tag: "v",
-    text: "⚡ 03H17. Une cyberattaque paralyse hôpitaux, impôts et trains. Une rançon clignote en bitcoins : on tient le pays en otage.",
-    left: { label: "Souveraineté numérique d'urgence", fx: { v: -2, s: -6 },
-      result: "Tu refuses de payer, réquisitionnes les ingénieurs, bascules en logiciel libre et reconstruis en public. Long et douloureux, mais souverain.",
-      note: "Reprendre la maîtrise publique du numérique a un coût.",
+    text: "⚡ 03H17. Une cyberattaque paralyse hôpitaux, impôts et trains. Une rançon clignote en bitcoins.",
+    left: { label: "Souveraineté numérique", fx: { v: -2, s: -6 },
+      result: "Tu refuses de payer, réquisitionnes les ingénieurs, bascules en logiciel libre et reconstruis en public. Long et coûteux, mais souverain.",
+      note: "Reprendre la maîtrise publique du numérique a un prix.",
       quip: "Le cloud sera désormais public et français.", head: "REPRISE EN MAIN" },
-    right: { label: "Rétablir le service au plus vite", fx: { v: -7, s: -1 },
-      result: "Tu paies pour tout remettre en marche immédiatement. Les services repartent, mais le précédent est posé : ils reviendront.",
+    right: { label: "Rétablir au plus vite", fx: { v: -6, s: -2 },
+      result: "Tu paies pour tout relancer immédiatement et limiter la casse économique. Rapide, mais te voilà à la merci des pirates.",
       note: "La solution rapide nourrit la dépendance.",
       quip: "On paie les pirates ? Ils reviendront dîner.", head: "SERVICE RÉTABLI" }
   },
   ev_bruxelles: {
     event: true, hits: "s", char: "eu", scene: "ue", tag: "s",
-    text: "⚡ BRUXELLES. La Commission attaque ta loi sociale devant la Cour : « entrave à la concurrence ». Menace d'amendes colossales.",
+    text: "⚡ BRUXELLES. La Commission attaque ta grande loi sociale devant la Cour : « entrave à la concurrence ».",
     left: { label: "Désobéir, maintenir la loi", fx: { s: -2, v: -6 },
-      result: "Tu invoques la clause de non-régression et tiens bon. La loi sociale s'applique, mais le bras de fer avec Bruxelles s'envenime.",
+      result: "Tu invoques la clause de non-régression et appliques la loi. Les droits sociaux tiennent ; le bras de fer avec Bruxelles s'envenime.",
       note: "Désobéir aux règles qui attaquent les droits sociaux.",
       quip: "Nos droits sociaux ne sont pas négociables.", head: "LA FRANCE DÉSOBÉIT" },
-    right: { label: "Retirer la loi", fx: { s: -7, v: -1 },
-      result: "Tu retires la loi pour éviter des amendes qui plomberaient le budget. Le social recule, « concurrence » oblige.",
+    right: { label: "Se conformer aux traités", fx: { s: -6, v: -2 },
+      result: "Tu retires la loi pour éviter des amendes et préserver tes relations européennes. Le social recule.",
       note: "Se plier aux traités, c'est souvent renoncer au progrès social.",
-      quip: "La concurrence libre, et le social tiré vers le bas.", head: "BRUXELLES DICTE SA LOI" }
+      quip: "« Concurrence libre et non faussée »… vers le bas.", head: "BRUXELLES TRANCHE" }
   },
-  ev_emeutes: {
-    event: true, hits: "p", char: "general", scene: "manif", tag: "p",
-    text: "⚡ Une bavure de trop. Des quartiers s'embrasent, la colère déborde, les chaînes tournent en boucle sur les voitures qui brûlent.",
-    left: { label: "Justice et réinvestir les quartiers", fx: { p: -2, s: -6 },
-      result: "Tu sanctionnes la bavure, ouvres le dialogue, réarmes les services publics abandonnés. Apaisant, mais l'addition sociale est lourde.",
-      note: "Répondre par la justice et l'égalité réelle, partout.",
-      quip: "La République, c'est l'égalité : partout, pour tous.", head: "RÉPONDRE PAR LA JUSTICE" },
-    right: { label: "Rétablir l'ordre d'abord", fx: { p: -7, s: -1 },
-      result: "Tu donnes la priorité au retour au calme par la fermeté. La rue se vide, mais la défiance et le ressentiment montent.",
-      note: "L'ordre sans justice ne fait que reporter la crise.",
-      quip: "Le calme du couvre-feu n'a jamais soigné une fracture.", head: "RETOUR AU CALME" }
+  ev_notation: {
+    event: true, hits: "v", char: "banker", scene: "bourse", tag: "v",
+    text: "⚡ 7H02. Les agences dégradent la note de la France. La City s'affole, les taux grimpent.",
+    left: { label: "Tenir tête aux marchés", fx: { v: -2, s: -6 },
+      result: "Tu ignores les agences et bloques la fuite des capitaux. Souveraineté préservée, mais l'économie encaisse un choc à court terme.",
+      note: "Désobéir aux marchés a un coût immédiat, pas éternel.",
+      quip: "Les agences notent ; le peuple décide.", head: "LA FINANCE NE DICTE PAS" },
+    right: { label: "Rassurer les marchés", fx: { v: -6, s: -2 },
+      result: "Tu donnes des gages budgétaires pour calmer la Bourse. L'économie se stabilise, mais tu leur cèdes du pouvoir.",
+      note: "Calmer les marchés, c'est leur céder du terrain.",
+      quip: "Trois lettres dictent leur loi : pratique, pour eux.", head: "MARCHÉS RASSURÉS" }
   },
-  ev_scandale: {
-    event: true, hits: "p", char: "judge", scene: "palais", tag: "p",
-    text: "⚡ « LEAKS ». Un fichier fuite : de grandes fortunes (et quelques amis du pouvoir) planquent des milliards dans des paradis fiscaux.",
-    left: { label: "Justice fiscale implacable", fx: { p: -2, v: -6 },
-      result: "Enquêtes, saisies, inéligibilités, sans exception. La transparence ravit le peuple ; les fortunes menacent de fuir avec leurs capitaux.",
-      note: "Une République exemplaire traque la corruption partout.",
-      quip: "Les paradis fiscaux, c'est fini.", head: "JUSTICE FISCALE" },
-    right: { label: "Traiter l'affaire sans vagues", fx: { p: -7, v: -1 },
-      result: "Tu confies tout à la justice, discrètement, pour ne pas effrayer les investisseurs. L'opinion, elle, flaire l'entre-soi.",
-      note: "La discrétion protège l'économie, mais nourrit le soupçon.",
-      quip: "« Circulez » : le pire des aveux.", head: "PROFIL BAS" }
+  ev_speculation: {
+    event: true, hits: "v", char: "lobby", scene: "bourse", tag: "v",
+    text: "⚡ Les requins de la finance parient des milliards CONTRE la dette française. Les taux s'envolent.",
+    left: { label: "Pôle bancaire public", fx: { v: -2, s: -6 },
+      result: "Tu adosses l'économie réelle à un pôle public et tiens bon. Lourd à lancer, mais la spéculation finit par caler.",
+      note: "Reprendre la main sur la finance demande des moyens.",
+      quip: "Mauvais calcul, messieurs les spéculateurs.", head: "RIPOSTE PUBLIQUE" },
+    right: { label: "Apaiser la Bourse", fx: { v: -6, s: -2 },
+      result: "Tu lâches du lest pour calmer les marchés. L'économie souffle, mais les spéculateurs ont flairé ta limite.",
+      note: "Céder un peu aujourd'hui, c'est les inviter demain.",
+      quip: "Les vautours reviennent toujours au festin.", head: "ACCALMIE FRAGILE" }
   },
-  ev_gilets: {
-    event: true, hits: "p", char: "citizen", scene: "manif", tag: "p",
-    text: "⚡ Sur les ronds-points, des milliers de gilets : carburant en feu, fin du mois impossible. La colère est juste, et on cherche à la retourner contre toi.",
-    left: { label: "Bouclier social immédiat", fx: { p: -2, s: -6 },
-      result: "Blocage des prix de l'essentiel, transports gratuits, assemblée citoyenne. La colère retombe ; le budget, lui, morfle.",
-      note: "Répondre à la colère par le concret et la démocratie directe.",
-      quip: "À la colère, on répond par l'égalité, pas la matraque.", head: "LE BOUCLIER POPULAIRE" },
-    right: { label: "Tenir le cap budgétaire", fx: { p: -7, s: -1 },
-      result: "Tu refuses la dépense tous azimuts et mises sur le dialogue. Raisonnable pour les comptes, risqué pour le climat social.",
-      note: "La rigueur a un prix : la patience d'un peuple à bout.",
-      quip: "Expliquer la courbe de la dette à un réservoir vide…", head: "LE CAP MAINTENU" }
+  ev_pandemie: {
+    event: true, hits: "s", char: "nurse", scene: "hopital", tag: "s",
+    text: "⚡ ALERTE OMS. Un nouveau virus circule. Souvenirs de 2020 : masques, lits, impréparation.",
+    left: { label: "Tout sur l'hôpital public", fx: { s: -2, v: -6 },
+      result: "Réquisition de production, lits rouverts, gratuité des soins. La santé est assurée, au prix d'un effort budgétaire colossal que Bruxelles scrute.",
+      note: "Un service public fort est la meilleure assurance collective.",
+      quip: "La santé n'a pas de prix, mais elle a un budget public.", head: "L'ÉTAT PROTÈGE" },
+    right: { label: "S'appuyer sur le privé", fx: { s: -6, v: -2 },
+      result: "Tu commandes au privé pour aller vite et ménager les comptes. Ça dépanne, mais te voilà dépendant de leurs prix et de leurs stocks.",
+      note: "La rapidité du marché a un prix : la dépendance.",
+      quip: "Les stocks stratégiques ? Bradés avant toi.", head: "AU PRIVÉ LA SANTÉ" }
   },
-  ev_marronnier: {
-    event: true, hits: "p", char: "cnews", scene: "studio_tv", tag: "p",
-    text: "⚡ Tu présentes une grande loi de partage des richesses, et toutes les chaînes ne parlent que d'un fait divers. Diversion parfaitement huilée.",
-    left: { label: "Grande offensive sur le fond", fx: { p: -2, s: -6 },
-      result: "Tu déploies les moyens pour imposer ton sujet : tournée, pédagogie, mobilisation. Coûteux, mais le débat revient au réel.",
-      note: "Reprendre la main sur l'agenda demande de l'énergie.",
-      quip: "Le milliard du jour vaut mieux que le fait divers du jour.", head: "RETOUR AU RÉEL" },
-    right: { label: "Laisser passer l'orage", fx: { p: -7, s: -1 },
-      result: "Tu maintiens ton calendrier sans surenchère médiatique. Économe, mais ta loi passe inaperçue dans le vacarme.",
-      note: "Ignorer le bruit, c'est parfois le laisser gagner.",
-      quip: "Pendant le fait divers, le partage des richesses attend.", head: "DANS LE VACARME" }
+  ev_delocalisation: {
+    event: true, hits: "s", char: "worker", scene: "usine", tag: "s",
+    text: "⚡ 6H. Les grilles de l'usine sont cadenassées : 1 200 emplois « transférés » à l'autre bout du monde.",
+    left: { label: "Réquisition en coopérative", fx: { s: -2, v: -6 },
+      result: "Les salariés reprennent l'outil en SCOP, soutenus par l'État. Bras de fer juridique rude avec l'actionnaire, mais l'emploi reste au pays.",
+      note: "Donner aux salariés un droit de reprise sur leur usine.",
+      quip: "L'usine au peuple, pas aux fonds de pension.", head: "L'USINE SAUVÉE" },
+    right: { label: "Indemniser et reconvertir", fx: { s: -6, v: -2 },
+      result: "Tu négocies un plan social en or et la reconversion du site, sans braquer les investisseurs. La ville survit, l'usine part.",
+      note: "Amortir la chute, à défaut d'empêcher le départ.",
+      quip: "Le patron prend l'avion ; le territoire, le deuil.", head: "RECONVERSION" }
+  },
+  ev_greve_patronale: {
+    event: true, hits: "s", char: "medef", scene: "usine", tag: "s",
+    text: "⚡ Le grand patronat dégaine son arme : « grève de l'investissement ». Plus d'embauches tant que tu n'auras pas plié.",
+    left: { label: "Relance publique massive", fx: { s: -2, v: -6 },
+      result: "Pas d'argent privé ? L'État investit, garantit l'emploi, étend les droits des salariés. La dette publique grimpe, les marchés grognent.",
+      note: "Quand le privé fait grève, le public prend le relais.",
+      quip: "Grève du patronat ? L'État embauche.", head: "L'ÉTAT INVESTIT" },
+    right: { label: "Négocier avec le patronat", fx: { s: -6, v: -2 },
+      result: "Tu fais des gestes pour débloquer l'investissement privé, sans creuser la dette. L'emploi repart un peu, mais tu as cédé du terrain.",
+      note: "Négocier avec le capital, c'est parfois lui donner raison.",
+      quip: "Les milliardaires font la grève du partage.", head: "COMPROMIS" }
+  },
+  ev_logement: {
+    event: true, hits: "s", char: "citizen", scene: "ville", tag: "s",
+    text: "⚡ CRISE DU LOGEMENT. Loyers en folie, des milliers de personnes à la rue, des logements vides spéculatifs partout.",
+    left: { label: "Réquisition + encadrement", fx: { s: -2, v: -6 },
+      result: "Tu encadres les loyers et réquisitionnes les logements vides. Des familles sont relogées ; les rentiers de l'immobilier hurlent.",
+      note: "Le logement est un droit, pas un placement.",
+      quip: "Logements vides réquisitionnés : la rue se vide.", head: "UN TOIT POUR TOUS" },
+    right: { label: "Relancer la construction privée", fx: { s: -6, v: -2 },
+      result: "Tu incites le privé à construire, sans toucher aux loyers ni aux logements vides. L'offre bouge lentement, la crise dure.",
+      note: "Compter sur le marché du logement, c'est attendre longtemps.",
+      quip: "Le marché construira… un jour, peut-être.", head: "PARI SUR LE MARCHÉ" }
+  },
+  ev_austerite: {
+    event: true, hits: "s", char: "eu", scene: "bourse", tag: "s",
+    text: "⚡ ULTIMATUM. Bruxelles et les marchés réclament 30 milliards d'économies « ou bien ». Le budget est sur la table.",
+    left: { label: "Refuser l'austérité, investir", fx: { s: -2, v: -6 },
+      result: "Tu finances services publics et transition par l'impôt sur les plus riches plutôt que par les coupes. Le social tient, le bras de fer monte.",
+      note: "L'austérité détruit les services publics : on bifurque.",
+      quip: "« Y a pas d'argent » ? Demandez aux milliardaires.", head: "STOP À L'AUSTÉRITÉ" },
+    right: { label: "Donner des gages", fx: { s: -6, v: -2 },
+      result: "Tu rassures marchés et Commission par quelques coupes ciblées. Les comptes apaisent, les services publics serrent la ceinture.",
+      note: "Rassurer la finance, c'est lui céder du pouvoir.",
+      quip: "Les marchés applaudissent ; les usagers, moins.", head: "TOUR DE VIS" }
+  },
+  ev_bollore: {
+    event: true, hits: "p", char: "bollore", scene: "studio_tv", tag: "p",
+    text: "⚡ CONCENTRATION. Un milliardaire rachète encore des médias : bientôt, l'info de tout un pays dépendra d'un seul groupe.",
+    left: { label: "Loi anti-concentration", fx: { p: -2, s: -6 },
+      result: "Tu fais voter une loi anti-monopole et soutiens les médias indépendants. Le pluralisme est sauvé, au prix d'un long bras de fer juridique et budgétaire.",
+      note: "Le pluralisme de l'information est une condition de la démocratie.",
+      quip: "Mille journaux, un seul patron ? Non merci.", head: "PLURALISME PROTÉGÉ" },
+    right: { label: "Ne pas légiférer", fx: { p: -6, s: -2 },
+      result: "Au nom de la liberté d'entreprendre, tu n'interviens pas. L'empire s'étend, le débat public rétrécit.",
+      note: "Sans garde-fou, l'info devient la voix d'un seul.",
+      quip: "La liberté de la presse… celle d'un seul propriétaire.", head: "L'EMPIRE S'ÉTEND" }
+  },
+  ev_ingerence: {
+    event: true, hits: "p", char: "musk", scene: "numerique", tag: "p",
+    text: "⚡ INGÉRENCE. Fermes de bots et sondages bidonnés inondent les réseaux pour fabriquer une fausse « opinion » et peser sur le débat.",
+    left: { label: "Réguler + transparence", fx: { p: -2, v: -6 },
+      result: "Tu imposes la transparence des algorithmes et un institut public des sondages. La démocratie est protégée ; le bras de fer avec les géants étrangers s'envenime.",
+      note: "L'opinion ne se fabrique pas : elle se débat librement.",
+      quip: "Les bots votent ? Pas dans cette République.", head: "DÉMOCRATIE DÉFENDUE" },
+    right: { label: "Laisser faire les réseaux", fx: { p: -6, v: -2 },
+      result: "Au nom de la liberté d'expression, tu laisses faire. Les manipulateurs étrangers prospèrent et faussent le débat.",
+      note: "Laisser fabriquer l'opinion, c'est abandonner la démocratie.",
+      quip: "La « main invisible » a beaucoup d'abonnés.", head: "RÉSEAUX LIVRÉS" }
   },
 
   /* ---------- ACTE IV — 2032 : le bilan ---------- */
@@ -973,17 +937,28 @@ const CARDS = {
    MODE HISTOIRE — déroulé en actes (les cartes conditionnelles
    sont sautées si leur cond() est fausse).
    ========================================================= */
+/* "@rnd" = emplacement tiré au hasard (rejouabilité) : rempli par une carte
+   non encore vue de STORY_RANDOM, différente à chaque partie. */
 const STORY = [
   { act: "ACTE I", title: "2027 · La prise du pouvoir", year: 2027, scene: "palais" },
-  "invest", "smic", "medef_tax", "capital_flight", "macron_emt", "vote16", "jlm_pep", "media",
+  "invest", "smic", "medef_tax", "capital_flight", "@rnd", "vote16", "jlm_pep", "media", "@rnd",
   { act: "ACTE II", title: "2028-2029 · Les fronts s'ouvrent", year: 2028, scene: "ue" },
-  "eu_austerity", "philippe_horloges", "trump_tariffs", "trump_retaliation", "trump_greenland", "ormuz", "retraite",
-  "hopital", "bardella_tiktok", "mercosur", "farmers_revolt", "energy_common", "lepen_recup",
+  "eu_austerity", "trump_tariffs", "trump_retaliation", "@rnd", "ormuz", "retraite", "hopital",
+  "@rnd", "mercosur", "farmers_revolt", "@rnd",
   { act: "ACTE III", title: "2030-2031 · Tempêtes", year: 2030, scene: "canicule" },
-  "canicule", "jlm_planif", "cop30", "nuclear", "darmanin_ordre", "censure", "krach",
-  "retailleau_bouc", "ukraine", "gaza", "cnews_propagande", "bollore_rachat", "attal_ecole", "ai_act", "musk_x", "hanouna_show", "glucksmann_centre", "outremer", "zemmour_declin",
+  "canicule", "jlm_planif", "@rnd", "censure", "krach", "@rnd", "ukraine", "gaza", "ai_act", "@rnd", "@rnd",
   { act: "ACTE IV", title: "2032 · Le bilan", year: 2032, scene: "palais" },
-  "hollande_flamby", "ruffin_ego", "jlm_energie", "corruption", "bilan"
+  "jlm_energie", "corruption", "bilan"
+];
+
+/* Cartes tirées au hasard pour remplir les "@rnd" : l'ossature reste la même,
+   mais les mesures secondaires, adversaires et sujets d'actualité varient. */
+const STORY_RANDOM = [
+  "energy_common", "nuclear", "cop30", "outremer", "jeunesse", "conges", "feminisme",
+  "monnaie", "recherche", "ess", "pesticides", "ecole", "manif_repression", "traite_ref", "prix",
+  "macron_emt", "lepen_recup", "bardella_tiktok", "hollande_flamby", "darmanin_ordre",
+  "retailleau_bouc", "attal_ecole", "philippe_horloges", "glucksmann_centre", "ruffin_ego",
+  "zemmour_declin", "trump_greenland", "musk_x", "bollore_rachat", "hanouna_show", "cnews_propagande"
 ];
 
 /* =========================================================
@@ -995,7 +970,7 @@ const POOL = [
   "retraite", "hopital", "mercosur", "energy_common", "canicule", "cop30", "nuclear",
   "ukraine", "gaza", "ai_act", "krach", "outremer", "jeunesse", "corruption",
   "manif_repression", "ecole", "pesticides", "conges", "feminisme", "monnaie",
-  "traite_ref", "recherche", "ess",
+  "traite_ref", "recherche", "ess", "prix",
   // Adversaires + Mélenchon (mode Survie)
   "macron_emt", "lepen_recup", "bardella_tiktok", "hollande_flamby", "darmanin_ordre",
   "retailleau_bouc", "attal_ecole", "philippe_horloges", "glucksmann_centre", "ruffin_ego",
@@ -1008,11 +983,48 @@ const SLOGANS = [
   "On ne lâche rien.", "Un autre monde est possible.", "Résistance et alternative."
 ];
 
+/* IMPACTS — effets CONCRETS d'une mesure adoptée sur la vie des gens.
+   Affichés au fil de l'histoire (intros d'actes) et au bilan final. */
+const IMPACTS = {
+  "SMIC à 1 600 € nets": "💶 +18 % de pouvoir d'achat pour 3 millions de salarié·es",
+  "Blocage des prix de l'essentiel": "🛒 le caddie et la facture d'énergie ne flambent plus",
+  "Taxe sur les superprofits": "⚖️ les richesses commencent à être mieux réparties",
+  "Contrôle des capitaux": "🏦 l'évasion fiscale recule, l'argent reste au pays",
+  "Retraite à 60 ans": "👵 des centaines de milliers de départs en retraite mérités",
+  "Allocation d'autonomie jeunesse": "🎓 une jeunesse libérée de la précarité",
+  "Gratuité des transports pour les jeunes": "🚆 transports gratuits : la jeunesse circule",
+  "6ᵉ semaine de congés payés": "🏖️ plus de temps pour vivre, moins de burn-out",
+  "Remboursement à 100 % des soins": "🏥 se soigner ne coûte plus rien, l'hôpital respire",
+  "Plan pour l'école publique": "📚 des classes allégées, une école qui émancipe",
+  "École publique émancipatrice": "📚 l'école de l'égalité, gratuite pour tous",
+  "Plan d'indépendance énergétique": "🌱 énergie plus verte, décarbonée et moins chère",
+  "Grand plan de bifurcation écologique": "🌍 industrie verte et centaines de milliers d'emplois",
+  "Règle verte constitutionnelle": "🌳 la nature protégée par la Constitution",
+  "Sortie programmée du nucléaire": "☀️ cap sur 100 % renouvelables maîtrisé",
+  "Énergie en bien commun": "💡 l'énergie publique, des factures sous contrôle",
+  "Prix planchers agricoles": "🚜 des paysans qui vivent enfin de leur travail",
+  "Interdiction des pesticides": "🐝 air, eau et abeilles : la santé environnementale revient",
+  "Pôle bancaire public": "🏛️ la finance au service de l'économie réelle",
+  "Égalité salariale femmes-hommes": "♀️ l'égalité salariale enfin appliquée",
+  "Égalité réelle Outre-mer": "🌺 les Outre-mer rattrapent leur retard, vie chère en baisse",
+  "Loi anti-concentration des médias": "📰 une information libérée des milliardaires",
+  "Conseil de déontologie des médias": "📺 un vrai contre-pouvoir citoyen sur les médias",
+  "Audiovisuel public renforcé": "🎙️ un service public de l'info indépendant",
+  "Droits nouveaux des salariés": "🤝 les salariés décident dans l'entreprise",
+  "Inéligibilité à vie pour corruption": "🧹 une République nettoyée des corrompus",
+  "Droit de vote à 16 ans": "🗳️ la jeunesse entre en politique",
+  "Assemblée constituante (6ᵉ République)": "📜 le peuple écrit lui-même sa Constitution",
+  "Processus constituant lancé": "📜 le chantier de la 6ᵉ République est ouvert",
+  "6ᵉ République proclamée": "✊ le peuple est désormais le seul souverain",
+  "Souveraineté numérique & IA encadrée": "🔓 données protégées, logiciels libres dans l'État",
+  "Régulation des réseaux & des algorithmes": "🔓 les réseaux remis au service de l'intérêt général",
+  "Recherche publique & nouvelles frontières": "🔭 la France de retour aux frontières du savoir"
+};
+
 /* Événements subis : crises imprévues, mais avec deux vraies options de réponse. */
 const EVENTS = [
-  "ev_cnews", "ev_hanouna", "ev_bollore", "ev_extreme_droite", "ev_notation",
-  "ev_speculation", "ev_canicule", "ev_inondations", "ev_secheresse", "ev_greve_patronale",
-  "ev_delocalisation", "ev_pandemie", "ev_cyber", "ev_bruxelles", "ev_emeutes",
-  "ev_scandale", "ev_gilets", "ev_marronnier"
+  "ev_energie", "ev_secheresse", "ev_inondations", "ev_cyber", "ev_bruxelles",
+  "ev_notation", "ev_speculation", "ev_pandemie", "ev_delocalisation", "ev_greve_patronale",
+  "ev_logement", "ev_austerite", "ev_bollore", "ev_ingerence"
 ];
 EVENTS.forEach(function (id) { var c = CARDS[id]; if (c) { c.event = true; } });
