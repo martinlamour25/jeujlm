@@ -1,5 +1,5 @@
 /* Service worker — cache hors-ligne pour « Président·e du Peuple » */
-const CACHE = "ppp2027-v23";
+const CACHE = "ppp2027-v24";
 const ASSETS = [
   "./",
   "./index.html",
@@ -10,10 +10,16 @@ const ASSETS = [
   "./js/game.js",
   "./manifest.webmanifest",
   "./icons/icon.svg",
-  "./assets/turtle/turtle-megaphone.png",
-  "./assets/turtle/turtle-tract.png",
-  "./assets/turtle/turtle-balai.png",
-  "./assets/turtle/turtle-don.png",
+  "./assets/fonts/UnionGothic.ttf",
+  "./assets/fonts/StackSansText-Regular.ttf",
+  "./assets/fonts/StackSansText-SemiBold.ttf",
+  "./assets/fonts/StackSansText-Bold.ttf",
+  "./assets/brand/m27-creme.png",
+  "./assets/brand/lfi-violet.png",
+  "./assets/turtle2/MICROS.png",
+  "./assets/turtle2/HOURA.png",
+  "./assets/turtle2/QUI_POUSSE.png",
+  "./assets/turtle2/QUI_POINTE.png",
   "./assets/turtle/turtle-scooter.png"
 ];
 

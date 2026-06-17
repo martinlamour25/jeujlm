@@ -3,28 +3,41 @@
    Identité : aubergine → rouge insoumis.
    ========================================================= */
 
+/* Polices officielles de la campagne */
+@font-face { font-family: "Union Gothic"; src: url("assets/fonts/UnionGothic.ttf") format("truetype");
+  font-weight: 100 1000; font-display: swap; }
+@font-face { font-family: "Stack Sans Text"; src: url("assets/fonts/StackSansText-Regular.ttf") format("truetype");
+  font-weight: 400; font-display: swap; }
+@font-face { font-family: "Stack Sans Text"; src: url("assets/fonts/StackSansText-SemiBold.ttf") format("truetype");
+  font-weight: 600; font-display: swap; }
+@font-face { font-family: "Stack Sans Text"; src: url("assets/fonts/StackSansText-Bold.ttf") format("truetype");
+  font-weight: 700 900; font-display: swap; }
+
 :root {
-  --c-bg-1: #25082f;
-  --c-bg-2: #3d0e3f;
-  --c-bg-3: #5a1430;
-  --c-red: #ff2b46;
-  --c-red-2: #ff5c6e;
-  --c-gold: #ffd166;
-  --c-cream: #fff4ec;
-  --c-white: #fff7f9;
-  --c-ink: #1a0820;
-  --c-muted: #d7b9d6;
-  --c-glass: rgba(255, 255, 255, 0.07);
-  --c-glass-2: rgba(255, 255, 255, 0.12);
-  --c-line: rgba(255, 255, 255, 0.14);
+  /* Charte graphique Mélenchon 2027 / La France insoumise */
+  --c-bg-1: #2a0357;
+  --c-bg-2: #1d003c;
+  --c-bg-3: #4c0297;
+  --c-violet: #4c0297;
+  --c-violet-2: #9c6ee8;
+  --c-red: #d1271c;
+  --c-red-2: #e85a50;
+  --c-gold: #c9adff;       /* accent clair (violet clair de la charte) */
+  --c-cream: #fffcf4;
+  --c-white: #fffcf4;
+  --c-ink: #212320;        /* charbon */
+  --c-muted: #b79be6;
+  --c-glass: rgba(255, 252, 244, 0.06);
+  --c-glass-2: rgba(255, 252, 244, 0.12);
+  --c-line: rgba(255, 252, 244, 0.16);
   --c-ok: #2bd97a;
-  --c-ko: #ff5470;
+  --c-ko: #ff6a5a;
 
   --r-lg: 26px; --r-md: 18px; --r-sm: 12px;
   --shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.55);
-  --shadow-red: 0 14px 30px -8px rgba(255, 43, 70, 0.55);
-  --font-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --shadow-red: 0 14px 30px -8px rgba(209, 39, 28, 0.55);
+  --font-display: "Union Gothic", "Bricolage Grotesque", Impact, sans-serif;
+  --font-body: "Stack Sans Text", "Inter", system-ui, -apple-system, sans-serif;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bot: env(safe-area-inset-bottom, 0px);
 }
@@ -611,3 +624,38 @@ body {
 @keyframes timerPulse { 50% { opacity: 0.55; } }
 .diff-hint { text-align: center; font-size: 0.8rem; color: var(--c-muted); margin-top: 10px; font-weight: 600; }
 .diff-hint.hot { color: var(--c-gold); }
+
+/* =========================================================
+   HABILLAGE CHARTE MÉLENCHON 2027 (violet / rouge / crème, polices officielles)
+   ========================================================= */
+.backdrop {
+  background:
+    radial-gradient(120% 80% at 18% 0%, #4c0297 0%, transparent 55%),
+    radial-gradient(120% 90% at 88% 8%, #7a1fd0 0%, transparent 48%),
+    linear-gradient(165deg, #2a0357 0%, #1d003c 62%, #14002b 100%);
+}
+.glow-1 { background: radial-gradient(circle, var(--c-red) 0%, transparent 70%); opacity: 0.4; }
+.glow-2 { background: radial-gradient(circle, #9c6ee8 0%, transparent 70%); }
+
+/* Gros titres en CAPITALES (Union Gothic condensé) */
+.home-title, .act-title, .end-title, .intro-title, .cine-title, .block-text,
+.modal-card h3, .mode-txt h3, .feedback-head { text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Titre d'accueil : lettres crème, extrusion violet (ligne 1) + rouge (ligne 2) */
+.home-title { color: var(--c-cream); letter-spacing: 0.5px;
+  text-shadow: 1px 1px 0 #6a18b3, 2px 2px 0 #6a18b3, 3px 3px 0 #6a18b3, 4px 4px 0 #6a18b3, 5px 8px 14px rgba(0,0,0,0.55); }
+.home-title span { color: var(--c-cream); -webkit-text-fill-color: var(--c-cream); background: none;
+  text-shadow: 1px 1px 0 var(--c-red), 2px 2px 0 var(--c-red), 3px 3px 0 var(--c-red), 4px 4px 0 var(--c-red), 5px 8px 14px rgba(0,0,0,0.55); }
+.home-title::after { background: linear-gradient(90deg, var(--c-violet) 45%, var(--c-red) 55%); }
+
+/* Wordmark officiel Mélenchon 2027 */
+.brand-m27 { display: block; width: min(62%, 270px); margin: 8px auto 0;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4)); -webkit-user-drag: none; }
+
+/* Boutons principaux : rouge de la charte (déjà via --c-red) ; fantômes violets */
+.btn--ghost { background: rgba(156,110,232,0.12); border-color: rgba(201,173,255,0.30); }
+.diff-chip.is-on { background: linear-gradient(135deg, var(--c-violet), #6a18b3); }
+.g-ring::before { background: #1d003c; }
+.card { background: linear-gradient(170deg, #3a0a72, #25064d); }
+.card.is-hero { background: linear-gradient(170deg, #4c0297, #25064d); }
+.card.is-event { background: linear-gradient(170deg, #5a0f2a, #2a0357); }

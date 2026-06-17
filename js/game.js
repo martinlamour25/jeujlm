@@ -9,7 +9,7 @@
   const ICONS = {
     phi:
       '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0" stop-color="#ff2b46"/><stop offset="1" stop-color="#ffd166"/></linearGradient></defs>' +
+      '<stop offset="0" stop-color="#fffcf4"/><stop offset="1" stop-color="#9c6ee8"/></linearGradient></defs>' +
       '<circle cx="50" cy="50" r="30" fill="none" stroke="url(#pg)" stroke-width="9"/><rect x="45" y="10" width="10" height="80" rx="5" fill="url(#pg)"/></svg>',
     fist: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 11V6.5a1.5 1.5 0 0 1 3 0V10h1V5a1.5 1.5 0 0 1 3 0v5h1V6.5a1.5 1.5 0 0 1 3 0V13a6 6 0 0 1-6 6h-1a6 6 0 0 1-6-6v-1.5a1.5 1.5 0 0 1 3 0V11z"/><rect x="6" y="2" width="12" height="2.4" rx="1.2"/></svg>',
     social: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M5 8h11a3 3 0 0 1 0 6H8a3 3 0 0 0 0 6h11"/></svg>',
@@ -640,7 +640,7 @@
 
     if (kind === "defeat") {
       const d = DEFEATS[deadKey];
-      mascot.src = "assets/turtle/turtle-balai.png"; // la tortue balaie les dégâts
+      mascot.src = "assets/turtle2/QUI_POUSSE.png"; // la tortue balaie les dégâts
       $("#endKicker").textContent = "Présidence interrompue";
       $("#endTitle").textContent = d.title;
       $("#endSub").innerHTML = d.text + " Mais le combat continue. ✊";
@@ -650,7 +650,7 @@
       // Fin du mode histoire
       const healthy = KEYS.every((k) => S.g[k] >= 35);
       const sixth = S.flags.sixth_republic;
-      mascot.src = "assets/turtle/turtle-megaphone.png"; // la tortue haranguе la foule
+      mascot.src = "assets/turtle2/HOURA.png"; // la tortue exulte (victoire)
       $("#endKicker").textContent = "Mandat accompli · 2032";
       if (sixth && healthy && S.measures.length >= 16) {
         $("#endTitle").textContent = "Raz-de-marée populaire !";
@@ -837,7 +837,7 @@
     ctx.fillText(GAME_URL_SHORT, W / 2, fb + 86);
 
     // Tortue mascotte (bas-gauche, posée sur la bande, sans croiser le texte centré)
-    const im = await loadImg(win ? "assets/turtle/turtle-megaphone.png" : "assets/turtle/turtle-balai.png");
+    const im = await loadImg(win ? "assets/turtle2/HOURA.png" : "assets/turtle2/QUI_POUSSE.png");
     if (im) { const tw = 150, th = tw * (im.height / im.width || 1.2); ctx.drawImage(im, 12, fb - th + 56, tw, th); }
 
     cv.toBlob((blob) => {
@@ -865,7 +865,7 @@
   function closeModal() { $("#modal").hidden = true; }
 
   const HOW_HTML =
-    '<div class="how-hero"><img src="assets/turtle/turtle-tract.png" alt="" /></div>' +
+    '<div class="how-hero"><img src="assets/turtle2/QUI_POINTE.png" alt="" /></div>' +
     '<p class="lead">Tu viens d\'être élu·e Président·e en 2027. Des personnages viennent te voir avec un dilemme.</p>' +
     '<ul class="how">' +
     '<li><span class="how-ico">👆</span><span>Glisse la carte à gauche ou à droite (ou les deux boutons) pour décider.</span></li>' +
