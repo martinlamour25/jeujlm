@@ -659,3 +659,23 @@ body {
 .card { background: linear-gradient(170deg, #3a0a72, #25064d); }
 .card.is-hero { background: linear-gradient(170deg, #4c0297, #25064d); }
 .card.is-event { background: linear-gradient(170deg, #5a0f2a, #2a0357); }
+
+/* =========================================================
+   FIX accueil : tout faire tenir + wordmark M27 cliquable
+   ========================================================= */
+.screen--home { overflow-y: auto; }
+.home-top { margin-top: 2.5vh; gap: 9px; }
+.mascot-home { width: clamp(88px, 24vw, 128px); margin: 2px auto -2px; }
+.home-actions { gap: 10px; }
+.brand-link { display: block; text-align: center; text-decoration: none; margin-top: 8px; flex-shrink: 0; }
+.brand-link:active { transform: scale(0.97); }
+.brand-m27 { width: min(52%, 210px); margin: 0 auto; }
+.brand-cta { display: block; margin-top: 4px; font-family: var(--font-body); font-weight: 700;
+  font-size: 0.78rem; color: var(--c-gold); letter-spacing: 0.3px; }
+.home-foot { margin-top: 6px; padding-bottom: 2px; }
+@media (max-height: 760px) {
+  .home-top { margin-top: 1vh; }
+  .mascot-home { width: clamp(76px, 20vw, 104px); }
+  .home-sub { font-size: 0.92rem; }
+  .brand-m27 { width: min(46%, 180px); }
+}
