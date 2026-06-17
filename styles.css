@@ -573,3 +573,15 @@ body {
 .mascot-end { width: clamp(64px, 15vh, 104px); margin: 0 auto 2px; }
 .end-title { font-size: clamp(1.5rem, 7vw, 2.2rem) !important; }
 .end-sub { font-size: 0.92rem; }
+
+/* =========================================================
+   Texte de carte PLUS GROS (remplit la carte) + tampon en superposition
+   ========================================================= */
+.card-bubble { font-size: 1.26rem !important; line-height: 1.36; font-weight: 600; }
+@media (max-height: 760px) { .card-bubble { font-size: 1.12rem !important; } }
+@media (max-height: 640px) { .card-bubble { font-size: 1rem !important; } .card-portrait { width: 64px; height: 64px; } }
+
+/* Tampon de swipe : plus grand, remonté, EN SUPERPOSITION du texte (aucun espace réservé) */
+.card-stamp { top: 38%; font-size: 1.55rem; padding: 12px 24px; max-width: 72%; z-index: 7; }
+.card-stamp--l { left: 12px; }
+.card-stamp--r { right: 12px; }
