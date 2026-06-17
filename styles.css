@@ -599,3 +599,15 @@ body {
 }
 .card .card-stamp--l { transform: translate(-50%, -50%) rotate(-10deg) !important; }
 .card .card-stamp--r { transform: translate(-50%, -50%) rotate(10deg) !important; }
+
+/* =========================================================
+   CHRONO de réponse (difficultés Insoumis·e & Hardcore)
+   ========================================================= */
+.timer-wrap { height: 6px; border-radius: 3px; background: rgba(0,0,0,0.35); overflow: hidden; margin: 0 0 8px; }
+.timer-wrap[hidden] { display: none; }
+.timer-fill { height: 100%; width: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, var(--c-ok), var(--c-gold)); }
+.timer-fill.low { background: var(--c-ko); animation: timerPulse 0.5s ease-in-out infinite; }
+@keyframes timerPulse { 50% { opacity: 0.55; } }
+.diff-hint { text-align: center; font-size: 0.8rem; color: var(--c-muted); margin-top: 10px; font-weight: 600; }
+.diff-hint.hot { color: var(--c-gold); }

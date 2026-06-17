@@ -52,10 +52,10 @@
   const BALANCE = {
     comboBase: 60,           // voix par bonne décision
     diff: {
-      decouverte: { start: 62, drift: 0, grace: 4, preview: "num",   label: "Découverte" },
-      normal:     { start: 50, drift: 1, grace: 3, preview: "arrow", label: "Normal" },
-      insoumis:   { start: 44, drift: 2, grace: 2, preview: "weak",  label: "Insoumis·e" },
-      hardcore:   { start: 38, drift: 3, grace: 0, preview: "none",  label: "Hardcore" }
+      decouverte: { start: 62, drift: 0, grace: 4, time: 0,    label: "Découverte" },
+      normal:     { start: 50, drift: 1, grace: 3, time: 0,    label: "Normal" },
+      insoumis:   { start: 44, drift: 2, grace: 2, time: 9000, label: "Insoumis·e" },
+      hardcore:   { start: 38, drift: 3, grace: 0, time: 4000, label: "Hardcore" }
     }
   };
   let difficulty = localStorage.getItem(DIFF_KEY) || "normal";
@@ -411,7 +411,34 @@
       card.style.transform = "translate(-50%, 0) rotate(0deg)";
       card.style.opacity = "1";
       busy = false;
+      startTimer();
     });
+  }
+
+  /* ---------- Chrono de réponse (difficultés Insoumis·e & Hardcore) ---------- */
+  function clearTimer() {
+    if (S && S.timer) { clearTimeout(S.timer); S.timer = null; }
+    const w2 = $("#timerWrap"); if (w2) w2.hidden = true;
+  }
+  function startTimer() {
+    clearTimer();
+    const t = (BALANCE.diff[S.diff] || {}).time;
+    const wrap = $("#timerWrap"), fill = $("#timerFill");
+    if (!t || !wrap) return;
+    wrap.hidden = false;
+    fill.classList.remove("low");
+    fill.style.transition = "none"; fill.style.width = "100%";
+    requestAnimationFrame(() => { fill.style.transition = "width " + t + "ms linear"; fill.style.width = "0%"; });
+    setTimeout(() => { if (fill) fill.classList.add("low"); }, t * 0.6);
+    S.timer = setTimeout(onTimeout, t);
+  }
+  function onTimeout() {
+    if (busy || !S.current) return;
+    S.timer = null; S.timedOut = true;
+    haptic([20, 50, 20]);
+    // Indécision : le statu quo s'impose (on subit le choix par défaut).
+    const physForLeft = (S.sideMap.left === "left") ? "left" : "right";
+    commit(physForLeft);
   }
 
   // Effet « pile de cartes » : carte fantôme derrière.
@@ -489,6 +516,7 @@
   /* ---------- Validation d'un choix ---------- */
   function commit(side) {
     if (busy || !S.current) return;
+    clearTimer();
     busy = true;
     const c = CARDS[S.current]; const logical = S.sideMap[side]; const opt = c[logical];
     const dir = side === "right" ? 1 : -1;
@@ -573,7 +601,9 @@
     let voixChip = S.lastGain ? '<span class="d-chip voix">🔥 +' + S.lastGain + " voix</span>" : "";
     $("#feedbackDeltas").innerHTML = chips + voixChip;
     const imp = opt.measure && typeof IMPACTS !== "undefined" && IMPACTS[opt.measure];
-    $("#feedbackResult").innerHTML = opt.result + (opt.quip ? ' <span class="quip">' + opt.quip + "</span>" : "")
+    const slow = S.timedOut ? '<span class="quip">⏱️ Trop lent ! Le statu quo s\'est imposé.</span> ' : "";
+    S.timedOut = false;
+    $("#feedbackResult").innerHTML = slow + opt.result + (opt.quip ? ' <span class="quip">' + opt.quip + "</span>" : "")
       + (imp ? '<span class="impact-line">Concrètement : ' + imp + "</span>" : "");
     $("#feedbackNote").innerHTML = (ev ? "<strong>⚡ Imprévu :</strong> " : "<strong>📖 L'Avenir en commun :</strong> ") + opt.note;
     $("#feedbackTag").innerHTML = ev ? "⚡ Imprévu"
@@ -862,7 +892,7 @@
     $("#modeStory").addEventListener("click", () => { firstGesture(); if (!SOUND.isMuted()) SOUND.startMusic(); newGame("story"); });
     $("#modeInfinite").addEventListener("click", () => { firstGesture(); if (!SOUND.isMuted()) SOUND.startMusic(); newGame("infinite"); });
 
-    $("#playQuit").addEventListener("click", () => { SOUND.stopMusic(); show("home"); });
+    $("#playQuit").addEventListener("click", () => { clearTimer(); SOUND.stopMusic(); show("home"); });
     $("#feedbackNext").addEventListener("click", afterFeedback);
     // Cliquer N'IMPORTE OÙ pendant l'explication la fait passer.
     $("#screen-play").addEventListener("click", () => {
@@ -877,7 +907,7 @@
     $$(".diff-chip").forEach((chip) => chip.addEventListener("click", () => {
       $$(".diff-chip").forEach((c) => c.classList.remove("is-on"));
       chip.classList.add("is-on"); difficulty = chip.dataset.d;
-      localStorage.setItem(DIFF_KEY, difficulty); SOUND.sfx("click");
+      localStorage.setItem(DIFF_KEY, difficulty); SOUND.sfx("click"); updateDiffHint();
     }));
 
     $("#audioBtn").addEventListener("click", () => {
@@ -895,9 +925,20 @@
       navigator.serviceWorker.register("sw.js").catch(() => {});
   }
 
+  function updateDiffHint() {
+    const el = $("#diffHint"); if (!el) return;
+    const t = (BALANCE.diff[difficulty] || {}).time;
+    el.textContent = !t ? "⏳ Sans limite de temps pour répondre."
+      : (difficulty === "hardcore"
+        ? "⏱️ Temps de réponse TRÈS court : chaque seconde compte !"
+        : "⏱️ Temps de réponse limité pour chaque carte.");
+    el.classList.toggle("hot", !!t);
+  }
+
   function init() {
     initHome(); bind(); registerSW(); refreshAudioBtn();
     $$(".diff-chip").forEach((c) => c.classList.toggle("is-on", c.dataset.d === difficulty));
+    updateDiffHint();
     playIntro();
   }
   document.addEventListener("DOMContentLoaded", init);
