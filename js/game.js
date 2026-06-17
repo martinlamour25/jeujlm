@@ -420,9 +420,17 @@
     if (S && S.timer) { clearTimeout(S.timer); S.timer = null; }
     const w2 = $("#timerWrap"); if (w2) w2.hidden = true;
   }
+  // Temps de réponse effectif : fixe en Histoire, décroissant en Survie (jusqu'à 1 s).
+  function effTime() {
+    const base = (BALANCE.diff[S.diff] || {}).time;
+    if (!base) return 0;
+    if (S.mode !== "infinite") return base;
+    const dec = (S.diff === "hardcore") ? 200 : 110; // Hardcore se réduit ~2× plus vite
+    return Math.max(1000, base - S.turn * dec);
+  }
   function startTimer() {
     clearTimer();
-    const t = (BALANCE.diff[S.diff] || {}).time;
+    const t = effTime();
     const wrap = $("#timerWrap"), fill = $("#timerFill");
     if (!t || !wrap) return;
     wrap.hidden = false;
