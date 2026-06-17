@@ -782,61 +782,73 @@
   async function shareImage() {
     const cv = $("#shareCanvas"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
     const win = S.outcome !== "defeat";
+    const DF = "'Union Gothic', 'Bricolage Grotesque', Impact, sans-serif"; // titres
+    const BF = "'Stack Sans Text', Inter, sans-serif";                       // corps
+    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+
+    // Fond violet de la charte
     const grad = ctx.createLinearGradient(0, 0, W, H);
-    grad.addColorStop(0, "#4a1450"); grad.addColorStop(1, "#1c0622");
+    grad.addColorStop(0, "#2a0357"); grad.addColorStop(1, "#14002b");
     ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "rgba(255,255,255,0.04)";
+    ctx.fillStyle = "rgba(255,252,244,0.05)";
     for (let i = 0; i < 50; i++) ctx.fillRect((i * 53) % W, (i * 89) % H, 3, 3);
-    ["#3f7fe0", "#fff7f9", "#ff2b46"].forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(0, 14 + i * 9, W, 9); });
+    ["#4c0297", "#fffcf4", "#d1271c"].forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(0, 14 + i * 9, W, 9); });
 
     ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
-    ctx.fillStyle = "#ffd166"; ctx.font = "800 34px 'Bricolage Grotesque', Inter, sans-serif";
-    ctx.fillText("✊  PRÉSIDENT·E DU PEUPLE", W / 2, 86);
-    ctx.fillStyle = "#d7b9d6"; ctx.font = "600 23px Inter, sans-serif";
-    ctx.fillText("Mode " + (S.mode === "infinite" ? "Survie" : "Histoire") + " · " + ((BALANCE.diff[S.diff] || {}).label || ""), W / 2, 120);
+
+    // Logo officiel Mélenchon 2027 en tête
+    const m27 = await loadImg("assets/brand/m27-creme.png");
+    let topY = 70;
+    if (m27) { const lw = 330, lh2 = lw * (m27.height / m27.width || 0.34); ctx.drawImage(m27, (W - lw) / 2, 44, lw, lh2); topY = 44 + lh2 + 44; }
+
+    ctx.fillStyle = "#fffcf4"; ctx.font = "800 32px " + DF;
+    ctx.fillText("✊  PRÉSIDENT·E DU PEUPLE", W / 2, topY);
+    ctx.fillStyle = "#b79be6"; ctx.font = "600 23px " + BF;
+    ctx.fillText("Mode " + (S.mode === "infinite" ? "Survie" : "Histoire") + " · " + ((BALANCE.diff[S.diff] || {}).label || ""), W / 2, topY + 34);
 
     // Titre de fin (auto-ajusté, centré)
     const tFit = fitLines(ctx, ($("#endTitle").textContent || "").toUpperCase(), W - 120, 52, 34, "800");
-    ctx.fillStyle = win ? "#ffd166" : "#ff8aa0"; ctx.font = "800 " + tFit.px + "px 'Bricolage Grotesque', Inter, sans-serif";
-    const tLh = tFit.px + 8; const ty = 180;
+    ctx.fillStyle = win ? "#fffcf4" : "#e85a50"; ctx.font = "800 " + tFit.px + "px " + DF;
+    const tLh = tFit.px + 8; const ty = topY + 92;
     tFit.lines.forEach((l, i) => ctx.fillText(l, W / 2, ty + i * tLh));
 
-    // Bandeau « Une » (taille adaptée au texte, centré)
+    // Bandeau « Une » crème (taille adaptée au texte, centré)
     const hFit = fitLines(ctx, $("#uneHead").textContent || "", W - 180, 30, 21, "800");
-    const bandTop = ty + (tFit.lines.length - 1) * tLh + 34;
+    const bandTop = ty + (tFit.lines.length - 1) * tLh + 32;
     const hLh = hFit.px + 6;
-    const bandH = 54 + hFit.lines.length * hLh;
-    ctx.fillStyle = "#fff7f9"; ctx.fillRect(50, bandTop, W - 100, bandH);
-    ctx.fillStyle = "#ff2b46"; ctx.fillRect(50, bandTop, W - 100, 6);
-    ctx.fillStyle = "#ff2b46"; ctx.font = "800 20px 'Bricolage Grotesque', Inter, sans-serif";
+    const bandH = 52 + hFit.lines.length * hLh;
+    ctx.fillStyle = "#fffcf4"; ctx.fillRect(50, bandTop, W - 100, bandH);
+    ctx.fillStyle = "#d1271c"; ctx.fillRect(50, bandTop, W - 100, 6);
+    ctx.fillStyle = "#d1271c"; ctx.font = "800 20px " + DF;
     ctx.fillText("LA UNE DU PEUPLE", W / 2, bandTop + 32);
-    ctx.fillStyle = "#1a0820"; ctx.font = "800 " + hFit.px + "px 'Bricolage Grotesque', Inter, sans-serif";
-    hFit.lines.forEach((l, i) => ctx.fillText(l, W / 2, bandTop + 56 + i * hLh));
+    ctx.fillStyle = "#212320"; ctx.font = "800 " + hFit.px + "px " + DF;
+    hFit.lines.forEach((l, i) => ctx.fillText(l, W / 2, bandTop + 54 + i * hLh));
 
     // 4 jauges finales (anneaux), centrées
-    const gy = bandTop + bandH + 96;
+    const gy = bandTop + bandH + 78;
     [["p", "✊ Peuple"], ["s", "⚖ Social"], ["e", "🌱 Planète"], ["v", "🕊 Souver."]]
-      .forEach((c, i) => ringOn(ctx, W / 2 + (i - 1.5) * 246, gy, 58, S.g[c[0]], GAUGES[c[0]].color, c[1]));
+      .forEach((c, i) => ringOn(ctx, W / 2 + (i - 1.5) * 246, gy, 56, S.g[c[0]], GAUGES[c[0]].color, c[1]));
 
     // Stats (centrées)
-    const sy = gy + 158;
+    const sy = gy + 150;
     const stat = (x, big, lab) => {
-      ctx.fillStyle = "#ffd166"; ctx.font = "800 66px 'Bricolage Grotesque', Inter, sans-serif"; ctx.fillText(big, x, sy);
-      ctx.fillStyle = "#d7b9d6"; ctx.font = "600 24px Inter, sans-serif"; ctx.fillText(lab, x, sy + 36);
+      ctx.fillStyle = "#c9adff"; ctx.font = "800 66px " + DF; ctx.fillText(big, x, sy);
+      ctx.fillStyle = "#b79be6"; ctx.font = "600 24px " + BF; ctx.fillText(lab, x, sy + 36);
     };
     stat(W / 2 - 300, String(S.measures.length), "mesures");
     stat(W / 2, S.voix > 999 ? (S.voix / 1000).toFixed(1) + "k" : String(S.voix), "voix");
     stat(W / 2 + 300, $("#endGrade").textContent, "bilan");
 
-    // Pied : LIEN bien visible + incitation (bande pleine largeur en bas)
+    // Pied : bande violette avec le LIEN du jeu + incitation
     const fb = H - 104;
-    ctx.fillStyle = "#ff5c6e"; ctx.fillRect(0, fb, W, 104);
-    ctx.fillStyle = "#fff7f9"; ctx.textAlign = "center"; ctx.font = "800 28px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillStyle = "#4c0297"; ctx.fillRect(0, fb, W, 104);
+    ctx.fillStyle = "#3b0277"; ctx.fillRect(0, fb, W, 6);
+    ctx.fillStyle = "#fffcf4"; ctx.textAlign = "center"; ctx.font = "700 27px " + BF;
     ctx.fillText("Tiens-tu le mandat jusqu'en 2032 ?", W / 2, fb + 44);
-    ctx.fillStyle = "#fff"; ctx.font = "800 40px 'Bricolage Grotesque', Inter, sans-serif";
+    ctx.fillStyle = "#fffcf4"; ctx.font = "800 40px " + DF;
     ctx.fillText(GAME_URL_SHORT, W / 2, fb + 86);
 
-    // Tortue mascotte (bas-gauche, posée sur la bande, sans croiser le texte centré)
+    // Tortue mascotte (bas-gauche, posée sur la bande)
     const im = await loadImg(win ? "assets/turtle2/HOURA.png" : "assets/turtle2/QUI_POUSSE.png");
     if (im) { const tw = 150, th = tw * (im.height / im.width || 1.2); ctx.drawImage(im, 12, fb - th + 56, tw, th); }
 
