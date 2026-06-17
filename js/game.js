@@ -139,7 +139,7 @@
     }
     function advance() {
       i++; if (i >= CINE.length) { finish(); return; }
-      renderSlide(); clearTimeout(timer); timer = setTimeout(advance, CINE[i].ms);
+      renderSlide(); // avance UNIQUEMENT au tap (pas d'enchaînement automatique)
     }
     intro.onclick = () => { firstGesture(); if (!SOUND.isMuted()) SOUND.startMusic(); advance(); };
     advance();
