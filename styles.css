@@ -585,3 +585,17 @@ body {
 .card-stamp { top: 38%; font-size: 1.55rem; padding: 12px 24px; max-width: 72%; z-index: 7; }
 .card-stamp--l { left: 12px; }
 .card-stamp--r { right: 12px; }
+
+/* =========================================================
+   FIX tampon de swipe : forcé en ABSOLU et CENTRÉ sur la carte
+   (corrige le fallback en position:relative qui le renvoyait en bas/invisible).
+   Taille du texte INCHANGÉE.
+   ========================================================= */
+.card .card-stamp {
+  position: absolute !important; z-index: 9 !important;
+  top: 50% !important; left: 50% !important; right: auto !important; bottom: auto !important;
+  font-size: 1.5rem !important; max-width: 84%; padding: 12px 22px;
+  background: rgba(16, 4, 22, 0.94);
+}
+.card .card-stamp--l { transform: translate(-50%, -50%) rotate(-10deg) !important; }
+.card .card-stamp--r { transform: translate(-50%, -50%) rotate(10deg) !important; }
