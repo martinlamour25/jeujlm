@@ -679,3 +679,20 @@ body {
   .home-sub { font-size: 0.92rem; }
   .brand-m27 { width: min(46%, 180px); }
 }
+
+/* =========================================================
+   DESKTOP : cadre "téléphone" centré, mis à l'échelle pour tenir
+   entièrement à l'écran (aucun défilement, tout visible)
+   ========================================================= */
+@media (min-width: 600px) {
+  #app {
+    width: 440px; height: 920px; max-width: none;
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(var(--app-scale, 1));
+    transform-origin: center center;
+    border-radius: 30px; overflow: hidden;
+    box-shadow: 0 30px 90px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,252,244,0.10);
+  }
+  .screen--home { overflow: hidden; }   /* tout tient dans le cadre, pas de scroll */
+  .audio-btn { top: 16px; right: calc(50% - 220px + 12px); }
+}

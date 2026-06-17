@@ -955,8 +955,17 @@
     el.classList.toggle("hot", !!t);
   }
 
+  // Desktop : met le cadre du jeu à l'échelle pour qu'il tienne en entier (zéro scroll).
+  function fitApp() {
+    const app = $("#app"); if (!app) return;
+    if (window.innerWidth < 600) { app.style.removeProperty("--app-scale"); return; }
+    const s = Math.min((window.innerWidth - 48) / 440, (window.innerHeight - 24) / 920);
+    app.style.setProperty("--app-scale", Math.max(0.55, Math.min(1.25, s)));
+  }
+
   function init() {
     initHome(); bind(); registerSW(); refreshAudioBtn();
+    fitApp(); window.addEventListener("resize", fitApp);
     $$(".diff-chip").forEach((c) => c.classList.toggle("is-on", c.dataset.d === difficulty));
     updateDiffHint();
     playIntro();
