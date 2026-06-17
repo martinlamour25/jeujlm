@@ -782,75 +782,95 @@
   async function shareImage() {
     const cv = $("#shareCanvas"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
     const win = S.outcome !== "defeat";
-    const DF = "'Union Gothic', 'Bricolage Grotesque', Impact, sans-serif"; // titres
-    const BF = "'Stack Sans Text', Inter, sans-serif";                       // corps
-    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+    const DF = "'Union Gothic', 'Bricolage Grotesque', Impact, sans-serif";
+    const BF = "'Stack Sans Text', Inter, sans-serif";
+    // Charger explicitement les polices de la charte (sinon le canvas prend une police par défaut)
+    try {
+      if (document.fonts && document.fonts.load) await Promise.all([
+        document.fonts.load("800 80px 'Union Gothic'"),
+        document.fonts.load("700 28px 'Stack Sans Text'"),
+        document.fonts.load("400 24px 'Stack Sans Text'")
+      ]);
+    } catch (e) {}
+    const roundRect = (x, y, w, h, r) => { ctx.beginPath(); ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); };
+    const block = (text, cx, y, px, face, shadow) => { // texte "bloc 3D" comme l'accueil
+      ctx.font = "800 " + px + "px " + DF; ctx.textAlign = "center";
+      for (let d = 6; d >= 1; d--) { ctx.fillStyle = shadow; ctx.fillText(text, cx + d * 0.7, y + d); }
+      ctx.fillStyle = face; ctx.fillText(text, cx, y);
+    };
 
-    // Fond violet de la charte
+    // Fond violet + halo + grain
     const grad = ctx.createLinearGradient(0, 0, W, H);
-    grad.addColorStop(0, "#2a0357"); grad.addColorStop(1, "#14002b");
+    grad.addColorStop(0, "#3a0479"); grad.addColorStop(0.55, "#26064f"); grad.addColorStop(1, "#15002c");
     ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+    const halo = ctx.createRadialGradient(W / 2, 330, 40, W / 2, 330, 560);
+    halo.addColorStop(0, "rgba(156,110,232,0.30)"); halo.addColorStop(1, "rgba(156,110,232,0)");
+    ctx.fillStyle = halo; ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = "rgba(255,252,244,0.05)";
-    for (let i = 0; i < 50; i++) ctx.fillRect((i * 53) % W, (i * 89) % H, 3, 3);
+    for (let i = 0; i < 60; i++) ctx.fillRect((i * 53) % W, (i * 89) % H, 3, 3);
+    // φ en filigrane
+    ctx.save(); ctx.globalAlpha = 0.07; ctx.strokeStyle = "#fffcf4"; ctx.lineWidth = 26; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.arc(W / 2, 330, 148, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W / 2, 150); ctx.lineTo(W / 2, 540); ctx.stroke(); ctx.restore();
+    // bande tricolore charte
     ["#4c0297", "#fffcf4", "#d1271c"].forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(0, 14 + i * 9, W, 9); });
 
     ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
-
-    // Logo officiel Mélenchon 2027 en tête
+    // Logo Mélenchon 2027
     const m27 = await loadImg("assets/brand/m27-creme.png");
-    let topY = 70;
-    if (m27) { const lw = 330, lh2 = lw * (m27.height / m27.width || 0.34); ctx.drawImage(m27, (W - lw) / 2, 44, lw, lh2); topY = 44 + lh2 + 44; }
+    if (m27) { const lw = 230, lh2 = lw * (m27.height / m27.width || 0.34); ctx.drawImage(m27, (W - lw) / 2, 40, lw, lh2); }
 
-    ctx.fillStyle = "#fffcf4"; ctx.font = "800 32px " + DF;
-    ctx.fillText("✊  PRÉSIDENT·E DU PEUPLE", W / 2, topY);
-    ctx.fillStyle = "#b79be6"; ctx.font = "600 23px " + BF;
-    ctx.fillText("Mode " + (S.mode === "infinite" ? "Survie" : "Histoire") + " · " + ((BALANCE.diff[S.diff] || {}).label || ""), W / 2, topY + 34);
+    // Logo-titre du jeu : même style "bloc" que l'accueil (crème + extrusion violet/rouge)
+    block("PRÉSIDENT·E", W / 2, 204, 78, "#fffcf4", "#6a18b3");
+    block("DU PEUPLE", W / 2, 282, 78, "#fffcf4", "#d1271c");
 
-    // Titre de fin (auto-ajusté, centré)
-    const tFit = fitLines(ctx, ($("#endTitle").textContent || "").toUpperCase(), W - 120, 52, 34, "800");
-    ctx.fillStyle = win ? "#fffcf4" : "#e85a50"; ctx.font = "800 " + tFit.px + "px " + DF;
-    const tLh = tFit.px + 8; const ty = topY + 92;
-    tFit.lines.forEach((l, i) => ctx.fillText(l, W / 2, ty + i * tLh));
+    // Mode + difficulté
+    ctx.fillStyle = "#c9adff"; ctx.font = "700 24px " + BF;
+    ctx.fillText("Mode " + (S.mode === "infinite" ? "Survie" : "Histoire") + " · " + ((BALANCE.diff[S.diff] || {}).label || ""), W / 2, 324);
+    // Issue (titre de fin), coloré
+    ctx.fillStyle = win ? "#ffe1a8" : "#ff9286"; ctx.font = "800 30px " + DF;
+    ctx.fillText(($("#endTitle").textContent || "").toUpperCase(), W / 2, 360);
 
-    // Bandeau « Une » crème (taille adaptée au texte, centré)
-    const hFit = fitLines(ctx, $("#uneHead").textContent || "", W - 180, 30, 21, "800");
-    const bandTop = ty + (tFit.lines.length - 1) * tLh + 32;
-    const hLh = hFit.px + 6;
-    const bandH = 52 + hFit.lines.length * hLh;
-    ctx.fillStyle = "#fffcf4"; ctx.fillRect(50, bandTop, W - 100, bandH);
-    ctx.fillStyle = "#d1271c"; ctx.fillRect(50, bandTop, W - 100, 6);
+    // Bandeau « Une » : carte crème arrondie avec ombre
+    const hFit = fitLines(ctx, $("#uneHead").textContent || "", W - 210, 34, 22, "800");
+    const bandTop = 386; const hLh = hFit.px + 6; const bandH = 66 + hFit.lines.length * hLh;
+    ctx.save(); ctx.shadowColor = "rgba(0,0,0,0.45)"; ctx.shadowBlur = 22; ctx.shadowOffsetY = 9;
+    ctx.fillStyle = "#fffcf4"; roundRect(56, bandTop, W - 112, bandH, 16); ctx.fill(); ctx.restore();
+    ctx.fillStyle = "#d1271c"; roundRect(56, bandTop, W - 112, 6, 3); ctx.fill();
     ctx.fillStyle = "#d1271c"; ctx.font = "800 20px " + DF;
-    ctx.fillText("LA UNE DU PEUPLE", W / 2, bandTop + 32);
+    ctx.fillText("LA UNE DU PEUPLE", W / 2, bandTop + 36);
     ctx.fillStyle = "#212320"; ctx.font = "800 " + hFit.px + "px " + DF;
-    hFit.lines.forEach((l, i) => ctx.fillText(l, W / 2, bandTop + 54 + i * hLh));
+    hFit.lines.forEach((l, i) => ctx.fillText(l, W / 2, bandTop + 60 + i * hLh));
 
-    // 4 jauges finales (anneaux), centrées
-    const gy = bandTop + bandH + 78;
+    // 4 jauges finales (anneaux)
+    const gy = bandTop + bandH + 70;
     [["p", "✊ Peuple"], ["s", "⚖ Social"], ["e", "🌱 Planète"], ["v", "🕊 Souver."]]
       .forEach((c, i) => ringOn(ctx, W / 2 + (i - 1.5) * 246, gy, 56, S.g[c[0]], GAUGES[c[0]].color, c[1]));
 
-    // Stats (centrées)
-    const sy = gy + 150;
+    // Stats
+    const sy = gy + 146;
     const stat = (x, big, lab) => {
-      ctx.fillStyle = "#c9adff"; ctx.font = "800 66px " + DF; ctx.fillText(big, x, sy);
-      ctx.fillStyle = "#b79be6"; ctx.font = "600 24px " + BF; ctx.fillText(lab, x, sy + 36);
+      ctx.fillStyle = "#c9adff"; ctx.font = "800 64px " + DF; ctx.fillText(big, x, sy);
+      ctx.fillStyle = "#b79be6"; ctx.font = "600 23px " + BF; ctx.fillText(lab, x, sy + 35);
     };
     stat(W / 2 - 300, String(S.measures.length), "mesures");
     stat(W / 2, S.voix > 999 ? (S.voix / 1000).toFixed(1) + "k" : String(S.voix), "voix");
     stat(W / 2 + 300, $("#endGrade").textContent, "bilan");
 
-    // Pied : bande violette avec le LIEN du jeu + incitation
-    const fb = H - 104;
-    ctx.fillStyle = "#4c0297"; ctx.fillRect(0, fb, W, 104);
+    // Pied : bande violette, LIEN du jeu + incitation (espacés)
+    const fb = H - 120;
+    ctx.fillStyle = "#4c0297"; ctx.fillRect(0, fb, W, 120);
     ctx.fillStyle = "#3b0277"; ctx.fillRect(0, fb, W, 6);
-    ctx.fillStyle = "#fffcf4"; ctx.textAlign = "center"; ctx.font = "700 27px " + BF;
-    ctx.fillText("Tiens-tu le mandat jusqu'en 2032 ?", W / 2, fb + 44);
-    ctx.fillStyle = "#fffcf4"; ctx.font = "800 40px " + DF;
-    ctx.fillText(GAME_URL_SHORT, W / 2, fb + 86);
+    ctx.textAlign = "center"; ctx.fillStyle = "#fffcf4"; ctx.font = "700 25px " + BF;
+    ctx.fillText("Tiens-tu le mandat jusqu'en 2032 ?", W / 2, fb + 46);
+    ctx.fillStyle = "#fffcf4"; ctx.font = "800 38px " + DF;
+    ctx.fillText(GAME_URL_SHORT, W / 2, fb + 94);
 
-    // Tortue mascotte (bas-gauche, posée sur la bande)
+    // Tortue mascotte (bas-gauche, ne croise pas le texte centré)
     const im = await loadImg(win ? "assets/turtle2/HOURA.png" : "assets/turtle2/QUI_POUSSE.png");
-    if (im) { const tw = 150, th = tw * (im.height / im.width || 1.2); ctx.drawImage(im, 12, fb - th + 56, tw, th); }
+    if (im) { const tw = 138, th = tw * (im.height / im.width || 1.2); ctx.drawImage(im, 14, fb - th + 40, tw, th); }
 
     cv.toBlob((blob) => {
       if (!blob) { toast("Image indisponible ici (essaie en ligne)"); return; }
