@@ -959,8 +959,8 @@
   function fitApp() {
     const app = $("#app"); if (!app) return;
     if (window.innerWidth < 600) { app.style.removeProperty("--app-scale"); return; }
-    const s = Math.min((window.innerWidth - 48) / 440, (window.innerHeight - 24) / 920);
-    app.style.setProperty("--app-scale", Math.max(0.55, Math.min(1.25, s)));
+    const s = Math.min((window.innerWidth - 40) / 680, (window.innerHeight - 20) / 880);
+    app.style.setProperty("--app-scale", Math.max(0.5, Math.min(1.4, s)));
   }
 
   function init() {
