@@ -759,9 +759,9 @@
     ctx.strokeStyle = "rgba(255,255,255,0.14)"; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
     ctx.strokeStyle = color; ctx.beginPath();
     ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (Math.max(0, val) / 100)); ctx.stroke();
-    ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.font = "800 38px 'Bricolage Grotesque', Inter, sans-serif";
-    ctx.fillText(Math.round(val) + "", cx, cy + 13);
-    ctx.fillStyle = "#e9d3e8"; ctx.font = "700 23px Inter, sans-serif"; ctx.fillText(label, cx, cy + r + 38);
+    ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.font = "800 40px 'Union Gothic', 'Bricolage Grotesque', sans-serif";
+    ctx.fillText(Math.round(val) + "", cx, cy + 14);
+    ctx.fillStyle = "#e9d3e8"; ctx.font = "700 23px 'Stack Sans Text', Inter, sans-serif"; ctx.fillText(label, cx, cy + r + 38);
   }
   function wrapLines(ctx, text, maxW) {
     const words = String(text).split(" "); const lines = []; let line = "";
@@ -771,9 +771,10 @@
     }
     if (line) lines.push(line); return lines;
   }
-  function fitLines(ctx, text, maxW, startPx, minPx, weight) {
+  function fitLines(ctx, text, maxW, startPx, minPx, weight, family) {
+    const fam = family || "'Bricolage Grotesque', Inter, sans-serif";
     let px = startPx, lines;
-    do { ctx.font = weight + " " + px + "px 'Bricolage Grotesque', Inter, sans-serif";
+    do { ctx.font = weight + " " + px + "px " + fam;
       lines = wrapLines(ctx, text, maxW); px -= 3; } while (lines.length > 2 && px > minPx);
     return { lines: lines, px: px + 3 };
   }
@@ -829,20 +830,25 @@
     // Mode + difficulté
     ctx.fillStyle = "#c9adff"; ctx.font = "700 24px " + BF;
     ctx.fillText("Mode " + (S.mode === "infinite" ? "Survie" : "Histoire") + " · " + ((BALANCE.diff[S.diff] || {}).label || ""), W / 2, 324);
-    // Issue (titre de fin), coloré
+    // Issue (titre de fin), colorée
     ctx.fillStyle = win ? "#ffe1a8" : "#ff9286"; ctx.font = "800 30px " + DF;
-    ctx.fillText(($("#endTitle").textContent || "").toUpperCase(), W / 2, 360);
+    ctx.fillText(($("#endTitle").textContent || "").toUpperCase(), W / 2, 356);
 
-    // Bandeau « Une » : carte crème arrondie avec ombre
-    const hFit = fitLines(ctx, $("#uneHead").textContent || "", W - 210, 34, 22, "800");
-    const bandTop = 386; const hLh = hFit.px + 6; const bandH = 66 + hFit.lines.length * hLh;
-    ctx.save(); ctx.shadowColor = "rgba(0,0,0,0.45)"; ctx.shadowBlur = 22; ctx.shadowOffsetY = 9;
-    ctx.fillStyle = "#fffcf4"; roundRect(56, bandTop, W - 112, bandH, 16); ctx.fill(); ctx.restore();
-    ctx.fillStyle = "#d1271c"; roundRect(56, bandTop, W - 112, 6, 3); ctx.fill();
-    ctx.fillStyle = "#d1271c"; ctx.font = "800 20px " + DF;
-    ctx.fillText("LA UNE DU PEUPLE", W / 2, bandTop + 36);
+    // Bandeau « Une » : carte crème arrondie avec ombre (mesurée avec la vraie police)
+    const hFit = fitLines(ctx, $("#uneHead").textContent || "", W - 150, 40, 26, "800", DF);
+    const bandTop = 384; const headTop = 86; const hLh = hFit.px + 10;
+    const bandH = headTop + hFit.lines.length * hLh + 18;
+    ctx.save(); ctx.shadowColor = "rgba(0,0,0,0.45)"; ctx.shadowBlur = 24; ctx.shadowOffsetY = 10;
+    ctx.fillStyle = "#fffcf4"; roundRect(56, bandTop, W - 112, bandH, 18); ctx.fill(); ctx.restore();
+    ctx.fillStyle = "#d1271c"; roundRect(56, bandTop, W - 112, 7, 3); ctx.fill();
+    // Manchette
+    ctx.fillStyle = "#d1271c"; ctx.font = "800 22px " + DF;
+    ctx.fillText("LA UNE DU PEUPLE", W / 2, bandTop + 44);
+    ctx.strokeStyle = "rgba(33,35,32,0.14)"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(120, bandTop + 60); ctx.lineTo(W - 120, bandTop + 60); ctx.stroke();
+    // Titre de la Une
     ctx.fillStyle = "#212320"; ctx.font = "800 " + hFit.px + "px " + DF;
-    hFit.lines.forEach((l, i) => ctx.fillText(l, W / 2, bandTop + 60 + i * hLh));
+    hFit.lines.forEach((l, i) => ctx.fillText(l, W / 2, bandTop + headTop + i * hLh));
 
     // 4 jauges finales (anneaux)
     const gy = bandTop + bandH + 70;
