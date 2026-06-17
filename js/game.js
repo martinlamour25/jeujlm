@@ -411,18 +411,7 @@
       card.style.transform = "translate(-50%, 0) rotate(0deg)";
       card.style.opacity = "1";
       busy = false;
-      fitCardText();
     });
-  }
-
-  // Ajuste la taille du texte pour qu'il tienne TOUJOURS dans la carte (zéro scroll).
-  function fitCardText() {
-    const el = $("#cardText"); if (!el) return;
-    let px = 21; el.style.fontSize = px + "px";
-    let guard = 0;
-    while (el.scrollHeight > el.clientHeight + 1 && px > 12 && guard++ < 30) {
-      px -= 1; el.style.fontSize = px + "px";
-    }
   }
 
   // Effet « pile de cartes » : carte fantôme derrière.
@@ -879,7 +868,6 @@
     $("#screen-play").addEventListener("click", () => {
       if ($("#feedback").classList.contains("show")) afterFeedback();
     });
-    window.addEventListener("resize", () => { if (!$("#screen-play").hidden && S && S.current) fitCardText(); });
 
     $("#endReplay").addEventListener("click", () => { if (!SOUND.isMuted()) SOUND.startMusic(); newGame(S ? S.mode : "story"); });
     $("#endShare").addEventListener("click", shareResult);

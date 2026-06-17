@@ -549,3 +549,27 @@ body {
 
 /* Texte de carte : auto-ajusté en JS, JAMAIS de scroll (mobile-friendly) */
 .card-bubble { overflow: hidden !important; }
+
+/* =========================================================
+   FIX cartes : police CONSTANTE, plus de place, jamais coupé
+   ========================================================= */
+/* Portrait + nom plus compacts => plus de place pour le texte */
+.card { padding: 16px 16px 18px; gap: 8px; }
+.card-portrait { width: 92px; height: 92px; margin-top: 2px; }
+.card-who { font-size: 1.02rem; margin: 0; }
+/* Texte de carte : TOUJOURS la même taille, lisible sur tout device, centré */
+.card-bubble {
+  flex: 1; display: flex; align-items: center; justify-content: center; text-align: center;
+  font-size: 1.04rem !important; line-height: 1.42; font-weight: 500;
+  overflow: hidden; padding: 2px 2px 0; width: 100%;
+}
+@media (max-height: 720px) { .card-portrait { width: 76px; height: 76px; } .card-bubble { font-size: 0.98rem !important; } }
+@media (max-height: 600px) { .card-portrait { width: 62px; height: 62px; } .card-who { font-size: 0.95rem; } }
+
+/* =========================================================
+   FIX fin de partie : ne plus couper le haut (mascotte/texte)
+   ========================================================= */
+.end-body { justify-content: flex-start !important; overflow-y: auto; padding-top: 2px; gap: 7px; }
+.mascot-end { width: clamp(64px, 15vh, 104px); margin: 0 auto 2px; }
+.end-title { font-size: clamp(1.5rem, 7vw, 2.2rem) !important; }
+.end-sub { font-size: 0.92rem; }

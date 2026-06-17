@@ -752,7 +752,7 @@ const CARDS = {
   /* ---------- IMPRÉVUS (crises de gouvernement : arbitrer entre deux objectifs légitimes) ---------- */
   ev_energie: {
     event: true, hits: "s", char: "worker", scene: "usine", tag: "s",
-    text: "⚡ CHOC ÉNERGÉTIQUE. La guerre relancée par Trump et Netanyahou fait flamber pétrole et gaz. Qui paie la facture : les citoyens, ou les multinationales ?",
+    text: "⚡ CHOC ÉNERGÉTIQUE. La guerre de Trump et Netanyahou fait flamber le gaz. Qui paie : les citoyens, ou les multinationales ?",
     left: { label: "Bloquer les prix", fx: { s: -2, e: -6 },
       result: "Tu bloques les prix de l'énergie et des biens essentiels : les ménages sont protégés. Mais subventionner l'énergie, fossile incluse, alourdit l'empreinte carbone.",
       note: "Le blocage des prix : que les multinationales paient, pas les gens.",
