@@ -358,8 +358,8 @@
       ov.classList.add("out"); ov.classList.remove("show");
       setTimeout(() => { ov.hidden = true; ov.onclick = null; nextCard(); }, 500);
     };
+    // Pas de défilement automatique : on attend que l'utilisateur touche l'écran.
     ov.onclick = close;
-    setTimeout(close, 2600);
   }
 
   /* ---------- Rendu d'une carte ---------- */
