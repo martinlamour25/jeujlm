@@ -855,28 +855,35 @@
     [["p", "✊ Peuple"], ["s", "⚖ Social"], ["e", "🌱 Planète"], ["v", "🕊 Souver."]]
       .forEach((c, i) => ringOn(ctx, W / 2 + (i - 1.5) * 246, gy, 56, S.g[c[0]], GAUGES[c[0]].color, c[1]));
 
-    // Stats
-    const sy = gy + 146;
-    const stat = (x, big, lab) => {
-      ctx.fillStyle = "#c9adff"; ctx.font = "800 64px " + DF; ctx.fillText(big, x, sy);
-      ctx.fillStyle = "#b79be6"; ctx.font = "600 23px " + BF; ctx.fillText(lab, x, sy + 35);
+    // Bilan chiffré : panneau « tableau » clair (3 cellules + séparateurs)
+    const pX = 90, pW = W - 180, pY = gy + 100, pH = 124;
+    ctx.save(); ctx.shadowColor = "rgba(0,0,0,0.35)"; ctx.shadowBlur = 18; ctx.shadowOffsetY = 7;
+    ctx.fillStyle = "rgba(255,252,244,0.07)"; roundRect(pX, pY, pW, pH, 18); ctx.fill(); ctx.restore();
+    ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,252,244,0.18)"; roundRect(pX, pY, pW, pH, 18); ctx.stroke();
+    // séparateurs verticaux
+    ctx.strokeStyle = "rgba(255,252,244,0.14)"; ctx.lineWidth = 2;
+    [pX + pW / 3, pX + (2 * pW) / 3].forEach((x) => { ctx.beginPath(); ctx.moveTo(x, pY + 22); ctx.lineTo(x, pY + pH - 22); ctx.stroke(); });
+    const cell = (cx, big, lab) => {
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#ffe1a8"; ctx.font = "800 58px " + DF; ctx.fillText(big, cx, pY + 66);
+      ctx.fillStyle = "#c9adff"; ctx.font = "700 24px " + BF; ctx.fillText(lab.toUpperCase(), cx, pY + 100);
     };
-    stat(W / 2 - 300, String(S.measures.length), "mesures");
-    stat(W / 2, S.voix > 999 ? (S.voix / 1000).toFixed(1) + "k" : String(S.voix), "voix");
-    stat(W / 2 + 300, $("#endGrade").textContent, "bilan");
+    cell(pX + pW / 6, String(S.measures.length), "mesures");
+    cell(pX + pW / 2, S.voix > 999 ? (S.voix / 1000).toFixed(1) + "k" : String(S.voix), "voix");
+    cell(pX + (5 * pW) / 6, $("#endGrade").textContent, "bilan");
 
-    // Pied : bande violette, LIEN du jeu + incitation (espacés)
-    const fb = H - 120;
-    ctx.fillStyle = "#4c0297"; ctx.fillRect(0, fb, W, 120);
-    ctx.fillStyle = "#3b0277"; ctx.fillRect(0, fb, W, 6);
-    ctx.textAlign = "center"; ctx.fillStyle = "#fffcf4"; ctx.font = "700 25px " + BF;
-    ctx.fillText("Tiens-tu le mandat jusqu'en 2032 ?", W / 2, fb + 46);
-    ctx.fillStyle = "#fffcf4"; ctx.font = "800 38px " + DF;
-    ctx.fillText(GAME_URL_SHORT, W / 2, fb + 94);
+    // Pied : bande violette, incitation + LIEN du jeu (police lisible, pas condensée)
+    const fb = H - 124;
+    ctx.fillStyle = "#4c0297"; ctx.fillRect(0, fb, W, 124);
+    ctx.fillStyle = "#d1271c"; ctx.fillRect(0, fb, W, 6);
+    ctx.textAlign = "center"; ctx.fillStyle = "#e9d3f0"; ctx.font = "700 26px " + BF;
+    ctx.fillText("Tiens-tu le mandat jusqu'en 2032 ?", W / 2, fb + 48);
+    ctx.fillStyle = "#fffcf4"; ctx.font = "800 36px " + BF;
+    ctx.fillText("▶ " + GAME_URL_SHORT, W / 2, fb + 96);
 
-    // Tortue mascotte (bas-gauche, ne croise pas le texte centré)
+    // Tortue mascotte (coin bas-gauche, posée sur le bandeau, hors du texte centré)
     const im = await loadImg(win ? "assets/turtle2/HOURA.png" : "assets/turtle2/QUI_POUSSE.png");
-    if (im) { const tw = 138, th = tw * (im.height / im.width || 1.2); ctx.drawImage(im, 14, fb - th + 40, tw, th); }
+    if (im) { const tw = 124, th = tw * (im.height / im.width || 1.2); ctx.drawImage(im, 16, fb - th + 66, tw, th); }
 
     cv.toBlob((blob) => {
       if (!blob) { toast("Image indisponible ici (essaie en ligne)"); return; }

@@ -696,7 +696,7 @@ body {
   .screen--home { overflow: hidden; }
   /* Contenu élargi pour occuper le cadre (sans s'étirer à l'excès) */
   .home-sub, .home-actions, .mode-list, .diff-select { max-width: 580px; margin-left: auto; margin-right: auto; }
-  .deck { max-width: 620px; margin-left: auto; margin-right: auto; }
+  .deck { width: 100%; max-width: 620px; margin-left: auto; margin-right: auto; }
   .feedback-foot, .feedback-deltas { max-width: 600px; margin-left: auto; margin-right: auto; }
   .audio-btn { top: 16px; right: calc(50% - 340px + 12px); }
 }
