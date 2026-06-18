@@ -98,8 +98,8 @@ const CARDS = {
       note: "Personne ne doit travailler à plein temps et rester pauvre.",
       quip: "Le patronat applaudit. Ton caddie, lui, reste vide.", head: "SALAIRES GELÉS : LE PEUPLE TRINQUE" },
     right: { label: "1 600 € nets", fx: { s: 14, p: 8, v: -5 }, set: ["raised_smic"], rep: { worker: 1, lobby: -1 },
-      result: "Le SMIC passe immédiatement à 1 600 € nets. Le pouvoir d'achat repart, le patronat fulmine.",
-      note: "SMIC à 1 600 € nets dès 2027 pour vivre dignement de son travail.",
+      result: "Le SMIC passe immédiatement à 1 600 € nets et les salaires sont indexés sur l'inflation. Le pouvoir d'achat repart, le patronat fulmine.",
+      note: "SMIC à 1 600 € nets dès 2027 et indexation des salaires sur l'inflation, pour vivre dignement de son travail.",
       measure: "SMIC à 1 600 € nets", quip: "Le CAC 40 a fait un malaise. Les caissières respirent.",
       head: "SMIC À 1 600 € : LE TRAVAIL ENFIN PAYÉ" }
   },
@@ -528,9 +528,213 @@ const CARDS = {
       result: "Tu laisses filer les prix « pour ne pas fausser le marché ». Les marges des géants explosent, pas les salaires.",
       note: "L'inflation sans réponse, c'est un transfert des ménages vers les profits." },
     right: { label: "Bloquer les prix", fx: { s: 14, p: 8 },
-      result: "Tu bloques les prix de l'énergie, des carburants et des produits de première nécessité.",
-      note: "Bloquer les prix : que les multinationales paient, pas les citoyens.",
+      result: "Tu bloques les prix de l'alimentation, de l'énergie et des carburants, et tu interdis la « réduflation ».",
+      note: "Bloquer les prix de l'essentiel et stopper la réduflation : que les multinationales paient, pas les citoyens.",
       measure: "Blocage des prix de l'essentiel" }
+  },
+
+  /* ---------- PROGRAMME 2025 — nouvelles mesures de L'Avenir en commun ---------- */
+  garantie_emploi: {
+    char: "worker", scene: "usine", tag: "s", rarity: "common",
+    text: "« Chômeur de longue durée, je veux travailler mais personne ne m'embauche. L'État peut faire quelque chose ? »",
+    left: { label: "Laisser le marché", fx: { s: -10, p: -8 }, betray: true,
+      result: "Tu comptes sur « la reprise » pour créer des emplois. Le chômage de longue durée s'installe.",
+      note: "La collectivité peut proposer un emploi utile à qui en est durablement privé." },
+    right: { label: "Garantie d'emploi", fx: { s: 12, p: 8, e: 3 }, set: ["garantie_emploi"],
+      result: "Tout chômeur de longue durée se voit proposer un emploi utile (transition écologique, action sociale) au moins au SMIC revalorisé.",
+      note: "État employeur en dernier ressort : plus personne n'est laissé sans solution.",
+      measure: "Garantie d'emploi" }
+  },
+  logement: {
+    char: "citizen", scene: "ville", tag: "s",
+    text: "« Mon loyer explose et on menace de m'expulser. Le logement, c'est un droit ou un marché ? »",
+    left: { label: "Laisser le marché", fx: { s: -12, p: -8 }, betray: true,
+      result: "Tu laisses faire bailleurs et plateformes type Airbnb. Les expulsions et la spéculation continuent.",
+      note: "Sans encadrement, se loger devient un luxe.",
+      head: "LE LOGEMENT, LUXE RÉSERVÉ AUX RENTIERS" },
+    right: { label: "Garantie des loyers", fx: { s: 14, p: 8, e: 3 }, set: ["logement"],
+      result: "Garantie universelle des loyers, encadrement partout, fin des expulsions sans relogement et réquisition des logements vides.",
+      note: "200 000 logements publics par an et des loyers encadrés : le logement redevient un droit.",
+      measure: "Garantie universelle des loyers",
+      quip: "Les multipropriétaires font la grimace. Les locataires respirent.",
+      head: "LE LOGEMENT REDEVIENT UN DROIT" }
+  },
+  conscription: {
+    char: "youth", scene: "meeting", tag: "p",
+    text: "« Le SNU de Macron a été un fiasco. On garde ce machin ou on invente autre chose ? »",
+    left: { label: "Garder le SNU", fx: { p: -8, s: -4 },
+      result: "Tu maintiens le Service national universel, coûteux et entaché de scandales.",
+      note: "Le programme remplace le SNU par un vrai service citoyen émancipateur." },
+    right: { label: "Conscription citoyenne", fx: { p: 10, s: 6, v: 4 }, set: ["conscription"],
+      result: "Conscription citoyenne de neuf mois rémunérée au SMIC (formation, permis, bilan de santé) et garde civile sous commandement civil.",
+      note: "Un service vraiment utile : secours, sécurité civile, protection de l'environnement.",
+      measure: "Conscription citoyenne & garde civile" }
+  },
+  pole_bancaire: {
+    char: "banker", scene: "bourse", tag: "s",
+    text: "« Laissez les banques privées financer l'économie, voyons : elles savent ce qu'elles font. »",
+    left: { label: "Laisser les banques", fx: { s: -10, p: -6, v: -4 },
+      result: "Les banques privées continuent de spéculer plutôt que de financer l'utile.",
+      note: "Sans pôle public, le crédit va à la rente, pas aux besoins." },
+    right: { label: "Pôle bancaire public", fx: { s: 12, p: 6, e: 4 }, set: ["pole_bancaire"],
+      result: "Socialisation de banques de détail dans un pôle public bancaire pour financer les TPE sur critères sociaux et écologiques.",
+      note: "La finance au service de l'économie réelle, pas l'inverse.",
+      measure: "Pôle bancaire public" }
+  },
+  dette: {
+    char: "eu", scene: "ue", tag: "v", topical: true,
+    text: "« Votre dette est colossale ! Coupez dans les dépenses pour rassurer les marchés. »",
+    left: { label: "Rembourser à tout prix", fx: { s: -12, p: -8, v: -6 }, set: ["austerity"],
+      result: "Tu sacrifies les services publics sur l'autel de la dette. L'austérité s'installe.",
+      note: "La dette est instrumentalisée pour justifier l'austérité et les privatisations." },
+    right: { label: "Restructurer la dette", fx: { v: 12, s: 8, p: 6 }, set: ["dette_restruct"],
+      result: "Tu exiges que la BCE transforme la dette qu'elle détient en titres perpétuels à taux nul. Fin du chantage.",
+      note: "L'État détient plus de patrimoine que de dette : l'austérité n'est pas une fatalité.",
+      measure: "Restructuration de la dette" }
+  },
+  animaux: {
+    char: "farmer", scene: "champ", tag: "e",
+    text: "« Ces fermes-usines entassent les bêtes dans des hangars sans lumière. On laisse faire ? »",
+    left: { label: "Garder l'élevage industriel", fx: { e: -10, s: -4 },
+      result: "Les fermes-usines prospèrent : souffrance animale, risques de zoonoses, concurrence déloyale aux paysans.",
+      note: "L'élevage industriel maltraite le vivant et favorise les pandémies." },
+    right: { label: "Interdire les fermes-usines", fx: { e: 12, s: 4 }, set: ["bienetre_animal"],
+      result: "Interdiction des fermes-usines et des pratiques cruelles (cages, broyage des poussins), limitation des transports d'animaux vivants.",
+      note: "Sortir de la maltraitance animale, c'est un progrès de civilisation.",
+      measure: "Interdiction des fermes-usines" }
+  },
+  petite_enfance: {
+    char: "nurse", scene: "ville", tag: "s",
+    text: "« Aucune place en crèche pour mon bébé, et le privé coûte une fortune. Vous faites quoi ? »",
+    left: { label: "Laisser le privé gérer", fx: { s: -10, p: -6 },
+      result: "Les crèches privées lucratives se multiplient, parfois au détriment de la sécurité des enfants.",
+      note: "L'accueil du jeune enfant ne devrait pas être une marchandise." },
+    right: { label: "Service public petite enfance", fx: { s: 12, p: 8 }, set: ["petite_enfance"],
+      result: "Création d'un service public de la petite enfance : 500 000 places de crèche en cinq ans et gratuité des crèches publiques.",
+      note: "Un droit opposable à l'accueil des jeunes enfants pour toutes les familles.",
+      measure: "Service public de la petite enfance" }
+  },
+  cannabis: {
+    char: "citizen", scene: "ville", tag: "p", topical: true,
+    text: "« La guerre à la drogue est un échec et les trafics gangrènent les quartiers. On change de stratégie ? »",
+    left: { label: "Tout-répressif", fx: { p: -8, s: -4 },
+      result: "Tu maintiens la prohibition : trafics et violences prospèrent, les prisons débordent.",
+      note: "Cinquante ans de prohibition n'ont fait qu'enrichir les trafiquants." },
+    right: { label: "Légaliser et encadrer", fx: { p: 10, s: 6, v: 3 }, set: ["cannabis"],
+      result: "Légalisation et encadrement du cannabis par un monopole d'État : trafic asséché, prévention financée, recettes publiques.",
+      note: "Changer de stratégie sur les drogues : santé publique plutôt que tout-répressif.",
+      measure: "Légalisation encadrée du cannabis" }
+  },
+  eau: {
+    char: "citizen", scene: "champ", tag: "e",
+    text: "« L'eau du robinet est gérée par des multinationales qui se gavent. À qui appartient l'eau ? »",
+    left: { label: "Laisser les multinationales", fx: { e: -8, s: -6 },
+      result: "La gestion privée de l'eau continue : factures qui grimpent, fuites jamais réparées.",
+      note: "L'eau est un bien commun vital, pas une source de profit." },
+    right: { label: "Régie publique de l'eau", fx: { e: 12, s: 6, p: 4 }, set: ["eau_publique"],
+      result: "Retour de l'eau en régie publique, « règle bleue » et accès garanti à l'eau potable, y compris en Outre-mer.",
+      note: "Ne pas prélever à la nature plus d'eau qu'elle ne peut reconstituer.",
+      measure: "Régie publique de l'eau" }
+  },
+  mer: {
+    char: "scientist", scene: "mer", tag: "e",
+    text: "« La France a le 2ᵉ domaine maritime du monde. On le pille ou on en fait un atout écologique ? »",
+    left: { label: "Exploiter les fonds marins", fx: { e: -10, v: -4 },
+      result: "Tu ouvres les grands fonds à l'extraction minière. Les écosystèmes marins s'effondrent.",
+      note: "Les océans sont un bien commun de l'humanité à protéger." },
+    right: { label: "Énergies marines & océans", fx: { e: 12, v: 6 }, set: ["mer"],
+      result: "Développement des énergies marines renouvelables (hydrolien) et protection de la biodiversité des grands fonds.",
+      note: "La mer, source d'énergie propre et de souveraineté, pas de pillage.",
+      measure: "Énergies marines renouvelables" }
+  },
+  espace: {
+    char: "general", scene: "espace", tag: "v", topical: true,
+    text: "« Milliardaires et puissances militarisent l'espace. La France suit le mouvement ou trace sa voie ? »",
+    left: { label: "Course à l'armement", fx: { v: -8, e: -4 },
+      result: "Tu engages la France dans la course aux armes spatiales privées. Dépendance et tensions.",
+      note: "L'espace devrait servir la science et l'humanité, pas la guerre." },
+    right: { label: "Souveraineté spatiale", fx: { v: 10, e: 4, s: -3 }, set: ["espace"],
+      result: "Tu défends une souveraineté spatiale française et l'interdiction de l'armement de l'espace, au service de la connaissance.",
+      note: "Relancer la découverte de l'espace comme bien commun de l'humanité.",
+      measure: "Souveraineté spatiale de la France" }
+  },
+  ecocide: {
+    char: "diplomat", scene: "monde", tag: "e",
+    text: "« Des multinationales ravagent forêts et rivières en toute impunité. On les laisse faire ? »",
+    left: { label: "Impunité", fx: { e: -10, p: -4 },
+      result: "Aucune sanction : les destructions massives de la nature restent impunies.",
+      note: "Sans crime d'écocide, détruire le vivant ne coûte rien." },
+    right: { label: "Crime d'écocide", fx: { e: 12, v: 6 }, set: ["ecocide"],
+      result: "Tu fais reconnaître le crime d'écocide et soutiens une justice internationale de l'environnement.",
+      note: "Détruire un écosystème devient un crime jugé.",
+      measure: "Reconnaissance du crime d'écocide" }
+  },
+  migration: {
+    char: "citizen", scene: "mer", tag: "v", topical: true,
+    text: "« Des gens se noient en Méditerranée. On les laisse couler comme le réclame l'extrême droite, ou on les sauve ? »",
+    left: { label: "Fermer les frontières", fx: { v: -8, p: -6 }, betray: true,
+      result: "Tu t'alignes sur le discours de Le Pen : moins de sauvetages, plus de drames en mer.",
+      note: "Laisser mourir en mer n'est ni humain ni conforme au droit.",
+      head: "L'EUROPE FERME LES YEUX SUR LES NOYADES" },
+    right: { label: "Sauver et accueillir", fx: { v: 10, p: 6, s: -3 }, set: ["migration"],
+      result: "Tu organises le sauvetage en mer, l'accueil digne et l'action sur les causes des migrations (guerres, pillage, climat).",
+      note: "Une politique migratoire humaniste et réaliste, fondée sur le droit d'asile.",
+      measure: "Politique migratoire humaniste" }
+  },
+  dependance: {
+    char: "nurse", scene: "hopital", tag: "s",
+    text: "« Mes parents vieillissent et les EHPAD privés sont hors de prix. Et le handicap, on en parle ? »",
+    left: { label: "Laisser le privé", fx: { s: -10, p: -6 },
+      result: "Les groupes privés type Orpea continuent de faire du grand âge un business.",
+      note: "Le grand âge et le handicap ne doivent pas être livrés au marché." },
+    right: { label: "Service public dépendance", fx: { s: 12, p: 8 }, set: ["dependance"],
+      result: "Création d'un service public de la dépendance pour vieillir à domicile et revalorisation de l'AAH au niveau du SMIC.",
+      note: "Garantir l'autonomie des personnes âgées et en situation de handicap.",
+      measure: "Service public de la dépendance" }
+  },
+  culture: {
+    char: "citizen", scene: "meeting", tag: "p",
+    text: "« La culture est asphyxiée et réservée aux grandes villes. On coupe encore les budgets ? »",
+    left: { label: "Couper la culture", fx: { p: -8, s: -4 },
+      result: "Nouvelles coupes : intermittents fragilisés, lieux culturels qui ferment.",
+      note: "La culture n'est pas un luxe : c'est un service public du progrès humain." },
+    right: { label: "1 % du PIB pour la culture", fx: { p: 10, s: 4 }, set: ["culture"],
+      result: "Tu portes le budget de l'art et de la culture à 1 % du PIB et garantis l'accès partout sur le territoire.",
+      note: "Un service public de la culture pour émanciper, partout et pour tous.",
+      measure: "Budget de la culture à 1 % du PIB" }
+  },
+  ric: {
+    char: "citizen", scene: "assemblee", tag: "p",
+    text: "« On vote tous les cinq ans et puis on se tait ? Donnez-nous le pouvoir d'agir entre deux élections ! »",
+    left: { label: "Démocratie verrouillée", fx: { p: -10 },
+      result: "Le pouvoir reste confisqué : les citoyens n'ont la parole qu'aux élections.",
+      note: "La souveraineté populaire ne s'arrête pas le soir de l'élection." },
+    right: { label: "Instaurer le RIC", fx: { p: 12, v: 3 }, set: ["ric"],
+      result: "Tu instaures le Référendum d'initiative citoyenne : proposer une loi, en abroger une, modifier la Constitution, révoquer un élu.",
+      note: "Le RIC met le pouvoir d'initiative directement entre les mains du peuple.",
+      measure: "Référendum d'initiative citoyenne (RIC)" }
+  },
+  impot: {
+    char: "lobby", scene: "bourse", tag: "s",
+    text: "« La flat tax, c'est si pratique pour nous. Vous n'allez quand même pas rétablir un vrai impôt progressif ? »",
+    left: { label: "Maintenir la flat tax", fx: { s: -10, p: -6 }, betray: true,
+      result: "Tu laisses les plus aisés payer proportionnellement moins que les classes moyennes.",
+      note: "Un impôt à peine progressif, c'est l'injustice fiscale organisée." },
+    right: { label: "Révolution fiscale", fx: { s: 12, p: 8, v: -3 }, set: ["impot"],
+      result: "Tu rends l'impôt sur le revenu réellement progressif : un barème à 14 tranches contre 5 aujourd'hui.",
+      note: "Chacun contribue selon ses moyens : la justice fiscale au cœur du partage.",
+      measure: "Révolution fiscale (14 tranches)" }
+  },
+  cantines: {
+    char: "farmer", scene: "champ", tag: "e",
+    text: "« La malbouffe industrielle empoisonne les enfants et tue les paysans. On change le contenu des assiettes ? »",
+    left: { label: "Laisser l'agro-industrie", fx: { e: -8, s: -4 },
+      result: "Les cantines restent livrées à l'agro-industrie : malbouffe pour les enfants, prix de misère pour les paysans.",
+      note: "Bien manger ne doit pas dépendre du portefeuille." },
+    right: { label: "Cantines bio et locales", fx: { e: 12, s: 6 }, set: ["cantines"],
+      result: "Tu crées un ministère de la Production alimentaire et instaures des cantines gratuites, bio et locales.",
+      note: "Souveraineté alimentaire : du bio local dans les assiettes, des débouchés pour les paysans.",
+      measure: "Cantines bio et locales gratuites" }
   },
 
   /* ---------- ADVERSAIRES POLITIQUES (caricatures satiriques) ---------- */
@@ -956,6 +1160,10 @@ const STORY = [
 const STORY_RANDOM = [
   "energy_common", "nuclear", "cop30", "outremer", "jeunesse", "conges", "feminisme",
   "monnaie", "recherche", "ess", "pesticides", "ecole", "manif_repression", "traite_ref", "prix",
+  // Nouvelles mesures du programme 2025
+  "garantie_emploi", "logement", "conscription", "pole_bancaire", "dette", "animaux",
+  "petite_enfance", "cannabis", "eau", "mer", "espace", "ecocide", "migration",
+  "dependance", "culture", "ric", "impot", "cantines",
   "macron_emt", "lepen_recup", "bardella_tiktok", "hollande_flamby", "darmanin_ordre",
   "retailleau_bouc", "attal_ecole", "philippe_horloges", "glucksmann_centre", "ruffin_ego",
   "zemmour_declin", "trump_greenland", "musk_x", "bollore_rachat", "hanouna_show", "cnews_propagande"
@@ -971,6 +1179,10 @@ const POOL = [
   "ukraine", "gaza", "ai_act", "krach", "outremer", "jeunesse", "corruption",
   "manif_repression", "ecole", "pesticides", "conges", "feminisme", "monnaie",
   "traite_ref", "recherche", "ess", "prix",
+  // Nouvelles mesures du programme 2025
+  "garantie_emploi", "logement", "conscription", "pole_bancaire", "dette", "animaux",
+  "petite_enfance", "cannabis", "eau", "mer", "espace", "ecocide", "migration",
+  "dependance", "culture", "ric", "impot", "cantines",
   // Adversaires + Mélenchon (mode Survie)
   "macron_emt", "lepen_recup", "bardella_tiktok", "hollande_flamby", "darmanin_ordre",
   "retailleau_bouc", "attal_ecole", "philippe_horloges", "glucksmann_centre", "ruffin_ego",
@@ -1018,7 +1230,24 @@ const IMPACTS = {
   "6ᵉ République proclamée": "✊ le peuple est désormais le seul souverain",
   "Souveraineté numérique & IA encadrée": "🔓 données protégées, logiciels libres dans l'État",
   "Régulation des réseaux & des algorithmes": "🔓 les réseaux remis au service de l'intérêt général",
-  "Recherche publique & nouvelles frontières": "🔭 la France de retour aux frontières du savoir"
+  "Recherche publique & nouvelles frontières": "🔭 la France de retour aux frontières du savoir",
+  "Garantie d'emploi": "💼 plus aucun chômeur de longue durée laissé sans solution",
+  "Garantie universelle des loyers": "🏠 fini les expulsions sans relogement, loyers encadrés",
+  "Conscription citoyenne & garde civile": "🎖️ une jeunesse formée et utile, le SNU remplacé",
+  "Restructuration de la dette": "🏦 fin du chantage à la dette, l'austérité écartée",
+  "Interdiction des fermes-usines": "🐔 fin de l'élevage industriel, des animaux mieux traités",
+  "Service public de la petite enfance": "👶 500 000 places de crèche, gratuité pour les familles",
+  "Légalisation encadrée du cannabis": "🌿 trafics asséchés, prévention financée, recettes pour l'État",
+  "Régie publique de l'eau": "💧 l'eau redevient un bien commun, pas une marchandise",
+  "Énergies marines renouvelables": "🌊 la mer produit une énergie propre et souveraine",
+  "Souveraineté spatiale de la France": "🛰️ un espace pour la science, pas pour la guerre",
+  "Reconnaissance du crime d'écocide": "🌍 détruire un écosystème devient un crime jugé",
+  "Politique migratoire humaniste": "🕊️ on sauve les vies en mer, on respecte le droit d'asile",
+  "Service public de la dépendance": "👵 bien vieillir chez soi, AAH au niveau du SMIC",
+  "Budget de la culture à 1 % du PIB": "🎭 la culture accessible à tous, partout",
+  "Référendum d'initiative citoyenne (RIC)": "🗳️ le peuple peut proposer, abroger, révoquer",
+  "Révolution fiscale (14 tranches)": "⚖️ un impôt vraiment progressif, les plus riches contribuent",
+  "Cantines bio et locales gratuites": "🍎 des repas sains pour les enfants, des débouchés paysans"
 };
 
 /* Événements subis : crises imprévues, mais avec deux vraies options de réponse. */
